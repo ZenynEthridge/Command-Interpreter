@@ -50,9 +50,9 @@ Controls::Controls()
 		thruster_torques.row(i) = thruster_moment_arms.row(i).cross(thruster_directions.row(i));
 	}
 
-	float volume_inches = 449.157;            // volume of vehicle in inches^3, from onshape
+	float volume_inches = 449.157;            // volume of vehicle in inches^3, from onshape. This is likley less than the displacement volume and should be corrected
 	volume = volume_inches * pow(0.0254, 3); // convert to meters^3	
-	mass = 5.51; 
+	mass = 5.51; // mass of vehicle in kg, from onshape
 
 }
 
