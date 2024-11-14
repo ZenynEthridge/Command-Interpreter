@@ -10,7 +10,7 @@
 int main() {
     
 
-	Controls Thruster = Controls();
+	Thruster_Commander Thruster = Thruster_Commander();
 	Thruster.print_info();
     return 0;
 }

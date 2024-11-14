@@ -3,7 +3,7 @@
 #include "ThrusterController.h"
 #include "eigen-3.4.0/Eigen/Dense"
 
-Controls::Controls()
+Thruster_Commander::Thruster_Commander()
 {
 	// Values come from Onshape 2024 Vehicle V10 11/12/24
 	num_thrusters = 8;
@@ -56,11 +56,11 @@ Controls::Controls()
 
 }
 
-Controls::~Controls()
+Thruster_Commander::~Thruster_Commander()
 {
 }
 
-void Controls::print_info() 
+void Thruster_Commander::print_info() 
 {
 	
 	std::cout << "Mass Center: \n" << mass_center << std::endl;
