@@ -8,8 +8,8 @@ struct pwm_array {
 struct Command
 {
 public:
-    int thruster_pwms[8]; // PWM values for each thruster
-    float duration;       // Duration of the command in seconds
+	int thruster_pwms[8]; // PWM values for each thruster
+	float duration;       // Duration of the command in seconds
 	Command();
 	~Command();
 
