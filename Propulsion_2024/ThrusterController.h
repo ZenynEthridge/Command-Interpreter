@@ -48,19 +48,22 @@ public:
 
 	// functions begining with 'simple_' make the assumption that the vehicle is stable about the x and y axes
 	// these functions only need to consider forces in the x, y, and z directions, and moments about the z axis
-	Command simple_vertical(float distance);
-	Command simple_forward(float distance);
-	Command simple_sideways(float distance);
-	Command simple_horizontal(float x_distance, float y_distance);
+	// these should output 1x8 arrays of pwm signals, not commands
+	Command simple_vertical(float force);
+	Command simple_forward(float force);
+	Command simple_sideways(float force);
+	Command simple_horizontal(float x_force, float y_force);
 	
-	Command simple_rotation(float angle);
-	Command simple_rotating_vertical(float distance, float angle);
-	Command simple_rotating_forward(float distance, float angle);
-	Command simple_rotating_sideways(float distance, float angle);
-	Command simple_rotating_horizontal(float x_distance, float y_distance, float angle);
+	Command simple_rotation(float torque);
+	Command simple_rotating_vertical(float force, float torque);
+	Command simple_rotating_forward(float force, float torque);
+	Command simple_rotating_sideways(float force, float torque);
+	Command simple_rotating_horizontal(float x_force, float y_force, float torque);
 
-	Command simple_3d(float x_distance, float y_distance, float z_distance);
-	Command simple_rotating_3d(float x_distance, float y_distance, float z_distance, float angle);
+	Command simple_3d(float x_force, float y_force);
+	Command simple_rotating_3d(float x_distance, float y_force, float z_force, float torque);
+
+	Command complex_3d(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque);
 
 };
 
