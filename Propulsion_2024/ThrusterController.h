@@ -49,21 +49,26 @@ public:
 	// functions begining with 'simple_' make the assumption that the vehicle is stable about the x and y axes
 	// these functions only need to consider forces in the x, y, and z directions, and moments about the z axis
 	// these should output 1x8 arrays of pwm signals, not commands
-	Command simple_vertical(float force);
-	Command simple_forward(float force);
-	Command simple_sideways(float force);
-	Command simple_horizontal(float x_force, float y_force);
 	
-	Command simple_rotation(float torque);
-	Command simple_rotating_vertical(float force, float torque);
-	Command simple_rotating_forward(float force, float torque);
-	Command simple_rotating_sideways(float force, float torque);
-	Command simple_rotating_horizontal(float x_force, float y_force, float torque);
+	struct pwm_array {
+		int pwm_signals[8];
+	};
 
-	Command simple_3d(float x_force, float y_force);
-	Command simple_rotating_3d(float x_distance, float y_force, float z_force, float torque);
+	pwm_array simple_vertical(float force);
+	pwm_array simple_forward(float force);
+	pwm_array simple_sideways(float force);
+	pwm_array simple_horizontal(float x_force, float y_force);
+	
+	pwm_array simple_rotation(float torque);
+	pwm_array simple_rotating_vertical(float force, float torque);
+	pwm_array simple_rotating_forward(float force, float torque);
+	pwm_array simple_rotating_sideways(float force, float torque);
+	pwm_array simple_rotating_horizontal(float x_force, float y_force, float torque);
 
-	Command complex_3d(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque);
+	pwm_array simple_3d(float x_force, float y_force);
+	pwm_array simple_rotating_3d(float x_distance, float y_force, float z_force, float torque);
+
+	pwm_array complex_3d(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque);
 
 };
 
