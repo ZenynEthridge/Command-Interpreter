@@ -26,6 +26,7 @@ Thruster_Commander::Thruster_Commander()
 	thruster_positions.row(6) << -.1165, -.1975, -.049;
 	thruster_positions.row(7) << .1165, -.1975, -.049;
 	
+	// torques will be calulated about the center of mass
 	thruster_moment_arms = thruster_positions - mass_center.replicate(8, 1);
 	
 

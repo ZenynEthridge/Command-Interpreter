@@ -29,9 +29,7 @@ protected:
 public:
 	Thruster_Commander();
 	~Thruster_Commander();
-	Eigen::Matrix<float, 1, 3> get_mass_center();
-	Eigen::Matrix<float, 1, 3> get_volume_center();
-	Eigen::Matrix<float, 6, 3> get_thruster_position();
+	
 
 	// mostly for debugging purposes
 	void print_info();

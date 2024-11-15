@@ -9,5 +9,7 @@ public:
 	float duration;       // Duration of the command in seconds
 	Command();
 	~Command();
+
+
 };
 
