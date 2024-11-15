@@ -1,6 +1,6 @@
 #pragma once
 #include "eigen-3.4.0/Eigen/Dense"
-#include "command.h"
+#include "Command.h"
 #include <vector>
 
 
@@ -50,11 +50,16 @@ public:
 	// these functions only need to consider forces in the x, y, and z directions, and moments about the z axis
 	// these should output 1x8 arrays of pwm signals, not commands
 	
+	bool simple_is_it_possible(float x_force, float y_force, float z_force, float z_torque);
+	bool is_it_possible(float x_force, float y_force, float z_force, float x_torque, float y_torque, float z_torque);
+
+	// force-torque commands
 	struct pwm_array {
 		int pwm_signals[8];
 	};
 
 	pwm_array simple_vertical(float force);
+	
 	pwm_array simple_forward(float force);
 	pwm_array simple_sideways(float force);
 	pwm_array simple_horizontal(float x_force, float y_force);
@@ -70,5 +75,7 @@ public:
 
 	pwm_array complex_3d(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque);
 
+	// distance commands
+	Command simple_vertical_travel(float distance);
 };
 

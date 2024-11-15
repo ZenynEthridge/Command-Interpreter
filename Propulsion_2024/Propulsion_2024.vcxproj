@@ -137,6 +137,9 @@
     <ClInclude Include="Command_Interpreter.h" />
     <ClInclude Include="ThrusterController.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\Downloads\T200-Public-Performance-Data-10-20V-September-2019 (1).xlsx" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
