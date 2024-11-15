@@ -8,6 +8,11 @@ enum PinStatus {Enabled, Disabled};
 enum EnableType {ActiveHigh, ActiveLow};
 enum Direction {Forwards, Backwards};
 
+/*
+ * NOTE: We may not need DigitalPin, in which case both DigitalPin and abstract Pin classes are not useful, and can
+ * be replaced with just the PwmPin class (probably renamed to Pin). This would also necessitate the removal of allPins
+ * and digitalPins data members from Command_Interpreter_RPi5
+ */
 class Pin {
 protected:
     int gpioNumber{};
@@ -45,10 +50,12 @@ public:
 
 class Command_Interpreter_RPi5 {
 private:
-    std::vector<Pin> pins;
+    std::vector<Pin*> allPins;
+    std::vector<PwmPin*> thrusterPins;
+    std::vector<DigitalPin*> digitalPins;
 public:
     Command_Interpreter_RPi5();
-    Command_Interpreter_RPi5(std::vector<Pin> pins);
-    void execute(Command command);
+    explicit Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins);
+    void execute(const Command& command);
     void initializePins();
 };

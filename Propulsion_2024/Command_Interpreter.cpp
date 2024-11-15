@@ -2,7 +2,7 @@
 #include "Command_Interpreter.h"
 #include <wiringPi.h> // this needs to be installed on the pi
 #include <iostream>
-
+#include <utility>
 
 DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), pinStatus(Disabled), enableType(enableType) {}
 
@@ -19,7 +19,7 @@ void DigitalPin::enable() {
             digitalWrite(gpioNumber, LOW);
             break;
         default:
-            std::cerr << "Unknown pin mode!" << std::endl;
+            std::cerr << "Impossible pin mode!" << std::endl; //throw exception?
     }
     pinStatus = Enabled;
 }
@@ -33,7 +33,7 @@ void DigitalPin::disable() {
             digitalWrite(gpioNumber, HIGH);
             break;
         default:
-            std::cerr << "Unknown pin mode!" << std::endl;
+            std::cerr << "Impossible pin mode!" << std::endl; //throw exception?
     }
     pinStatus = Disabled;
 }
@@ -51,10 +51,12 @@ void PwmPin::initialize() {
 
 void PwmPin::enable() {
     setPowerAndDirection(255, Forwards);
+    currentPwm = 255;
 }
 
 void PwmPin::disable() {
     setPowerAndDirection(0, Forwards);
+    currentPwm = 255;
 }
 
 bool PwmPin::enabled() {
@@ -64,22 +66,31 @@ bool PwmPin::enabled() {
 void PwmPin::setPowerAndDirection(int pwmValue, Direction direction) {
     //TODO: set direction (not sure how to do this w/ pwm. High/low?)
     pwmWrite(gpioNumber, pwmValue);
+    currentPwm = pwmValue;
 }
 
 
 
-Command_Interpreter_RPi5::Command_Interpreter_RPi5(): pins(std::vector<Pin>{}) {}
-Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<Pin> pins): pins(std::move(pins)) {}
+Command_Interpreter_RPi5::Command_Interpreter_RPi5(): thrusterPins(std::vector<PwmPin*>{}), digitalPins(std::vector<DigitalPin*>{}) {}
+Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins):
+                                                thrusterPins(std::move(thrusterPins)), digitalPins(std::move(digitalPins)) {
+    allPins = std::vector<Pin*>{};
+    allPins.insert(allPins.end(), thrusterPins.begin(), thrusterPins.end());
+    allPins.insert(allPins.end(), digitalPins.begin(), digitalPins.end());
+}
 
 void Command_Interpreter_RPi5::initializePins() {
     if (wiringPiSetupGpio() == -1) {
-        std::cerr << "Failure to configure GPIO pins through wiringPi!" << std::endl;
+        std::cerr << "Failure to configure GPIO pins through wiringPi!" << std::endl; //throw exception?
     }
-    for (Pin& pin : pins) {
-        pin.initialize();
+    for (Pin* pin : allPins) {
+        pin->initialize();
     }
 }
 
-void Command_Interpreter_RPi5::execute(Command command) {
-    //TODO
+void Command_Interpreter_RPi5::execute(const Command& command) {
+    for (int i = 0; i < 8; i++) {
+        thrusterPins[i]->setPowerAndDirection(command.thruster_pwms[i], Forwards);
+    }
+    //TODO: duration
 }
