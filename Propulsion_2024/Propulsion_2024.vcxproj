@@ -129,7 +129,7 @@
   <ItemGroup>
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="Command_Interpreter.cpp" />
-    <ClCompile Include="ThrusterControler.cpp" />
+    <ClCompile Include="ThrusterController.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
