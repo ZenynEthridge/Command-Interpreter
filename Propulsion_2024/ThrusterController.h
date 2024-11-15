@@ -29,13 +29,11 @@ protected:
 public:
 	Thruster_Commander();
 	~Thruster_Commander();
-	void set_mass_center(Eigen::Matrix<float, 1, 3> mass_center);
-	void set_volume_center(Eigen::Matrix<float, 1, 3> volume_center);
-	void set_thruster_position(Eigen::Matrix<float, 6, 3> thruster_position);
 	Eigen::Matrix<float, 1, 3> get_mass_center();
 	Eigen::Matrix<float, 1, 3> get_volume_center();
 	Eigen::Matrix<float, 6, 3> get_thruster_position();
 
+	// mostly for debugging purposes
 	void print_info();
 
 	// functions begining with 'simple_' make the assumption that the vehicle is stable about the x and y axes
