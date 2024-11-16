@@ -4,29 +4,32 @@
 #include <iostream>
 #include <utility>
 
-// START fake functions to make compiler happy
+// When compiling for non-PI devices, use -MOCK_RPI flag to enable mock function
+#ifdef MOCK_RPI
 #define PWM_OUTPUT 1
 #define OUTPUT 0
 #define HIGH 1
 #define LOW 0
 
 int wiringPiSetupGpio() {
-    std::cout << "set up GPIO with wiringPi" << std::endl;
-    return 1;
+    std::cout << "[Mock] wiringPi GPIO set up!" << std::endl;
+    return 0;
 }
 
 void pinMode(int pinNumber, int mode) {
-    std::cout << "set pin number " << pinNumber << " to mode " << mode << std::endl;
+    std::cout << "[Mock] pinMode: pin " << pinNumber << " set to mode " << mode << std::endl;
 }
 
 void digitalWrite(int pinNumber, int voltage) {
-    std::cout << "set pin number " << pinNumber << " to voltage " << voltage << std::endl;
+    std::cout << "[Mock] digitalWrite: pin " << pinNumber << ", voltage " << voltage << std::endl;
 }
 
 void pwmWrite(int pinNumber, int pwm) {
-    std::cout << "set pin number " << pinNumber << " to pwm " << pwm << std::endl;
+    std::cout << "[Mock] pwmWrite: pin " << pinNumber << ", PWM " << pwm << std::endl;
 }
-//END fake functions to make compiler happy
+#else
+#include <wiringPi.h>  // Include wiringPi library if flag not called
+#endif
 
 DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), pinStatus(Disabled), enableType(enableType) {}
 
