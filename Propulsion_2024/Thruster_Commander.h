@@ -73,6 +73,7 @@ public:
 
 	pwm_array complex_3d(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque);
 
+	Command simple_vertical_travel(float distance);
 	// distance commands
 	Command simple_vertical_travel(float distance);
 };
