@@ -1,6 +1,6 @@
 // William Barber
 #include "Command_Interpreter.h"
-#include <wiringPi.h> // this needs to be installed on the pi
+#include <wiringPi.h> // this needs to be installed on the pi (https://github.com/WiringPi/WiringPi#Installing)
 #include <iostream>
 #include <utility>
 

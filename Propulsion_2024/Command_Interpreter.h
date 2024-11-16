@@ -1,5 +1,6 @@
+// William Barber
 #pragma once
-#include "command.h"
+#include "Command.h"
 #include <vector>
 
 // The purpose of this class is toggle the GPIO pins on the Raspberry Pi based on a command object
