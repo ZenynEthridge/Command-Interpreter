@@ -103,13 +103,13 @@ int get_pwm(int thruster_num, float force){
         else
             high = mid - 1;
     }
+	return -1;
+    }
 }
  pwm_array Thruster_Commander::simple_vertical(float force){
 
-
     // If we reach here, then element was not present
-    return -1;
-    }
+    
 	force =/ 4;
 	int resultingPWMfromForce[4];
 	for(auto f: resultingPWMfromForce)
