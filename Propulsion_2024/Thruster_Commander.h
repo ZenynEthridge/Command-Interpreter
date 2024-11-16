@@ -54,10 +54,8 @@ public:
 	bool is_it_possible(float x_force, float y_force, float z_force, float x_torque, float y_torque, float z_torque);
 
 	// force-torque commands
-	struct pwm_array {
-		int pwm_signals[8];
-	};
-
+	
+	
 	pwm_array simple_vertical(float force);
 	
 	pwm_array simple_forward(float force);

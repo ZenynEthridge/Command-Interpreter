@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#include "ThrusterController.h"
+#include "Thruster_Commander.h"
 #include "eigen-3.4.0/Eigen/Dense"
 
 Thruster_Commander::Thruster_Commander()
@@ -72,4 +72,18 @@ void Thruster_Commander::print_info()
 	std::cout << "Thruster Torques: \n" << thruster_torques << std::endl;
 	std::cout << "Mass: \n" << mass << std::endl;
 	std::cout << "Volume: \n" << volume << std::endl;
+}
+
+void pwm_array::simple_vertical(float force){
+	
+}
+void pwm_array::simple_forward(float force){
+	
+}
+void pwm_array::simple_sideways(float force){
+	
+}
+void pwm_array::simple_horizontal(float x_force, float y_force)
+{
+
 }
