@@ -54,6 +54,7 @@ private:
     std::vector<Pin*> allPins;
     std::vector<PwmPin*> thrusterPins;
     std::vector<DigitalPin*> digitalPins;
+    static int convertPwmValue(int pwmFrequency);
 public:
     Command_Interpreter_RPi5();
     explicit Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins);

@@ -117,9 +117,25 @@ void Command_Interpreter_RPi5::initializePins() {
     }
 }
 
+int Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) { // converts frequency into range(0, 1023)
+    /*
+     * Converts a pwm frequency between 1100 and 1900 into a magnitude range between 0 and 1023.
+     * @param pwmFrequency: a pwm frequency between 1100 and 1900
+     * @return: a pwm magnitude between 0 and 1023
+     */
+    if (pwmFrequency == 0) {
+        return 0;
+    }
+    const int maxPwmValue = 1900;
+    const int minPwmValue = 1099; // slightly less than 1100 so that a pwm value of 1100 isn't stopped
+    int pwmMagnitude = pwmFrequency - minPwmValue;
+    pwmMagnitude *= (int)((double)(1023)/(double)(maxPwmValue - minPwmValue));
+    return pwmMagnitude;
+}
+
 void Command_Interpreter_RPi5::execute(const Command& command) {
     for (int i = 0; i < 8; i++) {
-        thrusterPins[i]->setPowerAndDirection(command.thruster_pwms[i], Forwards);
+        thrusterPins[i]->setPowerAndDirection(convertPwmValue(command.thruster_pwms[i]), Forwards);
     }
     //TODO: duration
 }
