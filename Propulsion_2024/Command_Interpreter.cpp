@@ -3,8 +3,12 @@
 #include <iostream>
 #include <utility>
 
-// When compiling for non-PI devices, use -MOCK_RPI flag to enable mock function
-#ifdef MOCK_RPI
+// When compiling for non-RPI devices which cannot run wiringPi library,  
+// use -MOCK_RPI flag to enable mock functions
+#ifndef MOCK_RPI
+#include <wiringPi.h>  // Include wiringPi library by default
+
+#else
 #define PWM_OUTPUT 1
 #define OUTPUT 0
 #define HIGH 1
@@ -26,10 +30,7 @@ void digitalWrite(int pinNumber, int voltage) {
 void pwmWrite(int pinNumber, int pwm) {
     std::cout << "[Mock] pwmWrite: pin " << pinNumber << ", PWM " << pwm << std::endl;
 }
-#else
-#include <wiringPi.h>  /* Include wiringPi library if flag not called
-                        * (this needs to be installed on the pi (https://github.com/WiringPi/WiringPi#Installing))
-                        */
+
 #endif
 
 DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), pinStatus(Disabled), enableType(enableType) {}
