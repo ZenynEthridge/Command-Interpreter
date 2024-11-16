@@ -74,7 +74,15 @@ void Thruster_Commander::print_info()
 	std::cout << "Volume: \n" << volume << std::endl;
 }
 
-void pwm_array::simple_vertical(float force){
+ pwm_array Thruster_Commander::simple_vertical(float force){
+	 std::ifstream dataset("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
+    std::string line;
+
+    // Get the header line (if exists)
+    if (std::getline(file, line)) {
+        
+    }
+	force =/ 4;
 	int resultingPWMfromForce[4];
 	for(auto f: resultingPWMfromForce)
 	{
@@ -88,7 +96,7 @@ void pwm_array::simple_vertical(float force){
 	}
 	
 }
-void pwm_array::simple_forward(float force){
+ pwm_array::simple_forward(float force){
 	
 }
 void pwm_array::simple_sideways(float force){
