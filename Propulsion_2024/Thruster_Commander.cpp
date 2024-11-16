@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <string>
 #include "Thruster_Commander.h"
 #include "eigen-3.4.0/Eigen/Dense"
 
@@ -73,14 +74,41 @@ void Thruster_Commander::print_info()
 	std::cout << "Mass: \n" << mass << std::endl;
 	std::cout << "Volume: \n" << volume << std::endl;
 }
-
- pwm_array Thruster_Commander::simple_vertical(float force){
+int get_pwm(int thruster_num, float force){
 	 std::ifstream dataset("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
     std::string line;
+	std::string PWM;
+	int PWM_value;
 
     // Get the header line (if exists)
     if (std::getline(file, line)) {
-        
+		for( auto s: line){
+		while(s != ','){
+			PWM += s;
+		}
+		}
+		PWM_value = stoi(PWM);
+        while (low <= high) {
+        int mid = low + (high - low) / 2;
+
+        // Check if x is present at mid
+        if (arr[mid] == x)
+            return mid;
+
+        // If x greater, ignore left half
+        if (arr[mid] < x)
+            low = mid + 1;
+
+        // If x is smaller, ignore right half
+        else
+            high = mid - 1;
+    }
+}
+ pwm_array Thruster_Commander::simple_vertical(float force){
+
+
+    // If we reach here, then element was not present
+    return -1;
     }
 	force =/ 4;
 	int resultingPWMfromForce[4];
