@@ -1,8 +1,32 @@
 // William Barber
 #include "Command_Interpreter.h"
-#include <wiringPi.h> // this needs to be installed on the pi (https://github.com/WiringPi/WiringPi#Installing)
+//#include <wiringPi.h> // this needs to be installed on the pi (https://github.com/WiringPi/WiringPi#Installing)
 #include <iostream>
 #include <utility>
+
+// START fake functions to make compiler happy
+#define PWM_OUTPUT 1
+#define OUTPUT 0
+#define HIGH 1
+#define LOW 0
+
+int wiringPiSetupGpio() {
+    std::cout << "set up GPIO with wiringPi" << std::endl;
+    return 1;
+}
+
+void pinMode(int pinNumber, int mode) {
+    std::cout << "set pin number " << pinNumber << " to mode " << mode << std::endl;
+}
+
+void digitalWrite(int pinNumber, int voltage) {
+    std::cout << "set pin number " << pinNumber << " to voltage " << voltage << std::endl;
+}
+
+void pwmWrite(int pinNumber, int pwm) {
+    std::cout << "set pin number " << pinNumber << " to pwm " << pwm << std::endl;
+}
+//END fake functions to make compiler happy
 
 DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), pinStatus(Disabled), enableType(enableType) {}
 
