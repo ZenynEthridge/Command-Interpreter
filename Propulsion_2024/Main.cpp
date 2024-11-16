@@ -2,7 +2,7 @@
 #include <vector>
 #include <stdexcept>
 #include <cmath>
-#include "ThrusterController.h"
+#include "Thruster_Commander.h"
 #include "eigen-3.4.0/Eigen/Dense"
 
 
