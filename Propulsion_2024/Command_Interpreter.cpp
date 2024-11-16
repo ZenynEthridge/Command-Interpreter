@@ -1,6 +1,5 @@
 // William Barber
 #include "Command_Interpreter.h"
-//#include <wiringPi.h> // this needs to be installed on the pi (https://github.com/WiringPi/WiringPi#Installing)
 #include <iostream>
 #include <utility>
 
@@ -28,7 +27,9 @@ void pwmWrite(int pinNumber, int pwm) {
     std::cout << "[Mock] pwmWrite: pin " << pinNumber << ", PWM " << pwm << std::endl;
 }
 #else
-#include <wiringPi.h>  // Include wiringPi library if flag not called
+#include <wiringPi.h>  /* Include wiringPi library if flag not called
+                        * (this needs to be installed on the pi (https://github.com/WiringPi/WiringPi#Installing))
+                        */
 #endif
 
 DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), pinStatus(Disabled), enableType(enableType) {}
