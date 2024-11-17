@@ -7,7 +7,6 @@
 // Requires information about wiring, ect.
 enum PinStatus {Enabled, Disabled};
 enum EnableType {ActiveHigh, ActiveLow};
-enum Direction {Forwards, Backwards};
 
 /*
  * NOTE: We may not need DigitalPin, in which case both DigitalPin and abstract Pin classes are not useful, and can

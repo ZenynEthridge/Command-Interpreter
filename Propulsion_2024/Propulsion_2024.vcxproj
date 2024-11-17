@@ -127,14 +127,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Command.cpp" />
     <ClCompile Include="Command_Interpreter.cpp" />
+    <ClCompile Include="ThrusterController.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Thruster_Commander.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.h" />
     <ClInclude Include="Command_Interpreter.h" />
-    <ClInclude Include="Thruster_Commander.h" />
+    <ClInclude Include="ThrusterController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Downloads\T200-Public-Performance-Data-10-20V-September-2019 (1).xlsx" />
