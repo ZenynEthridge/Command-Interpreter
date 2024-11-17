@@ -74,63 +74,63 @@ void Thruster_Commander::print_info()
 	std::cout << "Mass: \n" << mass << std::endl;
 	std::cout << "Volume: \n" << volume << std::endl;
 }
-int get_pwm(int thruster_num, float force){
-	 std::ifstream dataset("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
-    std::string line;
-	std::string PWM;
-	int PWM_value;
-
-    // Get the header line (if exists)
-    if (std::getline(file, line)) {
-		for( auto s: line){
-		while(s != ','){
-			PWM += s;
-		}
-		}
-		PWM_value = stoi(PWM);
-        while (low <= high) {
-        int mid = low + (high - low) / 2;
-
-        // Check if x is present at mid
-        if (arr[mid] == x)
-            return mid;
-
-        // If x greater, ignore left half
-        if (arr[mid] < x)
-            low = mid + 1;
-
-        // If x is smaller, ignore right half
-        else
-            high = mid - 1;
-    }
-	return -1;
-    }
-}
+//int Thruster_Commander::get_pwm(int thruster_num, float force) {
+//    std::ifstream dataset("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
+//    std::string line;
+//	std::string PWM;
+//	int PWM_value;
+//
+//    // Get the header line (if exists)
+//    if (std::getline(file, line)) {
+//		for( auto s: line){
+//		while(s != ','){
+//			PWM += s;
+//		}
+//		}
+//		PWM_value = stoi(PWM);
+//        while (low <= high) {
+//        int mid = low + (high - low) / 2;
+//
+//        // Check if x is present at mid
+//        if (arr[mid] == x)
+//            return mid;
+//
+//        // If x greater, ignore left half
+//        if (arr[mid] < x)
+//            low = mid + 1;
+//
+//        // If x is smaller, ignore right half
+//        else
+//            high = mid - 1;
+//    }
+//	return -1;
+//    }
+//}
  pwm_array Thruster_Commander::simple_vertical(float force){
-
-    // If we reach here, then element was not present
-    
-	force =/ 4;
-	int resultingPWMfromForce[4];
-	for(auto f: resultingPWMfromForce)
-	{
-		
-	}
-	// The force is going to tell us how much the PWM is going to be for each pin. The pins are stored in pwmsignals Array. 
-	//Fet Force -> deduce PWM from force for each pin -> tell each pin by iterating over the array what th
-	for(int i = 0; i < pwm_array.length(); ++i)
-	{
-		pwm_array[i]= resultingPWMfromForce[i];
-	}
+//
+//    // If we reach here, then element was not present
+//
+//	force =/ 4;
+//	int resultingPWMfromForce[4];
+//	for(auto f: resultingPWMfromForce)
+//	{
+//
+//	}
+//	// The force is going to tell us how much the PWM is going to be for each pin. The pins are stored in pwmsignals Array.
+//	//Fet Force -> deduce PWM from force for each pin -> tell each pin by iterating over the array what th
+//	for(int i = 0; i < pwm_array.length(); ++i)
+//	{
+//		pwm_array[i]= resultingPWMfromForce[i];
+//	}
 	
 }
- pwm_array::simple_forward(float force){
+pwm_array Thruster_Commander::simple_forward(float force){
 	
 }
-void pwm_array::simple_sideways(float force){
+pwm_array Thruster_Commander::simple_sideways(float force){
 	
 }
-void pwm_array::simple_horizontal(float x_force, float y_force)
+pwm_array Thruster_Commander::simple_horizontal(float x_force, float y_force)
 {
 
 }

@@ -75,6 +75,5 @@ public:
 
 	Command simple_vertical_travel(float distance);
 	// distance commands
-	Command simple_vertical_travel(float distance);
 };
 
