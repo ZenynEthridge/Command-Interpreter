@@ -1,18 +1,21 @@
 #pragma once
-#include <map>
 
 // A command is a simple instruction to the vehicle
 // Commands will be combined in sequencing to create more complex instructions
 
 enum Direction {Forwards, Backwards};
 
-struct pwm_array {
-		int pwm_signals[8];
-	};
-struct Command
-{
-public:
-    std::map<int, Direction>thruster_values; // map of pwm values to thruster directions
+struct ThrusterSpec {
+    int pwm_frequency;
+    Direction direction;
+};
+
+struct ThrusterSpecArray {
+    ThrusterSpec thruster_specs[8]; // array of thruster frequencies and directions
+};
+
+struct Command {
+    ThrusterSpecArray thruster_specs; // array of thruster frequencies and directions
     float duration;       // Duration of the command in seconds
 };
 

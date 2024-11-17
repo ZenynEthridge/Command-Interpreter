@@ -5,10 +5,10 @@
 
 // When compiling for non-RPI devices which cannot run wiringPi library,  
 // use -MOCK_RPI flag to enable mock functions
-//#ifndef MOCK_RPI
-//#include <wiringPi.h>  // Include wiringPi library by default
+#ifndef MOCK_RPI
+#include <wiringPi.h>  // Include wiringPi library by default
 
-//#else
+#else
 #define PWM_OUTPUT 1
 #define OUTPUT 0
 #define HIGH 1
@@ -31,7 +31,7 @@ void pwmWrite(int pinNumber, int pwm) {
     std::cout << "[Mock] pwmWrite: pin " << pinNumber << ", PWM " << pwm << std::endl;
 }
 
-//#endif
+#endif
 
 DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), pinStatus(Disabled), enableType(enableType) {}
 
@@ -100,12 +100,15 @@ void PwmPin::setPowerAndDirection(int pwmValue, Direction direction) {
 
 
 
-Command_Interpreter_RPi5::Command_Interpreter_RPi5(): thrusterPins(std::vector<PwmPin*>{}), digitalPins(std::vector<DigitalPin*>{}) {}
 Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins):
                                                 thrusterPins(std::move(thrusterPins)), digitalPins(std::move(digitalPins)) {
+    if (this->thrusterPins.size() != 8) {
+        std::cerr << "Incorrect number of thruster pwm pins given! Need 8, given " << this->thrusterPins.size() << std::endl;
+    }
     allPins = std::vector<Pin*>{};
-    allPins.insert(allPins.end(), thrusterPins.begin(), thrusterPins.end());
-    allPins.insert(allPins.end(), digitalPins.begin(), digitalPins.end());
+    allPins.insert(allPins.end(), this->thrusterPins.begin(), this->thrusterPins.end());
+    allPins.insert(allPins.end(), this->digitalPins.begin(), this->digitalPins.end());
+    initializePins();
 }
 
 void Command_Interpreter_RPi5::initializePins() {
@@ -117,7 +120,7 @@ void Command_Interpreter_RPi5::initializePins() {
     }
 }
 
-int Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) { // converts frequency into range(0, 1023)
+int Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) {
     /*
      * Converts a pwm frequency between 1100 and 1900 into a magnitude range between 0 and 1023.
      * @param pwmFrequency: a pwm frequency between 1100 and 1900
@@ -135,8 +138,8 @@ int Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) { // converts fr
 
 void Command_Interpreter_RPi5::execute(const Command& command) {
     int i = 0;
-    for (auto thruster : command.thruster_values) {
-        thrusterPins.at(i)->setPowerAndDirection(convertPwmValue(thruster.first), thruster.second);
+    for (auto thruster : command.thruster_specs.thruster_specs) {
+        thrusterPins.at(i)->setPowerAndDirection(convertPwmValue(thruster.pwm_frequency), thruster.direction);
         i++;
     }
     //TODO: duration
