@@ -5,10 +5,10 @@
 
 // When compiling for non-RPI devices which cannot run wiringPi library,  
 // use -MOCK_RPI flag to enable mock functions
-//#ifndef MOCK_RPI
-//#include <wiringPi.h>  // Include wiringPi library by default
+#ifndef MOCK_RPI
+#include <wiringPi.h>  // Include wiringPi library by default
 
-//#else
+#else
 #define PWM_OUTPUT 1
 #define OUTPUT 0
 #define HIGH 1
@@ -31,7 +31,7 @@ void pwmWrite(int pinNumber, int pwm) {
     std::cout << "[Mock] pwmWrite: pin " << pinNumber << ", PWM " << pwm << std::endl;
 }
 
-//#endif
+#endif
 
 DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), pinStatus(Disabled), enableType(enableType) {}
 
@@ -117,7 +117,7 @@ void Command_Interpreter_RPi5::initializePins() {
     }
 }
 
-int Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) { // converts frequency into range(0, 1023)
+int Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) {
     /*
      * Converts a pwm frequency between 1100 and 1900 into a magnitude range between 0 and 1023.
      * @param pwmFrequency: a pwm frequency between 1100 and 1900
