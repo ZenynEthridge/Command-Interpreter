@@ -100,12 +100,15 @@ void PwmPin::setPowerAndDirection(int pwmValue, Direction direction) {
 
 
 
-Command_Interpreter_RPi5::Command_Interpreter_RPi5(): thrusterPins(std::vector<PwmPin*>{}), digitalPins(std::vector<DigitalPin*>{}) {}
 Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins):
                                                 thrusterPins(std::move(thrusterPins)), digitalPins(std::move(digitalPins)) {
+    if (this->thrusterPins.size() != 8) {
+        std::cerr << "Incorrect number of thruster pwm pins given! Need 8, given " << this->thrusterPins.size() << std::endl;
+    }
     allPins = std::vector<Pin*>{};
-    allPins.insert(allPins.end(), thrusterPins.begin(), thrusterPins.end());
-    allPins.insert(allPins.end(), digitalPins.begin(), digitalPins.end());
+    allPins.insert(allPins.end(), this->thrusterPins.begin(), this->thrusterPins.end());
+    allPins.insert(allPins.end(), this->digitalPins.begin(), this->digitalPins.end());
+    initializePins();
 }
 
 void Command_Interpreter_RPi5::initializePins() {
@@ -135,8 +138,8 @@ int Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) {
 
 void Command_Interpreter_RPi5::execute(const Command& command) {
     int i = 0;
-    for (auto thruster : command.thruster_values) {
-        thrusterPins.at(i)->setPowerAndDirection(convertPwmValue(thruster.first), thruster.second);
+    for (auto thruster : command.thruster_specs.thruster_specs) {
+        thrusterPins.at(i)->setPowerAndDirection(convertPwmValue(thruster.pwm_frequency), thruster.direction);
         i++;
     }
     //TODO: duration

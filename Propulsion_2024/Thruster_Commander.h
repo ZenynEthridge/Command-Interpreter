@@ -56,22 +56,22 @@ public:
 	// force-torque commands
 	
 	
-	pwm_array simple_vertical(float force);
+	ThrusterSpecArray simple_vertical(float force);
 	
-	pwm_array simple_forward(float force);
-	pwm_array simple_sideways(float force);
-	pwm_array simple_horizontal(float x_force, float y_force);
+	ThrusterSpecArray simple_forward(float force);
+	ThrusterSpecArray simple_sideways(float force);
+	ThrusterSpecArray simple_horizontal(float x_force, float y_force);
 	
-	pwm_array simple_rotation(float torque);
-	pwm_array simple_rotating_vertical(float force, float torque);
-	pwm_array simple_rotating_forward(float force, float torque);
-	pwm_array simple_rotating_sideways(float force, float torque);
-	pwm_array simple_rotating_horizontal(float x_force, float y_force, float torque);
+	ThrusterSpecArray simple_rotation(float torque);
+	ThrusterSpecArray simple_rotating_vertical(float force, float torque);
+	ThrusterSpecArray simple_rotating_forward(float force, float torque);
+	ThrusterSpecArray simple_rotating_sideways(float force, float torque);
+	ThrusterSpecArray simple_rotating_horizontal(float x_force, float y_force, float torque);
 
-	pwm_array simple_3d(float x_force, float y_force);
-	pwm_array simple_rotating_3d(float x_distance, float y_force, float z_force, float torque);
+	ThrusterSpecArray simple_3d(float x_force, float y_force);
+	ThrusterSpecArray simple_rotating_3d(float x_distance, float y_force, float z_force, float torque);
 
-	pwm_array complex_3d(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque);
+	ThrusterSpecArray complex_3d(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque);
 
 	Command simple_vertical_travel(float distance);
 	// distance commands
