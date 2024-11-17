@@ -122,15 +122,20 @@ void Thruster_Commander::print_info()
 //	{
 //		pwm_array[i]= resultingPWMfromForce[i];
 //	}
-	
+	 pwm_array pwm_signals;
+	 return pwm_signals;
 }
 pwm_array Thruster_Commander::simple_forward(float force){
-	
+	pwm_array pwm_signals;
+	return pwm_signals;
 }
 pwm_array Thruster_Commander::simple_sideways(float force){
+	pwm_array pwm_signals;
+	return pwm_signals;
 	
 }
 pwm_array Thruster_Commander::simple_horizontal(float x_force, float y_force)
 {
-
+	pwm_array pwm_signals;
+	return pwm_signals;
 }
