@@ -78,14 +78,14 @@ void PwmPin::initialize() {
     pinMode(gpioNumber, PWM_OUTPUT);
 }
 
-void PwmPin::enable() { //TODO: check pwm range (currently assuming 0-255)
-    setPowerAndDirection(255, Forwards);
-    currentPwm = 255;
+void PwmPin::enable() { //TODO: check pwm range (currently assuming 0-1023)
+    setPowerAndDirection(1023, Forwards);
+    currentPwm = 1023;
 }
 
-void PwmPin::disable() { //TODO: check pwm range (currently assuming 0-255)
+void PwmPin::disable() { //TODO: check pwm range (currently assuming 0-1023)
     setPowerAndDirection(0, Forwards);
-    currentPwm = 255;
+    currentPwm = 0;
 }
 
 bool PwmPin::enabled() {
