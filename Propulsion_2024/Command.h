@@ -14,9 +14,5 @@ struct Command
 public:
     std::map<int, Direction>thruster_values; // map of pwm values to thruster directions
     float duration;       // Duration of the command in seconds
-	Command();
-	~Command();
-
-
 };
 
