@@ -56,7 +56,7 @@ public:
 	// force-torque commands
 	
 	
-	pwm_array simple_vertical(float force);
+	pwm_array simple_vertical(pwm_array &pwmArray, float force);
 	
 	pwm_array simple_forward(float force);
 	pwm_array simple_sideways(float force);

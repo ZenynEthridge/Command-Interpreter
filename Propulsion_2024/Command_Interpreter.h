@@ -40,6 +40,7 @@ class PwmPin : public Pin {
 private:
     int currentPwm;
 public:
+    PwmPin();
     void initialize() override;
     void enable() override;
     void disable() override;

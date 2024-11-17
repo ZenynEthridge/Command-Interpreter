@@ -2,6 +2,8 @@
 #include <cmath>
 #include <string>
 #include "Thruster_Commander.h"
+#include "Command.h"
+#include "Command_Interpreter.h"
 #include "eigen-3.4.0/Eigen/Dense"
 
 Thruster_Commander::Thruster_Commander()
@@ -78,7 +80,7 @@ void Thruster_Commander::print_info()
 //    std::ifstream dataset("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
 //    std::string line;
 //	std::string PWM;
-//	int PWM_value;
+//	int PWM_constant_value;
 //
 //    // Get the header line (if exists)
 //    if (std::getline(file, line)) {
@@ -87,7 +89,7 @@ void Thruster_Commander::print_info()
 //			PWM += s;
 //		}
 //		}
-//		PWM_value = stoi(PWM);
+//		PWM_constant_value = stoi(PWM);
 //        while (low <= high) {
 //        int mid = low + (high - low) / 2;
 //
@@ -106,27 +108,27 @@ void Thruster_Commander::print_info()
 //	return -1;
 //    }
 //}
- pwm_array Thruster_Commander::simple_vertical(float force){
-//
-//    // If we reach here, then element was not present
-//
-//	force =/ 4;
-//	int resultingPWMfromForce[4];
-//	for(auto f: resultingPWMfromForce)
-//	{
-//
-//	}
-//	// The force is going to tell us how much the PWM is going to be for each pin. The pins are stored in pwmsignals Array.
-//	//Fet Force -> deduce PWM from force for each pin -> tell each pin by iterating over the array what th
-//	for(int i = 0; i < pwm_array.length(); ++i)
-//	{
-//		pwm_array[i]= resultingPWMfromForce[i];
-//	}
-	 pwm_array pwm_signals;
-	 return pwm_signals;
+ pwm_array Thruster_Commander::simple_vertical(pwm_array& pwmArray, float force){
+	int PWM_constant_value;
+    force /= 4;
+    PWM_constant_value = get_pwm(0, force);
+	// The force is going to tell us how much the PWM is going to be for each pin. The pins are stored in pwmsignals Array. 
+	//Fet Force -> deduce PWM from force for each pin -> tell each pin by iterating over the array what th
+	for(int i = 0; i < 4; ++i)
+	{
+		pwmArray.pwm_signals[i] = PWM_constant_value;
+	}
+	for(int i = 4; i < 8; ++i)
+	{
+		pwmArray.pwm_signals[i] = 0;
+	}
+	
+
+	 return pwmArray;
 }
 pwm_array Thruster_Commander::simple_forward(float force){
 	pwm_array pwm_signals;
+
 	return pwm_signals;
 }
 pwm_array Thruster_Commander::simple_sideways(float force){
