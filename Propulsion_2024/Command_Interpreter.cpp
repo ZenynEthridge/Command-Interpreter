@@ -5,10 +5,10 @@
 
 // When compiling for non-RPI devices which cannot run wiringPi library,  
 // use -MOCK_RPI flag to enable mock functions
-#ifndef MOCK_RPI
-#include <wiringPi.h>  // Include wiringPi library by default
+//#ifndef MOCK_RPI
+//#include <wiringPi.h>  // Include wiringPi library by default
 
-#else
+//#else
 #define PWM_OUTPUT 1
 #define OUTPUT 0
 #define HIGH 1
@@ -31,7 +31,7 @@ void pwmWrite(int pinNumber, int pwm) {
     std::cout << "[Mock] pwmWrite: pin " << pinNumber << ", PWM " << pwm << std::endl;
 }
 
-#endif
+//#endif
 
 DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), pinStatus(Disabled), enableType(enableType) {}
 
@@ -134,8 +134,10 @@ int Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) { // converts fr
 }
 
 void Command_Interpreter_RPi5::execute(const Command& command) {
-    for (int i = 0; i < 8; i++) {
-        thrusterPins[i]->setPowerAndDirection(convertPwmValue(command.thruster_pwms[i]), Forwards);
+    int i = 0;
+    for (auto thruster : command.thruster_values) {
+        thrusterPins.at(i)->setPowerAndDirection(convertPwmValue(thruster.first), thruster.second);
+        i++;
     }
     //TODO: duration
 }
