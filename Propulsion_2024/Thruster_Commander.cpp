@@ -74,6 +74,8 @@ void Thruster_Commander::print_info()
 	std::cout << "Mass: \n" << mass << std::endl;
 	std::cout << "Volume: \n" << volume << std::endl;
 }
+
+
 //int get_pwm(int thruster_num, float force){
 //	 std::ifstream dataset("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
 //    std::string line;
