@@ -7,6 +7,7 @@
 // Requires information about wiring, ect.
 enum PinStatus {Enabled, Disabled};
 enum EnableType {ActiveHigh, ActiveLow};
+const int MAX_PWM_VALUE = 1023; //TODO: check pwm range (currently assuming 0-1023)
 
 /*
  * NOTE: We may not need DigitalPin, in which case both DigitalPin and abstract Pin classes are not useful, and can

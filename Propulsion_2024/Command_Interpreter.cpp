@@ -78,12 +78,12 @@ void PwmPin::initialize() {
     pinMode(gpioNumber, PWM_OUTPUT);
 }
 
-void PwmPin::enable() { //TODO: check pwm range (currently assuming 0-1023)
-    setPowerAndDirection(1023, Forwards);
-    currentPwm = 1023;
+void PwmPin::enable() {
+    setPowerAndDirection(MAX_PWM_VALUE, Forwards);
+    currentPwm = MAX_PWM_VALUE;
 }
 
-void PwmPin::disable() { //TODO: check pwm range (currently assuming 0-1023)
+void PwmPin::disable() {
     setPowerAndDirection(0, Forwards);
     currentPwm = 0;
 }
@@ -122,9 +122,9 @@ void Command_Interpreter_RPi5::initializePins() {
 
 int Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) {
     /*
-     * Converts a pwm frequency between 1100 and 1900 into a magnitude range between 0 and 1023.
+     * Converts a pwm frequency between 1100 and 1900 into a magnitude range between 0 and MAX_PWM_VALUE.
      * @param pwmFrequency: a pwm frequency between 1100 and 1900
-     * @return: a pwm magnitude between 0 and 1023
+     * @return: a pwm magnitude between 0 and MAX_PWM_VALUE
      */
     if (pwmFrequency == 0) {
         return 0;
@@ -132,7 +132,7 @@ int Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) {
     const int maxPwmValue = 1900;
     const int minPwmValue = 1099; // slightly less than 1100 so that a pwm value of 1100 isn't stopped
     int pwmMagnitude = pwmFrequency - minPwmValue;
-    pwmMagnitude *= (int)((double)(1023)/(double)(maxPwmValue - minPwmValue));
+    pwmMagnitude *= (int)((double)(MAX_PWM_VALUE)/(double)(maxPwmValue - minPwmValue));
     return pwmMagnitude;
 }
 
