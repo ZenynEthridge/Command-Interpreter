@@ -12,4 +12,4 @@ add_executable(Propulsion_2024
         Command_Interpreter.h
         Main.cpp
         Thruster_Commander.cpp
-        Thruster_Commander.h)
+        Thruster_Commander.h "UnitTesting.h")
