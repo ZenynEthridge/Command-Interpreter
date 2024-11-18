@@ -14,6 +14,7 @@ int main() {
     //TODO: Move this testing to proper unit testing
 	Thruster_Commander Thruster = Thruster_Commander();
 	Thruster.print_info();
+	
 
     //Begin command/command interpreter testing
     struct Command command = {1500, 1900, 1100, 1250, 1300, 1464, 1535, 1536, 2};

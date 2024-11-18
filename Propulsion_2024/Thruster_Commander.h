@@ -10,6 +10,7 @@ class Thruster_Commander
 {
 protected:
 
+	// Constants
 	Eigen::Matrix<float, 1, 3> mass_center;
 	Eigen::Matrix<float, 1, 3> volume_center;
 	Eigen::Matrix<float, 8, 3> thruster_positions;
@@ -21,17 +22,27 @@ protected:
 	int num_thrusters; // Number of thrusters on the vehicle
 	float mass;       // Mass of the vehicle (kg)
 	float volume;    // Displacement volume of the vehicle (m^3)
-	float rho_water = 1025; // Density of water (kg/m^3)
+	float rho_water; // Density of water (kg/m^3)
 
-	
+	// Variables. These need to be updated continuously
+	Eigen::Matrix<float, 1, 3> orientation; // Orientation of the vehicle (roll, pitch, yaw) in radians relative to starting orientation
+	Eigen::Matrix<float, 1, 3> position;    // Position of the vehicle (x, y, z) in meters relative to starting position
+	Eigen::Matrix<float, 1, 3> velocity;    // Velocity of the vehicle (surge, sway, heave) in m/s
+	Eigen::Matrix<float, 1, 3> angular_velocity; // Angular velocity of the vehicle (roll, pitch, yaw) in rad/s
+	Eigen::Matrix<float, 1, 3> acceleration; // Acceleration of the vehicle (surge, sway, heave) in m/s^2
+	Eigen::Matrix<float, 1, 3> angular_acceleration; // Angular acceleration of the vehicle (roll, pitch, yaw) in rad/s^2
+
+
 	// Returns the PWM value for a given thruster and force
 	int get_pwm(int thruster_num, float force);
+
+	Eigen::Matrix<float, 1, 3> weight_force();
+	Eigen::Matrix<float, 1, 3> buoyant_force();
 
 
 	// Drag force = 0.5 * rho_water * v^2 * Cd * A
 	// rho water is known, A can be found as a function of direction, v is input, Cd is unknown, but can be estimated or found through trail and error
-	Eigen::Matrix<float, 1, 3> predict_drag_forces(
-		float x_velocity, float y_velocity, float z_velocity);
+	Eigen::Matrix<float, 1, 3> predict_drag_forces(float x_velocity, float y_velocity, float z_velocity);
 	
 	// <drag_torque> = <r> x <drag_force> = <r> x < 0.5 * rho_water * (r*omega)^2 * Cd * A >
 	// this will be a little trickier to calculate, might require integration
@@ -54,16 +65,16 @@ public:
 	bool is_it_possible(float x_force, float y_force, float z_force, float x_torque, float y_torque, float z_torque);
 
 	// force-torque commands
+	// these functions compute the pwm signals for the thrusters to achieve the desired force and torque produced by thrusters
+	// these functions do not condier drag, or any other forces not produced directly by the thruster 
+	pwm_array simple_vertical(float z_force);
 	
-	
-	pwm_array simple_vertical(float force);
-	
-	pwm_array simple_forward(float force);
-	pwm_array simple_sideways(float force);
+	pwm_array simple_forward(float y_force);
+	pwm_array simple_sideways(float x_force);
 	pwm_array simple_horizontal(float x_force, float y_force);
 	
-	pwm_array simple_rotation(float torque);
-	pwm_array simple_rotating_vertical(float force, float torque);
+	pwm_array simple_rotation(float z_torque);
+	pwm_array simple_rotating_vertical(float z_force, float z_torque);
 	pwm_array simple_rotating_forward(float force, float torque);
 	pwm_array simple_rotating_sideways(float force, float torque);
 	pwm_array simple_rotating_horizontal(float x_force, float y_force, float torque);
