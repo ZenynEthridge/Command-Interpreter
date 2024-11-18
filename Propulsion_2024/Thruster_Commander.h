@@ -78,8 +78,12 @@ public:
 	// force-torque commands
 	// these functions compute the pwm signals for the thrusters to achieve the desired force and torque produced by thrusters
 	// these functions do not condier drag, or any other forces not produced directly by the thruster 
-	pwm_array simple_vertical(float z_force);
+	force_array simple_vertical_forces(float z_force);
 	
+
+	// TODO the following functions should be modified to produce force_array objects rather than pwm_array objects
+	// this will allow for easier testing and debugging. The pwm_array objects can be generated from the force_array objects
+	// using a separate function. These functions should also be renamed with _forces suffix for clarity
 	pwm_array simple_forward(float y_force);
 	pwm_array simple_sideways(float x_force);
 	pwm_array simple_horizontal(float x_force, float y_force);

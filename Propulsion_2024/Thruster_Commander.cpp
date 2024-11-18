@@ -120,20 +120,20 @@ int Thruster_Commander::get_pwm(int thruster_num, float force) {
  //   }
 	return 1500;
 }
- pwm_array Thruster_Commander::simple_vertical(float z_force){
+ force_array Thruster_Commander::simple_vertical_forces(float z_force){
 
     // Force is euqally divided by the 4 vertical thrusters for this function
 	
 	float force_per_thruster = z_force / 4;
-	pwm_array pwms = pwm_array();
+	force_array forces = force_array();
 	
 	for(int i = 0; i < num_thrusters; i++)
 	{
-		if (i < 4) { pwms.pwm_signals[i] = get_pwm(i, force_per_thruster); }
-		else { pwms.pwm_signals[i] = get_pwm(i, 0); }
-		std::cout << i << " " << pwms.pwm_signals[i] << std::endl;
+		if (i < 4) { forces.forces[i] = force_per_thruster; }
+		else { forces.forces[i] = 0; }
+		std::cout << i << " " << forces.forces[i] << std::endl;
 	} 
-	return pwms;
+	return forces;
 }
 pwm_array Thruster_Commander::simple_forward(float y_force){
 	pwm_array pwm_signals;
