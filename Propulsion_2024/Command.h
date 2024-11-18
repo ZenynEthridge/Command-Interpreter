@@ -5,17 +5,13 @@
 
 enum Direction {Forwards, Backwards};
 
-struct ThrusterSpec {
-    int pwm_frequency;
-    Direction direction;
-};
+struct pwm_array {
+    int pwm_signals[8];
 
-struct ThrusterSpecArray {
-    ThrusterSpec thruster_specs[8]; // array of thruster frequencies and directions
 };
 
 struct Command {
-    ThrusterSpecArray thruster_specs; // array of thruster frequencies and directions
+    pwm_array thruster_pwms; // PWM values for each thruster
     float duration;       // Duration of the command in seconds
 };
 

@@ -106,7 +106,7 @@ void Thruster_Commander::print_info()
 //	return -1;
 //    }
 //}
- ThrusterSpecArray Thruster_Commander::simple_vertical(float force){
+ pwm_array Thruster_Commander::simple_vertical(float force){
 //
 //    // If we reach here, then element was not present
 //
@@ -122,20 +122,20 @@ void Thruster_Commander::print_info()
 //	{
 //		pwm_array[i]= resultingPWMfromForce[i];
 //	}
-	 ThrusterSpecArray pwm_signals;
+	 pwm_array pwm_signals;
 	 return pwm_signals;
 }
-ThrusterSpecArray Thruster_Commander::simple_forward(float force){
-	ThrusterSpecArray pwm_signals;
+pwm_array Thruster_Commander::simple_forward(float force){
+	pwm_array pwm_signals;
 	return pwm_signals;
 }
-ThrusterSpecArray Thruster_Commander::simple_sideways(float force){
-	ThrusterSpecArray pwm_signals;
+pwm_array Thruster_Commander::simple_sideways(float force){
+	pwm_array pwm_signals;
 	return pwm_signals;
-	
+
 }
-ThrusterSpecArray Thruster_Commander::simple_horizontal(float x_force, float y_force)
+pwm_array Thruster_Commander::simple_horizontal(float x_force, float y_force)
 {
-	ThrusterSpecArray pwm_signals;
+	pwm_array pwm_signals;
 	return pwm_signals;
 }
