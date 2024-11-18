@@ -10,18 +10,18 @@ class Thruster_Commander
 {
 protected:
 
-	// Constants
+	// Shouldn't usually change
 	Eigen::Matrix<float, 1, 3> mass_center;
 	Eigen::Matrix<float, 1, 3> volume_center;
 	Eigen::Matrix<float, 8, 3> thruster_positions;
-	Eigen::Matrix<float, 8, 3> thruster_moment_arms; // Distance from thruster to mass center (m)
-	Eigen::Matrix<float, 8, 3> thruster_directions; // Direction of thruster force (unit vector)
-	Eigen::Matrix<float, 8, 3> thruster_torques;   // Force of thruster (N)
-	Eigen::Matrix<float, 8, 1> thruster_voltages;  // Torque of thruster (N*m)
+	Eigen::Matrix<float, 8, 3> thruster_moment_arms;  // Distance from thruster to mass center (m)
+	Eigen::Matrix<float, 8, 3> thruster_directions;  // Direction of thruster force (unit vector)
+	Eigen::Matrix<float, 8, 3> thruster_torques;    // Torque of thruster on the sub about the x,y and z axes (N*m)
+	Eigen::Matrix<float, 8, 1> thruster_voltages;  // voltage supplied to each thruster (V) (this might not be a constant)
 
-	int num_thrusters; // Number of thrusters on the vehicle
-	float mass;       // Mass of the vehicle (kg)
-	float volume;    // Displacement volume of the vehicle (m^3)
+	int num_thrusters;  // Number of thrusters on the vehicle
+	float mass;        // Mass of the vehicle (kg)
+	float volume;     // Displacement volume of the vehicle (m^3)
 	float rho_water; // Density of water (kg/m^3)
 
 	// Variables. These need to be updated continuously
@@ -32,6 +32,7 @@ protected:
 	Eigen::Matrix<float, 1, 3> acceleration; // Acceleration of the vehicle (surge, sway, heave) in m/s^2
 	Eigen::Matrix<float, 1, 3> angular_acceleration; // Angular acceleration of the vehicle (roll, pitch, yaw) in rad/s^2
 
+	Eigen::Matrix<float, 1, 3> water_current_velocity; // velocity of the water current in m/s. Should be near 0 in controlled environments
 
 	// Returns the PWM value for a given thruster and force
 	int get_pwm(int thruster_num, float force);
@@ -42,13 +43,17 @@ protected:
 
 	// Drag force = 0.5 * rho_water * v^2 * Cd * A
 	// rho water is known, A can be found as a function of direction, v is input, Cd is unknown, but can be estimated or found through trail and error
-	Eigen::Matrix<float, 1, 3> predict_drag_forces(float x_velocity, float y_velocity, float z_velocity);
+	Eigen::Matrix<float, 1, 3> predict_drag_forces(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity);
 	
 	// <drag_torque> = <r> x <drag_force> = <r> x < 0.5 * rho_water * (r*omega)^2 * Cd * A >
 	// this will be a little trickier to calculate, might require integration
-	Eigen::Matrix<float, 1, 3> predict_drag_torques(
-		float x_velocity, float y_velocity, float z_velocity, float x_angular_velocity, 
-		float y_angular_velocity, float z_angular_velocity);
+	Eigen::Matrix<float, 1, 3> predict_drag_torques(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity);
+
+	// environmental forces such as weight, boyancy, drag, ect
+	Eigen::Matrix<float, 1, 3> predict_env_forces(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity);
+
+	// torques produced by environmental forces
+	Eigen::Matrix<float, 1, 3> predict_env_torques(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity);
 
 public:
 	Thruster_Commander();
@@ -84,7 +89,8 @@ public:
 
 	pwm_array complex_3d(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque);
 
-	Command simple_vertical_travel(float distance);
 	// distance commands
+	Command simple_vertical_travel(float distance);
+	
 };
 
