@@ -23,6 +23,9 @@ protected:
 	float mass;        // Mass of the vehicle (kg)
 	float volume;     // Displacement volume of the vehicle (m^3)
 	float rho_water; // Density of water (kg/m^3)
+	float gravity;   // Acceleration due to gravity (m/s^2)
+	float weight_magnitude; // Weight of the vehicle (N)
+	float buoyant_magnitude; // Buoyant force on the vehicle (N)
 
 	// Variables. These need to be updated continuously
 	Eigen::Matrix<float, 1, 3> orientation; // Orientation of the vehicle (roll, pitch, yaw) in radians relative to starting orientation
@@ -37,6 +40,10 @@ protected:
 	// Returns the PWM value for a given thruster and force
 	int get_pwm(int thruster_num, float force);
 
+	// this will mostly be used for debugging and unit testing
+	int get_force_from_pwm(int thruster_num, int pwm);
+
+	// these functions will find weight and boyancy force vectors based on orientation and magnitudes
 	Eigen::Matrix<float, 1, 3> weight_force();
 	Eigen::Matrix<float, 1, 3> buoyant_force();
 
@@ -81,7 +88,8 @@ public:
 	force_array simple_vertical_forces(float z_force);
 	
 
-	// TODO the following functions should be modified to produce force_array objects rather than pwm_array objects
+	// /!\ TODO:
+	// the following functions should be modified to produce force_array objects rather than pwm_array objects
 	// this will allow for easier testing and debugging. The pwm_array objects can be generated from the force_array objects
 	// using a separate function. These functions should also be renamed with _forces suffix for clarity
 	pwm_array simple_forward(float y_force);
