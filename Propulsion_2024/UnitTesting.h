@@ -8,8 +8,8 @@
 #include "Command_Interpreter.h"
 
 
-// a value of zero indicates success
 // please write and save your tests here
+// all exisiting tests should be ran and passed before pushing new code
 
 
 int command_interpreter_test_0() 
