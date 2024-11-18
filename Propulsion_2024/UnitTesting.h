@@ -7,6 +7,11 @@
 #include "Command.h"
 #include "Command_Interpreter.h"
 
+
+// a value of zero indicates success
+// please write and save your tests here
+
+
 int command_interpreter_test_0() 
 {
     //Begin command/command interpreter testing
