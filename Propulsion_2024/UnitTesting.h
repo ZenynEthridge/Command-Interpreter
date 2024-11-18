@@ -43,9 +43,7 @@ int command_interpreter_test_0()
 
 int thruster_commander_test_0()
 {
-	//Begin thruster commander testing
 	Thruster_Commander thruster_commander = Thruster_Commander();
 	thruster_commander.print_info();
-	//End thruster commander testing
 	return 0;
 }
