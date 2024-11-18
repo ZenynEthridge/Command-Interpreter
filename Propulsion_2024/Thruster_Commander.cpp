@@ -6,6 +6,13 @@
 
 Thruster_Commander::Thruster_Commander()
 {
+	// TODO: Move all the hardcoded values in this constructor to a config file
+	//       this will make unit testing simpler
+
+	
+	rho_water = 1025; // Density of water (kg/m^3)
+	
+	
 	// Values come from Onshape 2024 Vehicle V10 11/12/24
 	num_thrusters = 8;
 	Eigen::Matrix<float, 1, 3> mass_center_inches = { 0, 0.466, 1.561 };
@@ -56,6 +63,14 @@ Thruster_Commander::Thruster_Commander()
 	volume = volume_inches * pow(0.0254, 3); // convert to meters^3	
 	mass = 5.51; // mass of vehicle in kg, from onshape
 
+	// all zeros for now
+	position = Eigen::Matrix<float, 1, 3>::Zero();
+	orientation = Eigen::Matrix<float, 1, 3>::Zero();
+	velocity = Eigen::Matrix<float, 1, 3>::Zero();
+	angular_velocity = Eigen::Matrix<float, 1, 3>::Zero();
+	acceleration = Eigen::Matrix<float, 1, 3>::Zero();
+	angular_acceleration = Eigen::Matrix<float, 1, 3>::Zero();
+
 }
 
 Thruster_Commander::~Thruster_Commander()
@@ -74,56 +89,51 @@ void Thruster_Commander::print_info()
 	std::cout << "Mass: \n" << mass << std::endl;
 	std::cout << "Volume: \n" << volume << std::endl;
 }
-//int Thruster_Commander::get_pwm(int thruster_num, float force) {
-//    std::ifstream dataset("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
-//    std::string line;
-//	std::string PWM;
-//	int PWM_value;
-//
-//    // Get the header line (if exists)
-//    if (std::getline(file, line)) {
-//		for( auto s: line){
-//		while(s != ','){
-//			PWM += s;
-//		}
-//		}
-//		PWM_value = stoi(PWM);
-//        while (low <= high) {
-//        int mid = low + (high - low) / 2;
-//
-//        // Check if x is present at mid
-//        if (arr[mid] == x)
-//            return mid;
-//
-//        // If x greater, ignore left half
-//        if (arr[mid] < x)
-//            low = mid + 1;
-//
-//        // If x is smaller, ignore right half
-//        else
-//            high = mid - 1;
-//    }
-//	return -1;
-//    }
-//}
+int Thruster_Commander::get_pwm(int thruster_num, float force) {
+ //   std::ifstream dataset("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
+ //   std::string line;
+	//std::string PWM;
+	//int PWM_value;
+
+ //   // Get the header line (if exists)
+ //   if (std::getline(file, line)) {
+	//	for( auto s: line){
+	//	while(s != ','){
+	//		PWM += s;
+	//	}
+	//	}
+	//	PWM_value = stoi(PWM);
+ //       while (low <= high) {
+ //       int mid = low + (high - low) / 2;
+
+ //       // Check if x is present at mid
+ //       if (arr[mid] == x)
+ //           return mid;
+
+ //       // If x greater, ignore left half
+ //       if (arr[mid] < x)
+ //           low = mid + 1;
+
+ //       // If x is smaller, ignore right half
+ //       else
+ //           high = mid - 1;
+ //   }
+	return 1500;
+}
  pwm_array Thruster_Commander::simple_vertical(float force){
-//
-//    // If we reach here, then element was not present
-//
-//	force =/ 4;
-//	int resultingPWMfromForce[4];
-//	for(auto f: resultingPWMfromForce)
-//	{
-//
-//	}
-//	// The force is going to tell us how much the PWM is going to be for each pin. The pins are stored in pwmsignals Array.
-//	//Fet Force -> deduce PWM from force for each pin -> tell each pin by iterating over the array what th
-//	for(int i = 0; i < pwm_array.length(); ++i)
-//	{
-//		pwm_array[i]= resultingPWMfromForce[i];
-//	}
-	 pwm_array pwm_signals;
-	 return pwm_signals;
+
+    // Force is euqally divided by the 4 vertical thrusters for this function
+	
+	float force_per_thruster = force / 4;
+	pwm_array pwms = pwm_array();
+	
+	for(int i = 0; i < num_thrusters; i++)
+	{
+		if (i < 4) { pwms.pwm_signals[i] = get_pwm(i, force_per_thruster); }
+		else { pwms.pwm_signals[i] = get_pwm(i, 0); }
+		std::cout << i << " " << pwms.pwm_signals[i] << std::endl;
+	} 
+	return pwms;
 }
 pwm_array Thruster_Commander::simple_forward(float force){
 	pwm_array pwm_signals;
