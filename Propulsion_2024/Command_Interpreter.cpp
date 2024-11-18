@@ -139,7 +139,7 @@ Command_Interpreter_RPi5::ThrusterSpec Command_Interpreter_RPi5::convertPwmValue
         return ThrusterSpec{0, Forwards};
     }
     if (pwmFrequency <= 1464) {
-        multiplier = ((double)(MAX_PWM_VALUE)/(double)(maxPosPwmFrequency - minPosPwmFrequency));
+        multiplier = ((double)(MAX_PWM_VALUE)/(double)(maxNegPwmFrequency - minNegPwmFrequency));
         pwmMagnitude = MAX_PWM_VALUE - (int)((double)(pwmFrequency - minNegPwmFrequency) * multiplier);
         return ThrusterSpec{pwmMagnitude, Backwards};
     }
