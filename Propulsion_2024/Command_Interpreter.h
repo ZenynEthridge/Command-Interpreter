@@ -51,10 +51,14 @@ public:
 
 class Command_Interpreter_RPi5 {
 private:
+    struct ThrusterSpec {
+        int pwm_value;
+        Direction direction;
+    };
     std::vector<Pin*> allPins;
     std::vector<PwmPin*> thrusterPins;
     std::vector<DigitalPin*> digitalPins;
-    static int convertPwmValue(int pwmFrequency);
+    static ThrusterSpec convertPwmValue(int pwmFrequency);
 public:
     explicit Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins);
     void execute(const Command& command);

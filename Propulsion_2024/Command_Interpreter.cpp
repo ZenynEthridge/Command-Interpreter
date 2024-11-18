@@ -120,26 +120,42 @@ void Command_Interpreter_RPi5::initializePins() {
     }
 }
 
-int Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) {
+Command_Interpreter_RPi5::ThrusterSpec Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) {
     /*
-     * Converts a pwm frequency between 1100 and 1900 into a magnitude range between 0 and MAX_PWM_VALUE.
+     * Converts a pwm frequency between 1100 and 1900 into a Thruster Spec.
      * @param pwmFrequency: a pwm frequency between 1100 and 1900
-     * @return: a pwm magnitude between 0 and MAX_PWM_VALUE
+     * @return: a Thruster Spec with a pwm magnitude between 0 and MAX_PWM_VALUE and a Direction
      */
-    if (pwmFrequency == 0) {
-        return 0;
+    // 1100 - 1464 = negative
+    // 1536 - 1900 = positive
+    const int minPosPwmFrequency = 1535; // slightly less than 1536 so that 1536 is not zero
+    const int maxPosPwmFrequency = 1900;
+    const int minNegPwmFrequency = 1100;
+    const int maxNegPwmFrequency = 1465; // slightly greater than 1464 so that 1464 is not zero
+    int pwmMagnitude;
+    double multiplier;
+
+    if (pwmFrequency >= 1465 && pwmFrequency <= 1535) {
+        return ThrusterSpec{0, Forwards};
     }
-    const int maxPwmValue = 1900;
-    const int minPwmValue = 1099; // slightly less than 1100 so that a pwm value of 1100 isn't stopped
-    int pwmMagnitude = pwmFrequency - minPwmValue;
-    pwmMagnitude *= (int)((double)(MAX_PWM_VALUE)/(double)(maxPwmValue - minPwmValue));
-    return pwmMagnitude;
+    if (pwmFrequency <= 1464) {
+        multiplier = ((double)(MAX_PWM_VALUE)/(double)(maxPosPwmFrequency - minPosPwmFrequency));
+        pwmMagnitude = MAX_PWM_VALUE - (int)((double)(pwmFrequency - minNegPwmFrequency) * multiplier);
+        return ThrusterSpec{pwmMagnitude, Backwards};
+    }
+    else {
+        multiplier = ((double)(MAX_PWM_VALUE)/(double)(maxPosPwmFrequency - minPosPwmFrequency));
+        pwmMagnitude = (int)((double)(pwmFrequency - minPosPwmFrequency) * multiplier);
+        return ThrusterSpec{pwmMagnitude, Forwards};
+    }
 }
 
 void Command_Interpreter_RPi5::execute(const Command& command) {
     int i = 0;
-    for (auto thruster : command.thruster_specs.thruster_specs) {
-        thrusterPins.at(i)->setPowerAndDirection(convertPwmValue(thruster.pwm_frequency), thruster.direction);
+    for (int frequency : command.thruster_pwms.pwm_signals) {
+        std::cout << "frequency: " << frequency << std::endl;
+        ThrusterSpec thrusterSpec = convertPwmValue(frequency);
+        thrusterPins.at(i)->setPowerAndDirection(thrusterSpec.pwm_value, thrusterSpec.direction);
         i++;
     }
     //TODO: duration
