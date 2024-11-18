@@ -55,6 +55,12 @@ protected:
 	// torques produced by environmental forces
 	Eigen::Matrix<float, 1, 3> predict_env_torques(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity);
 
+	// net force produced by thrusters at a particular set of pwms. This will mostly be used for testing
+	Eigen::Matrix<float, 1, 3> predict_net_force(Eigen::Matrix<float, 1, 8> pwms);
+
+	// net torque produced by thrusters at a particular set of pwms. This will mostly be used for testing
+	Eigen::Matrix<float, 1, 3> predict_net_torque(Eigen::Matrix<float, 1, 8> pwms);
+
 public:
 	Thruster_Commander();
 	~Thruster_Commander();
@@ -90,7 +96,7 @@ public:
 	pwm_array complex_3d(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque);
 
 	// distance commands
-	Command simple_vertical_travel(float distance);
+	Command simple_vertical_travel(float z_distance);
 	
 };
 
