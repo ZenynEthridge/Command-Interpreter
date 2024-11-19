@@ -121,11 +121,7 @@ void Command_Interpreter_RPi5::initializePins() {
 }
 
 Command_Interpreter_RPi5::ThrusterSpec Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) {
-    /*
-     * Converts a pwm frequency between 1100 and 1900 into a Thruster Spec.
-     * @param pwmFrequency: a pwm frequency between 1100 and 1900
-     * @return: a Thruster Spec with a pwm magnitude between 0 and MAX_PWM_VALUE and a Direction
-     */
+
     // 1100 - 1464 = negative
     // 1536 - 1900 = positive
     const int minPosPwmFrequency = 1535; // slightly less than 1536 so that 1536 is not zero
@@ -158,4 +154,10 @@ void Command_Interpreter_RPi5::execute(const Command& command) {
         i++;
     }
     //TODO: duration
+}
+
+Command_Interpreter_RPi5::~Command_Interpreter_RPi5() {
+    for (auto pin : allPins) {
+        delete pin;
+    }
 }
