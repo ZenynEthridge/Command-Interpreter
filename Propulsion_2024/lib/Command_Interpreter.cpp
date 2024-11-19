@@ -153,7 +153,6 @@ Command_Interpreter_RPi5::ThrusterSpec Command_Interpreter_RPi5::convertPwmValue
 void Command_Interpreter_RPi5::execute(const Command& command) {
     int i = 0;
     for (int frequency : command.thruster_pwms.pwm_signals) {
-        std::cout << "frequency: " << frequency << std::endl;
         ThrusterSpec thrusterSpec = convertPwmValue(frequency);
         thrusterPins.at(i)->setPowerAndDirection(thrusterSpec.pwm_value, thrusterSpec.direction);
         i++;
