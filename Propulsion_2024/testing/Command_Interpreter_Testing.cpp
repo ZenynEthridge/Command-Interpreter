@@ -24,6 +24,7 @@ TEST(CommandInterpreterTest, CreateCommandInterpreter) {
 
 
     auto interpreter = new Command_Interpreter_RPi5(pins, std::vector<DigitalPin *>{});
+    interpreter->initializePins();
     std::string output = testing::internal::GetCapturedStdout();
     auto result = parseInterpreterOutput(output);
 
@@ -59,6 +60,7 @@ TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
     auto digitalPins = std::vector<DigitalPin*>{digital1, digital2};
 
     auto interpreter = new Command_Interpreter_RPi5(pwmPins, digitalPins);
+    interpreter->initializePins();
     std::string output = testing::internal::GetCapturedStdout();
     auto result = parseInterpreterOutput(output);
 
@@ -95,6 +97,7 @@ TEST(CommandInterpreterTest, ExecuteCommand) {
     auto pins = std::vector<PwmPin *>{pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8};
 
     auto interpreter = new Command_Interpreter_RPi5(pins, std::vector<DigitalPin *>{});
+    interpreter->initializePins();
     interpreter->execute(command);
     std::string output = testing::internal::GetCapturedStdout();
     auto result = parseInterpreterOutput(output);

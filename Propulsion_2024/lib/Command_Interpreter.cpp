@@ -108,7 +108,6 @@ Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<PwmPin*> thruster
     allPins = std::vector<Pin*>{};
     allPins.insert(allPins.end(), this->thrusterPins.begin(), this->thrusterPins.end());
     allPins.insert(allPins.end(), this->digitalPins.begin(), this->digitalPins.end());
-    initializePins();
 }
 
 void Command_Interpreter_RPi5::initializePins() {

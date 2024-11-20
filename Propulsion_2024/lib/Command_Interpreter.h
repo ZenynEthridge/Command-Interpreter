@@ -81,16 +81,16 @@ private:
     std::vector<PwmPin*> thrusterPins;
     std::vector<DigitalPin*> digitalPins;
 
-    /// @brief Initializes the pins in allPins through the WiringPi library to be either PWM or digital pins
-    /// depending on their types
-    void initializePins();
-
     /// @brief Converts a pwm frequency between 1100 and 1900 into a Thruster Spec.
     /// @param pwmFrequency a pwm frequency between 1100 and 1900
     /// @return A Thruster Spec with a pwm magnitude between 0 and MAX_PWM_VALUE and a Direction
     static ThrusterSpec convertPwmValue(int pwmFrequency);
 public:
     explicit Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins);
+
+    /// @brief Initializes the pins in allPins through the WiringPi library to be either PWM or digital pins
+    /// depending on their types
+    void initializePins();
 
     /// @brief Executes a command by sending the specified pwm values to the Pi's GPIO for the specified duration
     /// @param command a command struct with a C-style array of pwm frequency integers and a duration float
