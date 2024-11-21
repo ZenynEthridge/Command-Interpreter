@@ -45,7 +45,7 @@ int thruster_commander_test_0()
 {
 	Thruster_Commander thruster_commander = Thruster_Commander();
 	thruster_commander.print_info();
-	thruster_commander.simple_vertical_forces(5);
+	thruster_commander.thrust_compute_fz(5);
 	return 0;
 }
 

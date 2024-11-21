@@ -40,8 +40,17 @@ protected:
 	// Returns the PWM value for a given thruster and force
 	int get_pwm(int thruster_num, float force);
 
+	// Returns the PWM values for a given set of forces
+	pwm_array get_pwms(force_array forces);
+
 	// this will mostly be used for debugging and unit testing
 	int get_force_from_pwm(int thruster_num, int pwm);
+
+	void test_force_functions();
+	
+	// also mostly for testing
+	Eigen::Matrix<float, 1, 3> compute_forces(force_array);
+	Eigen::Matrix<float, 1, 3> compute_torques(force_array);
 
 	// these functions will find weight and boyancy force vectors based on orientation and magnitudes
 	Eigen::Matrix<float, 1, 3> weight_force();
@@ -70,6 +79,9 @@ protected:
 
 public:
 	Thruster_Commander();
+
+	// we should move to this constructor style asap
+	Thruster_Commander(std::string file, std::string type="json");
 	~Thruster_Commander();
 
 	// mostly for debugging purposes
@@ -83,29 +95,26 @@ public:
 	bool is_it_possible(float x_force, float y_force, float z_force, float x_torque, float y_torque, float z_torque);
 
 	// force-torque commands
-	// these functions compute the pwm signals for the thrusters to achieve the desired force and torque produced by thrusters
-	// these functions do not condier drag, or any other forces not produced directly by the thruster 
-	force_array simple_vertical_forces(float z_force);
+	// these functions compute the forces from each thruster necessary to acheive a given force or torque on the sub
+	// these functions do not condier drag, or any other forces not produced directly by the thruster
+	// suffixes state which forces and torques are being driven by the thrusters
+	// if a force fx, fy, fz , or torque mz is not specified, it's desried value is zero
+	// if a torque mx or my is not stated, it should be small enough for the vehicle to be stable
+	force_array thrust_compute_fz(float z_force);
+	force_array thrust_compute_fy(float y_force);
+	force_array thrust_compute_fx(float x_force);
+	force_array thrust_compute_fx_fy(float x_force, float y_force);
 	
+	force_array thrust_compute_mz(float z_torque);
+	force_array thrust_compute_fz_mz(float z_force, float z_torque);
+	force_array thrust_compute_fy_mz(float y_force, float z_torque);
+	force_array thrust_compute_fx_mz(float force, float torque);
+	force_array thrust_compute_fx_fy_mz(float x_force, float y_force, float torque);
 
-	// /!\ TODO:
-	// the following functions should be modified to produce force_array objects rather than pwm_array objects
-	// this will allow for easier testing and debugging. The pwm_array objects can be generated from the force_array objects
-	// using a separate function. These functions should also be renamed with _forces suffix for clarity
-	pwm_array simple_forward(float y_force);
-	pwm_array simple_sideways(float x_force);
-	pwm_array simple_horizontal(float x_force, float y_force);
-	
-	pwm_array simple_rotation(float z_torque);
-	pwm_array simple_rotating_vertical(float z_force, float z_torque);
-	pwm_array simple_rotating_forward(float force, float torque);
-	pwm_array simple_rotating_sideways(float force, float torque);
-	pwm_array simple_rotating_horizontal(float x_force, float y_force, float torque);
+	force_array thrust_compute_fx_fy_fz(float x_force, float y_force);
+	force_array thrust_compute_fx_fy_fz_mz(float x_distance, float y_force, float z_force, float torque);
 
-	pwm_array simple_3d(float x_force, float y_force);
-	pwm_array simple_rotating_3d(float x_distance, float y_force, float z_force, float torque);
-
-	pwm_array complex_3d(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque);
+	force_array thrust_compute_fx_fy_fz_mx_my_mz(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque);
 
 	// distance commands
 	Command simple_vertical_travel(float z_distance);

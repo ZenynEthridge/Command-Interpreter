@@ -8,10 +8,8 @@ Thruster_Commander::Thruster_Commander()
 {
 	// TODO: Move all the hardcoded values in this constructor to a config file
 	//       this will make unit testing simpler
-
 	
 	rho_water = 1025; // Density of water (kg/m^3)
-	
 	
 	// Values come from Onshape 2024 Vehicle V10 11/12/24
 	num_thrusters = 8;
@@ -37,7 +35,6 @@ Thruster_Commander::Thruster_Commander()
 	// torques will be calulated about the center of mass
 	thruster_moment_arms = thruster_positions - mass_center.replicate(8, 1);
 	
-
 	// directionality recorded as the direction the front of thruster is facing
 	// force direction will be reversed
 	const double PI = 3.141592653589793;
@@ -51,7 +48,6 @@ Thruster_Commander::Thruster_Commander()
 	thruster_directions.row(5) <<  sin45, -sin45, 0;
 	thruster_directions.row(6) << sin45, -sin45, 0;
 	thruster_directions.row(7) << -sin45, -sin45, 0;
-
 
 	thruster_torques = Eigen::Matrix<float, 8, 3>::Zero();
 	for (int i = 0; i < num_thrusters; i++)
@@ -120,7 +116,47 @@ int Thruster_Commander::get_pwm(int thruster_num, float force) {
  //   }
 	return 1500;
 }
- force_array Thruster_Commander::simple_vertical_forces(float z_force){
+
+//
+Eigen::Matrix<float, 1, 3> Thruster_Commander::compute_forces(force_array forces)
+{
+	Eigen::Matrix<float, 1, 3> total_force = Eigen::Matrix<float, 1, 3>::Zero();
+	for (int i = 0; i < num_thrusters; i++)
+	{
+		total_force += forces.forces[i] * thruster_directions.row(i);
+	}
+	return total_force;
+}
+
+Eigen::Matrix<float, 1, 3> Thruster_Commander::compute_torques(force_array forces)
+{
+	Eigen::Matrix<float, 1, 3> total_torque = Eigen::Matrix<float, 1, 3>::Zero();
+	for (int i = 0; i < num_thrusters; i++)
+	{
+		total_torque += forces.forces[i] * thruster_torques.row(i);
+	}
+	return total_torque;
+}
+
+void Thruster_Commander::test_force_functions()
+{
+	// check thrust_compute_fz
+	// check thrust_compute_fy
+	// check thrust_compute_fx
+	// check thrust_compute_fx_fy
+	// check thrust_compute_mz
+	// check thrust_compute_fz_mz
+	// check thrust_compute_fy_mz
+	// check thrust_compute_fx_mz
+	// check thrust_compute_fx_fy_mz
+	// check thrust_compute_fx_fy_fz
+	// check thrust_compute_fx_fy_fz_mz
+	// check thrust_compute_fx_fy_fz_mx_my_mz
+}
+
+// this one is done and seems to work
+force_array Thruster_Commander::thrust_compute_fz(float z_force)
+{
 
     // Force is euqally divided by the 4 vertical thrusters for this function
 	
@@ -135,17 +171,63 @@ int Thruster_Commander::get_pwm(int thruster_num, float force) {
 	} 
 	return forces;
 }
-pwm_array Thruster_Commander::simple_forward(float y_force){
-	pwm_array pwm_signals;
-	return pwm_signals;
+force_array Thruster_Commander::thrust_compute_fy(float y_force){
+	force_array forces;
+	return forces;
 }
-pwm_array Thruster_Commander::simple_sideways(float x_force){
-	pwm_array pwm_signals;
-	return pwm_signals;
+force_array Thruster_Commander::thrust_compute_fx(float x_force){
+	force_array forces;
+	return forces;
 
 }
-pwm_array Thruster_Commander::simple_horizontal(float x_force, float y_force)
+force_array Thruster_Commander::thrust_compute_fx_fy(float x_force, float y_force)
 {
-	pwm_array pwm_signals;
-	return pwm_signals;
+	force_array forces;
+	return forces;
+}
+force_array Thruster_Commander::thrust_compute_mz(float z_torque)
+{
+	force_array forces;
+	return forces;
+}
+force_array Thruster_Commander::thrust_compute_fz_mz(float z_force, float z_torque) 
+{
+	force_array forces;
+	return forces;
+}
+force_array Thruster_Commander::thrust_compute_fy_mz(float force, float torque) 
+{
+	force_array forces;
+	return forces;
+}
+force_array Thruster_Commander::thrust_compute_fx_mz(float force, float torque) 
+{
+	force_array forces;
+	return forces;
+}
+force_array Thruster_Commander::thrust_compute_fx_fy_mz(float x_force, float y_force, float torque)
+{
+	force_array forces;
+	return forces;
+}
+force_array Thruster_Commander::thrust_compute_fx_fy_fz(float x_force, float y_force) 
+{
+	force_array forces;
+	return forces;
+}
+force_array Thruster_Commander::thrust_compute_fx_fy_fz_mz(float x_distance, float y_force, float z_force, float torque) 
+{
+	force_array forces;
+	return forces;
+}
+force_array Thruster_Commander::thrust_compute_fx_fy_fz_mx_my_mz(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque) 
+{
+	force_array forces;
+	return forces;
+}
+
+Command Thruster_Commander::simple_vertical_travel(float z_distance)
+{
+	Command command;
+	return command;
 }
