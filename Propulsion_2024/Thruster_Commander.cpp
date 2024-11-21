@@ -109,7 +109,7 @@ int Thruster_Commander::get_pwm(int thruster_num, float force) {
  //       // Check if x is present at mid
  //       if (arr[mid] == x)
  //           return mid;
-//test 
+
  //       // If x greater, ignore left half
  //       if (arr[mid] < x)
  //           low = mid + 1;
