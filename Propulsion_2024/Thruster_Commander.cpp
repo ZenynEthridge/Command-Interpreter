@@ -247,7 +247,7 @@ force_array Thruster_Commander::thrust_compute_fx_fy_fz_mx_my_mz(float x_force, 
 	force_array forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute(Eigen::Matrix<float, 1, 6> force_torque, bool simple=true)
+force_array Thruster_Commander::thrust_compute(Eigen::Matrix<float, 1, 6> force_torque, bool simple)
 {
 	// this is a general case force function
 	// it will call other force functions depending on what forces and torques are specified

@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 // A command is a simple instruction to the vehicle
 // Commands will be combined in sequencing to create more complex instructions
