@@ -9,7 +9,7 @@ Thruster_Commander::Thruster_Commander()
 	// TODO: Move all the hardcoded values in this constructor to a config file
 	//       this will make unit testing simpler
 	
-	rho_water = 1025; // Density of water (kg/m^3)
+	
 	
 	// Values come from Onshape 2024 Vehicle V10 11/12/24
 	num_thrusters = 8;
@@ -59,7 +59,10 @@ Thruster_Commander::Thruster_Commander()
 	float volume_inches = 449.157;            // volume of vehicle in inches^3, from onshape. This is likley less than the displacement volume and should be corrected
 	volume = volume_inches * pow(0.0254, 3); // convert to meters^3	
 	mass = 5.51; // mass of vehicle in kg, from onshape
-
+	gravity = -9.81;
+	rho_water = 1025; // Density of water (kg/m^3)
+	weight_magnitude = mass * gravity;
+	buoyant_magnitude = -rho_water * gravity * volume;
 	// all zeros for now
 	position = Eigen::Matrix<float, 1, 3>::Zero();
 	orientation = Eigen::Matrix<float, 1, 3>::Zero();
@@ -120,7 +123,32 @@ int Thruster_Commander::get_pwm(int thruster_num, float force) {
 	return 1500;
 }
 
-
+three_axis Thruster_Commander::weight_force(three_axis orientation)
+{
+	three_axis result = weight_magnitude * three_axis::UnitZ();
+	std::cout << "Weight force: \n" << result << std::endl;
+	result *= - Eigen::AngleAxisf(orientation(0), Eigen::Vector3f::UnitX()).toRotationMatrix();
+	result *= - Eigen::AngleAxisf(orientation(1), Eigen::Vector3f::UnitY()).toRotationMatrix();
+	result *= - Eigen::AngleAxisf(orientation(2), Eigen::Vector3f::UnitZ()).toRotationMatrix();
+	std::cout << "Weight force: \n" << result << std::endl;
+	return result;
+}
+three_axis Thruster_Commander::buoyant_force(three_axis orientation) 
+{
+	three_axis result = buoyant_magnitude * three_axis::UnitZ();
+	std::cout << "Buoyant force: \n" << result << std::endl;
+	result *= - Eigen::AngleAxisf(orientation(0), Eigen::Vector3f::UnitX()).toRotationMatrix();
+	result *= - Eigen::AngleAxisf(orientation(1), Eigen::Vector3f::UnitY()).toRotationMatrix();
+	result *= - Eigen::AngleAxisf(orientation(2), Eigen::Vector3f::UnitZ()).toRotationMatrix();
+	std::cout << "Buoyant force: \n" << result << std::endl;
+	return result;
+}
+three_axis Thruster_Commander::bouyant_torque(three_axis bouyant_force)
+{
+	three_axis result = bouyant_force.cross(volume_center - mass_center);
+	std::cout << "Buoyant torque: \n" << result << std::endl;
+	return result;
+}
 Eigen::Matrix<float, 1, 3> Thruster_Commander::compute_forces(force_array forces)
 {
 	Eigen::Matrix<float, 1, 3> total_force = Eigen::Matrix<float, 1, 3>::Zero();
