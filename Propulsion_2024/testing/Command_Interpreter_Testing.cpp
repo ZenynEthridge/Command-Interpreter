@@ -101,6 +101,7 @@ TEST(CommandInterpreterTest, ExecuteCommand) {
     interpreter->execute(command);
     std::string output = testing::internal::GetCapturedStdout();
     auto result = parseInterpreterOutput(output);
+
     delete interpreter;
 
     ASSERT_TRUE(result.wiringPiSetUp);
