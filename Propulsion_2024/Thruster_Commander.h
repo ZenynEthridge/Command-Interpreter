@@ -89,6 +89,7 @@ protected:
 		Eigen::Matrix<float, 1, 3> start_velocity, 
 		Eigen::Matrix<float, 1, 3> start_angular_velocity,
 		Eigen::Matrix<float, 1, 8> thruster_sets, float duration, int n);
+
 	// net force produced by thrusters at a particular set of pwms. This will mostly be used for testing
 	Eigen::Matrix<float, 1, 3> predict_net_force(Eigen::Matrix<float, 1, 8> pwms);
 
