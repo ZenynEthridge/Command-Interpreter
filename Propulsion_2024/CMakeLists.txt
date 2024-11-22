@@ -4,15 +4,40 @@ project(Propulsion_2024)
 set(CMAKE_CXX_STANDARD 14)
 add_compile_options("-DMOCK_RPI")
 
-include_directories(.)
-include_directories(
-   third-party/yaml-cpp/include
-)    
+include_directories(.
+        lib)
 
 add_executable(Propulsion_2024
-        Command.h
-        Command_Interpreter.cpp
-        Command_Interpreter.h
-        Main.cpp
-        Thruster_Commander.cpp
-        Thruster_Commander.h "UnitTesting.h")
+        lib/Command.h
+        lib/Command_Interpreter.cpp
+        lib/Command_Interpreter.h
+        lib/Main.cpp
+        lib/Thruster_Commander.cpp
+        lib/Thruster_Commander.h
+)
+
+# GTest start
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/d144031940543e15423a25ae5a8a74141044862f.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+add_executable(
+        run_tests
+        testing/Command_Interpreter_Testing.cpp
+        testing/Thruster_Commander_Testing.cpp
+)
+target_link_libraries(
+        run_tests
+        GTest::gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(run_tests)
+#Gtest end

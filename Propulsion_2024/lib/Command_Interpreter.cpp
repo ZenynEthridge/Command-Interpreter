@@ -13,7 +13,7 @@
 #define OUTPUT 0
 #define HIGH 1
 #define LOW 0
-
+//TODO: wrapper class for wiringPi GTest
 int wiringPiSetupGpio() {
     std::cout << "[Mock] wiringPi GPIO set up!" << std::endl;
     return 0;
@@ -105,27 +105,26 @@ Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<PwmPin*> thruster
     if (this->thrusterPins.size() != 8) {
         std::cerr << "Incorrect number of thruster pwm pins given! Need 8, given " << this->thrusterPins.size() << std::endl;
     }
-    allPins = std::vector<Pin*>{};
+}
+
+std::vector<Pin*> Command_Interpreter_RPi5::allPins() {
+    auto allPins = std::vector<Pin*>{};
     allPins.insert(allPins.end(), this->thrusterPins.begin(), this->thrusterPins.end());
     allPins.insert(allPins.end(), this->digitalPins.begin(), this->digitalPins.end());
-    initializePins();
+    return allPins;
 }
 
 void Command_Interpreter_RPi5::initializePins() {
     if (wiringPiSetupGpio() == -1) {
         std::cerr << "Failure to configure GPIO pins through wiringPi!" << std::endl; //throw exception?
     }
-    for (Pin* pin : allPins) {
+    for (Pin* pin : allPins()) {
         pin->initialize();
     }
 }
 
 Command_Interpreter_RPi5::ThrusterSpec Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) {
-    /*
-     * Converts a pwm frequency between 1100 and 1900 into a Thruster Spec.
-     * @param pwmFrequency: a pwm frequency between 1100 and 1900
-     * @return: a Thruster Spec with a pwm magnitude between 0 and MAX_PWM_VALUE and a Direction
-     */
+
     // 1100 - 1464 = negative
     // 1536 - 1900 = positive
     const int minPosPwmFrequency = 1535; // slightly less than 1536 so that 1536 is not zero
@@ -153,10 +152,15 @@ Command_Interpreter_RPi5::ThrusterSpec Command_Interpreter_RPi5::convertPwmValue
 void Command_Interpreter_RPi5::execute(const Command& command) {
     int i = 0;
     for (int frequency : command.thruster_pwms.pwm_signals) {
-        std::cout << "frequency: " << frequency << std::endl;
         ThrusterSpec thrusterSpec = convertPwmValue(frequency);
         thrusterPins.at(i)->setPowerAndDirection(thrusterSpec.pwm_value, thrusterSpec.direction);
         i++;
     }
     //TODO: duration
+}
+
+Command_Interpreter_RPi5::~Command_Interpreter_RPi5() {
+    for (auto pin : allPins()) {
+        delete pin;
+    }
 }
