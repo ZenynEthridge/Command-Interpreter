@@ -243,7 +243,7 @@ force_array Thruster_Commander::thrust_compute_fx_fy_fz_mz(float x_distance, flo
 	force_array forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute_fx_fy_fz_mx_my_mz(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque) 
+force_array Thruster_Commander::thrust_compute_fx_fy_fz_mx_my_mz(float x_force, float y_force, float z_force, float x_torque, float y_torque, float z_torque) 
 {
 	// this is the most general case
 	// all forces and torques are specified
