@@ -127,7 +127,6 @@ Eigen::Matrix<float, 1, 3> Thruster_Commander::compute_forces(force_array forces
 	}
 	return total_force;
 }
-
 Eigen::Matrix<float, 1, 3> Thruster_Commander::compute_torques(force_array forces)
 {
 	Eigen::Matrix<float, 1, 3> total_torque = Eigen::Matrix<float, 1, 3>::Zero();
@@ -137,7 +136,6 @@ Eigen::Matrix<float, 1, 3> Thruster_Commander::compute_torques(force_array force
 	}
 	return total_torque;
 }
-
 void Thruster_Commander::test_force_functions()
 {
 	// check thrust_compute_fz
@@ -153,7 +151,6 @@ void Thruster_Commander::test_force_functions()
 	// check thrust_compute_fx_fy_fz_mz
 	// check thrust_compute_fx_fy_fz_mx_my_mz
 }
-
 // this one is done and seems to work
 force_array Thruster_Commander::thrust_compute_fz(float z_force)
 {
@@ -250,7 +247,6 @@ force_array Thruster_Commander::thrust_compute_fx_fy_fz_mx_my_mz(float x_force, 
 	force_array forces;
 	return forces;
 }
-
 force_array Thruster_Commander::thrust_compute(Eigen::Matrix<float, 1, 6> force_torque, bool simple=true)
 {
 	// this is a general case force function
@@ -258,4 +254,32 @@ force_array Thruster_Commander::thrust_compute(Eigen::Matrix<float, 1, 6> force_
 	// if simple=true, mz and my will be neglected
 	force_array forces;
 	return forces;
+}
+
+Eigen::Matrix<float, 1, 3> Thruster_Commander::predict_drag_forces(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity)
+{
+	// Drag force = 0.5 * rho_water * v^2 * Cd * A
+	// rho water is known, A can be found as a function of direction, v is input, Cd is unknown, but can be estimated or found through trail and error
+	Eigen::Matrix<float, 1, 3> drag_force = Eigen::Matrix<float, 1, 3>::Zero();
+	return drag_force;
+}
+Eigen::Matrix<float, 1, 3> Thruster_Commander::predict_drag_torques(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity)
+{
+	// <drag_torque> = <r> x <drag_force> = <r> x < 0.5 * rho_water * (r*omega)^2 * Cd * A >
+	// this will be a little trickier to calculate, might require integration
+	Eigen::Matrix<float, 1, 3> drag_torque = Eigen::Matrix<float, 1, 3>::Zero();
+	return drag_torque;
+}
+
+Eigen::Matrix<float, 1, 3> Thruster_Commander::predict_env_forces(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity)
+{
+	// environmental forces such as weight, boyancy, drag, ect
+	Eigen::Matrix<float, 1, 3> env_forces = Eigen::Matrix<float, 1, 3>::Zero();
+	return env_forces;
+}
+Eigen::Matrix<float, 1, 3> Thruster_Commander::predict_env_torques(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity)
+{
+	// torques produced by environmental forces
+	Eigen::Matrix<float, 1, 3> env_torques = Eigen::Matrix<float, 1, 3>::Zero();
+	return env_torques;
 }

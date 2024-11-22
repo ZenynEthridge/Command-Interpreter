@@ -13,6 +13,7 @@ protected:
 	// Shouldn't usually change
 	Eigen::Matrix<float, 1, 3> mass_center;
 	Eigen::Matrix<float, 1, 3> volume_center;
+	Eigen::Matrix<float, 1, 3> mass_moment_of_inertia;  // Moment of inertia of the vehicle about the x, y, and z axes (kg*m^2)
 	Eigen::Matrix<float, 8, 3> thruster_positions;
 	Eigen::Matrix<float, 8, 3> thruster_moment_arms;  // Distance from thruster to mass center (m)
 	Eigen::Matrix<float, 8, 3> thruster_directions;  // Direction of thruster force (unit vector)
@@ -23,7 +24,7 @@ protected:
 	float mass;        // Mass of the vehicle (kg)
 	float volume;     // Displacement volume of the vehicle (m^3)
 	float rho_water; // Density of water (kg/m^3)
-	float gravity;   // Acceleration due to gravity (m/s^2)
+	float gravity;  // Acceleration due to gravity (m/s^2)
 	float weight_magnitude; // Weight of the vehicle (N)
 	float buoyant_magnitude; // Buoyant force on the vehicle (N)
 
@@ -58,24 +59,43 @@ protected:
 
 
 	// Drag force = 0.5 * rho_water * v^2 * Cd * A
-	// rho water is known, A can be found as a function of direction, v is input, Cd is unknown, but can be estimated or found through trail and error
-	Eigen::Matrix<float, 1, 3> predict_drag_forces(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity);
+	// rho water is known, A can be found as a function of direction, 
+	// v is input, Cd is unknown, but can be estimated or found through trail and error
+	Eigen::Matrix<float, 1, 3> predict_drag_forces(
+		Eigen::Matrix<float, 1, 3> velocity, 
+		Eigen::Matrix<float, 1, 3> angular_velocity);
 	
 	// <drag_torque> = <r> x <drag_force> = <r> x < 0.5 * rho_water * (r*omega)^2 * Cd * A >
 	// this will be a little trickier to calculate, might require integration
-	Eigen::Matrix<float, 1, 3> predict_drag_torques(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity);
+	Eigen::Matrix<float, 1, 3> predict_drag_torques(
+		Eigen::Matrix<float, 1, 3> velocity, 
+		Eigen::Matrix<float, 1, 3> angular_velocity);
+
 
 	// environmental forces such as weight, boyancy, drag, ect
-	Eigen::Matrix<float, 1, 3> predict_env_forces(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity);
+	Eigen::Matrix<float, 1, 3> predict_env_forces(
+		Eigen::Matrix<float, 1, 3> velocity, 
+		Eigen::Matrix<float, 1, 3> angular_velocity);
 
 	// torques produced by environmental forces
-	Eigen::Matrix<float, 1, 3> predict_env_torques(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity);
+	Eigen::Matrix<float, 1, 3> predict_env_torques(
+		Eigen::Matrix<float, 1, 3> velocity, 
+		Eigen::Matrix<float, 1, 3> angular_velocity);
 
+	// this function will integrate the environmental forces and thruster
+	// forces to calculate the linear and angular impulse (change in momentum) 
+	// on the vehicle
+	Eigen::Matrix<float, 1, 6> integrate_impulse(
+		Eigen::Matrix<float, 1, 3> start_velocity, 
+		Eigen::Matrix<float, 1, 3> start_angular_velocity,
+		Eigen::Matrix<float, 1, 8> thruster_sets, float duration, int n);
 	// net force produced by thrusters at a particular set of pwms. This will mostly be used for testing
 	Eigen::Matrix<float, 1, 3> predict_net_force(Eigen::Matrix<float, 1, 8> pwms);
 
 	// net torque produced by thrusters at a particular set of pwms. This will mostly be used for testing
 	Eigen::Matrix<float, 1, 3> predict_net_torque(Eigen::Matrix<float, 1, 8> pwms);
+
+	
 
 public:
 	Thruster_Commander();
@@ -113,17 +133,24 @@ public:
 	force_array thrust_compute_fx_fy_fz_mz(float x_distance, float y_force, float z_force, float torque);
 	force_array thrust_compute_fx_fy_fz_mx_my_mz(float x_force, float y_force, float z_force, float, float x_torque, float y_torque, float z_torque);
 
-	// this is a general case force function
+	// this is the general case force function
 	// it will call other force functions depending on what forces and torques are specified
 	// if simple=true, mz and my will be neglected
 	force_array thrust_compute(Eigen::Matrix<float, 1, 6> force_torque, bool simple=true);
 
 	// computes a force array from an acceleration vector (surge, sway, heave) in m/s^2, and (roll, pitch, yaw) in rad/s^2
+	// this function will consider the mass of the vehicle and external forces such as drag
 	force_array acceleration_compute(Eigen::Matrix<float, 1, 6> acceleration, bool simple=true);
 
 	// generates a command to a target velocity
 	// target velocity is a 1x6 matrix with (sway, surge, heave) linear velocities in m/s and (roll, pitch, yaw) angular velocities in r/s
 	Command accelerate_to(Eigen::Matrix<float, 1, 6> target_velocity);
 	
+
+	// this is the big, important, general case function which we're building up to
+	std::vector<Command> sequence_to(
+		Eigen::Matrix<float, 1, 6> target_position, 
+		Eigen::Matrix<float, 1, 6> target_velocity,
+		Eigen::Matrix<float, 1, 6> target_acceleration);
 };
 
