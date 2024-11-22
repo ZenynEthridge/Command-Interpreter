@@ -3,7 +3,6 @@
 #include <string>
 #include "Thruster_Commander.h"
 #include "eigen-3.4.0/Eigen/Dense"
-#include "yaml-cpp-master/include/yaml-cpp/yaml.h"
 
 Thruster_Commander::Thruster_Commander()
 {
@@ -71,7 +70,7 @@ Thruster_Commander::Thruster_Commander()
 }
 Thruster_Commander::Thruster_Commander(std::string file, std::string type)
 {
-
+	
 }
 Thruster_Commander::~Thruster_Commander()
 {
