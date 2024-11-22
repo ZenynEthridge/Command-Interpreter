@@ -1,3 +1,4 @@
+#include <string>
 
 struct PinSetEvent {
     int pinNumber;
