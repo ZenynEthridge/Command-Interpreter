@@ -13,7 +13,7 @@
 #define OUTPUT 0
 #define HIGH 1
 #define LOW 0
-
+//TODO: wrapper class for wiringPi GTest
 int wiringPiSetupGpio() {
     std::cout << "[Mock] wiringPi GPIO set up!" << std::endl;
     return 0;
@@ -105,16 +105,20 @@ Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<PwmPin*> thruster
     if (this->thrusterPins.size() != 8) {
         std::cerr << "Incorrect number of thruster pwm pins given! Need 8, given " << this->thrusterPins.size() << std::endl;
     }
-    allPins = std::vector<Pin*>{};
+}
+
+std::vector<Pin*> Command_Interpreter_RPi5::allPins() {
+    auto allPins = std::vector<Pin*>{};
     allPins.insert(allPins.end(), this->thrusterPins.begin(), this->thrusterPins.end());
     allPins.insert(allPins.end(), this->digitalPins.begin(), this->digitalPins.end());
+    return allPins;
 }
 
 void Command_Interpreter_RPi5::initializePins() {
     if (wiringPiSetupGpio() == -1) {
         std::cerr << "Failure to configure GPIO pins through wiringPi!" << std::endl; //throw exception?
     }
-    for (Pin* pin : allPins) {
+    for (Pin* pin : allPins()) {
         pin->initialize();
     }
 }
@@ -156,7 +160,7 @@ void Command_Interpreter_RPi5::execute(const Command& command) {
 }
 
 Command_Interpreter_RPi5::~Command_Interpreter_RPi5() {
-    for (auto pin : allPins) {
+    for (auto pin : allPins()) {
         delete pin;
     }
 }

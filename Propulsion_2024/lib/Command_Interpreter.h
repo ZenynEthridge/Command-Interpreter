@@ -77,7 +77,7 @@ private:
         int pwm_value;
         Direction direction;
     };
-    std::vector<Pin*> allPins;
+    std::vector<Pin*> allPins();
     std::vector<PwmPin*> thrusterPins;
     std::vector<DigitalPin*> digitalPins;
 
