@@ -264,7 +264,7 @@ Eigen::Matrix<float, 1, 6> Thruster_Commander::predict_drag_forces(Eigen::Matrix
 	// Drag force = 0.5 * rho_water * v^2 * Cd * A
 	// where cd is the drag coefficient, and A is the reference area
 	
-	Eigen::Matrix<float, 1, 3> drag_force = Eigen::Matrix<float,1,3>::Zero();
+	Eigen::Matrix<float, 1, 6> drag_force = Eigen::Matrix<float,1,6>::Zero();
 
 	// this is a guess. Actual surface area should be approximated
 	float area = 0.1;
@@ -280,6 +280,7 @@ Eigen::Matrix<float, 1, 6> Thruster_Commander::predict_drag_forces(Eigen::Matrix
 	// drag_torque = r x drag_force
 	// d[drag torque] = 0.5 * rho_water * (r*omega)^2 * Cd * d[A]
 	// drag_torque = integral(d[drag torque]) over A
+	// this might simplify to something less mathy. try pen&paper
 	for (int i = 3; i < 6; i++)
 	{
 	}
@@ -288,12 +289,7 @@ Eigen::Matrix<float, 1, 6> Thruster_Commander::predict_drag_forces(Eigen::Matrix
 	return drag_force;
 }
 
-Eigen::Matrix<float, 1, 6> Thruster_Commander::predict_env_forces(Eigen::Matrix<float, 1, 6> velocity)
-{
-	// environmental forces such as weight, boyancy, drag, ect
-	Eigen::Matrix<float, 1, 6> env_forces = predict_drag_forces(velocity) /*+ weight_force()*/;
-	return env_forces;
-}
+
 
 std::vector<Command> Thruster_Commander::sequence_to(Eigen::Matrix<float, 1, 6> target_position)
 {

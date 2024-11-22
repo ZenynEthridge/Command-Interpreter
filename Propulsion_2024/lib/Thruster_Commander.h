@@ -10,15 +10,26 @@ class Thruster_Commander
 {
 protected:
 
+	/// @breif a set of values for each thruster
+	typedef Eigen::Matrix<float, 8, 1> thruster_set_1D;
+	typedef Eigen::Matrix<float, 8, 3> thruster_set_3D;
+	typedef Eigen::Matrix<float, 8, 6> thruster_set_6D;
+
+
+	typedef Eigen::Matrix<float, 1, 6> six_axis;
+	typedef Eigen::Matrix<float, 1, 3> three_axis;
+	
+	
 	// Shouldn't usually change
-	Eigen::Matrix<float, 1, 3> mass_center;
-	Eigen::Matrix<float, 1, 3> volume_center;
-	Eigen::Matrix<float, 1, 3> mass_moment_of_inertia;  // Moment of inertia of the vehicle about the x, y, and z axes (kg*m^2)
-	Eigen::Matrix<float, 8, 3> thruster_positions;
-	Eigen::Matrix<float, 8, 3> thruster_moment_arms;  // Distance from thruster to mass center (m)
-	Eigen::Matrix<float, 8, 3> thruster_directions;  // Direction of thruster force (unit vector)
-	Eigen::Matrix<float, 8, 3> thruster_torques;    // Torque of thruster on the sub about the x,y and z axes (N*m)
-	Eigen::Matrix<float, 8, 1> thruster_voltages;  // voltage supplied to each thruster (V) (this might not be a constant)
+	three_axis mass_center;
+	three_axis volume_center;
+	three_axis mass_moment_of_inertia;  // Moment of inertia of the vehicle about the x, y, and z axes (kg*m^2)
+	thruster_set_3D thruster_positions;
+	
+	thruster_set_3D thruster_moment_arms;  // Distance from thruster to mass center (m)
+	thruster_set_3D thruster_directions;  // Direction of thruster force (unit vector)
+	thruster_set_3D thruster_torques;    // Torque of thruster on the sub about the x,y and z axes (N*m)
+	thruster_set_1D thruster_voltages;  // voltage supplied to each thruster (V) (this might not be a constant)
 
 	int num_thrusters;  // Number of thrusters on the vehicle
 	float mass;        // Mass of the vehicle (kg)
@@ -28,16 +39,16 @@ protected:
 	float weight_magnitude; // Weight of the vehicle (N)
 	float buoyant_magnitude; // Buoyant force on the vehicle (N)
 
-	// Variables. These need to be updated continuously
-	Eigen::Matrix<float, 1, 3> orientation; // Orientation of the vehicle (roll, pitch, yaw) in radians relative to starting orientation
-	Eigen::Matrix<float, 1, 3> position;    // Position of the vehicle (x, y, z) in meters relative to starting position
-	Eigen::Matrix<float, 1, 3> velocity;    // Velocity of the vehicle (surge, sway, heave) in m/s
-	Eigen::Matrix<float, 1, 3> angular_velocity; // Angular velocity of the vehicle (roll, pitch, yaw) in rad/s
-	Eigen::Matrix<float, 1, 3> acceleration; // Acceleration of the vehicle (surge, sway, heave) in m/s^2
-	Eigen::Matrix<float, 1, 3> angular_acceleration; // Angular acceleration of the vehicle (roll, pitch, yaw) in rad/s^2
-	Eigen::Matrix<float, 1, 3> water_current_velocity; // velocity of the water current in m/s. Should be near 0 in controlled environments
 
-	Eigen::Matrix<float, 1, 3> weight_force(); // Weight of the vehicle (N)
+	// Variables. These need to be updated continuously
+	three_axis orientation; // Orientation of the vehicle (roll, pitch, yaw) in radians relative to starting orientation
+	three_axis position;    // Position of the vehicle (x, y, z) in meters relative to starting position
+	three_axis velocity;    // Velocity of the vehicle (surge, sway, heave) in m/s
+	three_axis angular_velocity; // Angular velocity of the vehicle (roll, pitch, yaw) in rad/s
+	three_axis acceleration; // Acceleration of the vehicle (surge, sway, heave) in m/s^2
+	three_axis angular_acceleration; // Angular acceleration of the vehicle (roll, pitch, yaw) in rad/s^2
+	three_axis water_current_velocity; // velocity of the water current in m/s. Should be near 0 in controlled environments
+
 public:
 	Thruster_Commander();
 
@@ -49,6 +60,7 @@ public:
 	void print_info();
 	// Returns the PWM value for a given thruster and force
 	int get_pwm(int thruster_num, float force);
+	Eigen::Matrix<float, 1, 3> weight_force(); // Weight of the vehicle (N)
 
 	// Returns the PWM values for a given set of forces
 	pwm_array get_pwms(force_array forces);
@@ -63,8 +75,8 @@ public:
 	Eigen::Matrix<float, 1, 3> compute_torques(force_array);
 
 	// these functions will find weight and boyancy force vectors based on orientation and magnitudes
-	Eigen::Matrix<float, 1, 3> weight_force();
-	Eigen::Matrix<float, 1, 3> buoyant_force();
+	Eigen::Matrix<float, 1, 3> weight_force(Eigen::Matrix<float, 1, 3> orientation);
+	Eigen::Matrix<float, 1, 3> buoyant_force(Eigen::Matrix<float, 1, 3> orientation);
 
 
 	// Drag force = 0.5 * rho_water * v^2 * Cd * A
