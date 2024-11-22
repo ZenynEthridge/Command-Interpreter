@@ -13,7 +13,7 @@ Thruster_Commander::Thruster_Commander()
 	
 	// Values come from Onshape 2024 Vehicle V10 11/12/24
 	num_thrusters = 8;
-	Eigen::Matrix<float, 1, 3> mass_center_inches = { 0, 0.466, 1.561 };
+	Eigen::Matrix<float, 1, 3> mass_center_inches = { 0.466, 0, 1.561 };
 	mass_center = mass_center_inches * 0.0254; // convert to meters
 	
 	volume_center = mass_center; // volume center, currently, is a complete guess
@@ -22,15 +22,16 @@ Thruster_Commander::Thruster_Commander()
 	// avg(max distance, min distance) of motor part 4 cylindrical surface to orgin
 	// front left top, front right top, rear left top, rear right top, front left bottom, front right bottom, rear left bottom, rear right bottom
 	// x, y, z coordinates here are how the appear on onshape. May need to be corrected to match surge, sway, heave
+
 	thruster_positions = Eigen::Matrix<float, 8, 3>::Zero();
-	thruster_positions.row(0) <<  -.2035, .2535, .042 ;
-	thruster_positions.row(1) << .2035, .2535, -.042;
-	thruster_positions.row(2) << -.2035, -.2545, .042;
-	thruster_positions.row(3) << .2035, -.2545, .042;
-	thruster_positions.row(4) << -.1375, .167, -.049;
-	thruster_positions.row(5) << .1375, .167, -.049;
-	thruster_positions.row(6) << -.1165, -.1975, -.049;
-	thruster_positions.row(7) << .1165, -.1975, -.049;
+	thruster_positions.row(0) <<   .2535, -.2035, .042 ;
+	thruster_positions.row(1) <<  .2535, .2035, -.042;
+	thruster_positions.row(2) <<  -.2545, -.2035, .042;
+	thruster_positions.row(3) <<  -.2545, .2035, .042;
+	thruster_positions.row(4) <<  .167, -.1375, -.049;
+	thruster_positions.row(5) <<  .167, .1375, -.049;
+	thruster_positions.row(6) <<  -.1975, -.1165, -.049;
+	thruster_positions.row(7) <<  -.1975, .1165, -.049;
 	
 	// torques will be calulated about the center of mass
 	thruster_moment_arms = thruster_positions - mass_center.replicate(8, 1);
@@ -45,8 +46,8 @@ Thruster_Commander::Thruster_Commander()
 	thruster_directions.row(2) << 0, 0, 1;
 	thruster_directions.row(3) << 0, 0, 1;
 	thruster_directions.row(4) << -sin45, -sin45, 0;
-	thruster_directions.row(5) <<  sin45, -sin45, 0;
-	thruster_directions.row(6) << sin45, -sin45, 0;
+	thruster_directions.row(5) <<  -sin45, sin45, 0;
+	thruster_directions.row(6) << -sin45, sin45, 0;
 	thruster_directions.row(7) << -sin45, -sin45, 0;
 
 	thruster_torques = Eigen::Matrix<float, 8, 3>::Zero();
