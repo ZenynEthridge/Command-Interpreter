@@ -116,12 +116,14 @@ public:
 	// this is a general case force function
 	// it will call other force functions depending on what forces and torques are specified
 	// if simple=true, mz and my will be neglected
-	force_array thrust_compute(Eigen::Matrix<float, 1, 3> force_torque, bool simple=true);
+	force_array thrust_compute(Eigen::Matrix<float, 1, 6> force_torque, bool simple=true);
 
-	// accelerations fuctions
-	// these functions return a command obj
+	// computes a force array from an acceleration vector (surge, sway, heave) in m/s^2, and (roll, pitch, yaw) in rad/s^2
+	force_array acceleration_compute(Eigen::Matrix<float, 1, 6> acceleration, bool simple=true);
 
-	std::vector<Command> travel_fz(float z_distance, float stop_time);
+	// generates a command to a target velocity
+	// target velocity is a 1x6 matrix with (sway, surge, heave) linear velocities in m/s and (roll, pitch, yaw) angular velocities in r/s
+	Command accelerate_to(Eigen::Matrix<float, 1, 6> target_velocity);
 	
 };
 
