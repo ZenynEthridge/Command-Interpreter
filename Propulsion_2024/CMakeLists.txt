@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 14)
 add_compile_options("-DMOCK_RPI")
 
 include_directories(.)
+include_directories(
+   third-party/yaml-cpp/include
+)    
 
 add_executable(Propulsion_2024
         Command.h

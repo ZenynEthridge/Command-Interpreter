@@ -102,7 +102,7 @@ public:
 	Thruster_Commander();
 
 	// we should move to this constructor style asap
-	Thruster_Commander(std::string file, std::string type="yaml");
+	Thruster_Commander(std::string file);
 	~Thruster_Commander();
 
 	// mostly for debugging purposes

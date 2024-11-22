@@ -68,7 +68,7 @@ Thruster_Commander::Thruster_Commander()
 	acceleration = Eigen::Matrix<float, 1, 3>::Zero();
 	angular_acceleration = Eigen::Matrix<float, 1, 3>::Zero();
 }
-Thruster_Commander::Thruster_Commander(std::string file, std::string type)
+Thruster_Commander::Thruster_Commander(std::string file)
 {
 	
 }
