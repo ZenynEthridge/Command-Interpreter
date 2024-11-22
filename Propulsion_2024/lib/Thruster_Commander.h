@@ -35,9 +35,18 @@ protected:
 	Eigen::Matrix<float, 1, 3> angular_velocity; // Angular velocity of the vehicle (roll, pitch, yaw) in rad/s
 	Eigen::Matrix<float, 1, 3> acceleration; // Acceleration of the vehicle (surge, sway, heave) in m/s^2
 	Eigen::Matrix<float, 1, 3> angular_acceleration; // Angular acceleration of the vehicle (roll, pitch, yaw) in rad/s^2
-
 	Eigen::Matrix<float, 1, 3> water_current_velocity; // velocity of the water current in m/s. Should be near 0 in controlled environments
 
+	Eigen::Matrix<float, 1, 3> weight_force(); // Weight of the vehicle (N)
+public:
+	Thruster_Commander();
+
+	// we should move to this constructor style asap
+	Thruster_Commander(std::string file);
+	~Thruster_Commander();
+
+	// mostly for debugging purposes
+	void print_info();
 	// Returns the PWM value for a given thruster and force
 	int get_pwm(int thruster_num, float force);
 
@@ -48,7 +57,7 @@ protected:
 	int get_force_from_pwm(int thruster_num, int pwm);
 
 	void test_force_functions();
-	
+
 	// also mostly for testing
 	Eigen::Matrix<float, 1, 3> compute_forces(force_array);
 	Eigen::Matrix<float, 1, 3> compute_torques(force_array);
@@ -61,32 +70,24 @@ protected:
 	// Drag force = 0.5 * rho_water * v^2 * Cd * A
 	// rho water is known, A can be found as a function of direction, 
 	// v is input, Cd is unknown, but can be estimated or found through trail and error
-	Eigen::Matrix<float, 1, 3> predict_drag_forces(
-		Eigen::Matrix<float, 1, 3> velocity, 
-		Eigen::Matrix<float, 1, 3> angular_velocity);
-	
-	// <drag_torque> = <r> x <drag_force> = <r> x < 0.5 * rho_water * (r*omega)^2 * Cd * A >
-	// this will be a little trickier to calculate, might require integration
-	Eigen::Matrix<float, 1, 3> predict_drag_torques(
-		Eigen::Matrix<float, 1, 3> velocity, 
-		Eigen::Matrix<float, 1, 3> angular_velocity);
+	Eigen::Matrix<float, 1, 6> predict_drag_forces(Eigen::Matrix<float, 1, 6> velocity);
+
 
 
 	// environmental forces such as weight, boyancy, drag, ect
-	Eigen::Matrix<float, 1, 3> predict_env_forces(
-		Eigen::Matrix<float, 1, 3> velocity, 
-		Eigen::Matrix<float, 1, 3> angular_velocity);
+	Eigen::Matrix<float, 1, 6> predict_env_forces(
+		Eigen::Matrix<float, 1, 6> velocity);
 
 	// torques produced by environmental forces
 	Eigen::Matrix<float, 1, 3> predict_env_torques(
-		Eigen::Matrix<float, 1, 3> velocity, 
+		Eigen::Matrix<float, 1, 3> velocity,
 		Eigen::Matrix<float, 1, 3> angular_velocity);
 
 	// this function will integrate the environmental forces and thruster
 	// forces to calculate the linear and angular impulse (change in momentum) 
 	// on the vehicle
 	Eigen::Matrix<float, 1, 6> integrate_impulse(
-		Eigen::Matrix<float, 1, 3> start_velocity, 
+		Eigen::Matrix<float, 1, 3> start_velocity,
 		Eigen::Matrix<float, 1, 3> start_angular_velocity,
 		Eigen::Matrix<float, 1, 8> thruster_sets, float duration, int n);
 
@@ -95,19 +96,6 @@ protected:
 
 	// net torque produced by thrusters at a particular set of pwms. This will mostly be used for testing
 	Eigen::Matrix<float, 1, 3> predict_net_torque(Eigen::Matrix<float, 1, 8> pwms);
-
-	
-
-public:
-	Thruster_Commander();
-
-	// we should move to this constructor style asap
-	Thruster_Commander(std::string file);
-	~Thruster_Commander();
-
-	// mostly for debugging purposes
-	void print_info();
-
 	// functions begining with 'simple_' make the assumption that the vehicle is stable about the x and y axes
 	// these functions only need to consider forces in the x, y, and z directions, and moments about the z axis
 	// these should output 1x8 arrays of pwm signals, not commands
@@ -148,12 +136,9 @@ public:
 	// generates a command to a target velocity
 	// target velocity is a 1x6 matrix with (sway, surge, heave) linear velocities in m/s and (roll, pitch, yaw) angular velocities in r/s
 	Command accelerate_to(Eigen::Matrix<float, 1, 6> target_velocity);
-	
+
 
 	// this is the big, important, general case function which we're building up to
-	std::vector<Command> sequence_to(
-		Eigen::Matrix<float, 1, 6> target_position, 
-		Eigen::Matrix<float, 1, 6> target_velocity,
-		Eigen::Matrix<float, 1, 6> target_acceleration);
+	std::vector<Command> sequence_to(Eigen::Matrix<float, 1, 6> target_position);
 };
 
