@@ -259,30 +259,59 @@ force_array Thruster_Commander::thrust_compute(Eigen::Matrix<float, 1, 6> force_
 	return forces;
 }
 
-Eigen::Matrix<float, 1, 3> Thruster_Commander::predict_drag_forces(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity)
+Eigen::Matrix<float, 1, 6> Thruster_Commander::predict_drag_forces(Eigen::Matrix<float, 1, 6> velocity)
 {
 	// Drag force = 0.5 * rho_water * v^2 * Cd * A
-	// rho water is known, A can be found as a function of direction, v is input, Cd is unknown, but can be estimated or found through trail and error
-	Eigen::Matrix<float, 1, 3> drag_force = Eigen::Matrix<float, 1, 3>::Zero();
+	// where cd is the drag coefficient, and A is the reference area
+	
+	Eigen::Matrix<float, 1, 3> drag_force = Eigen::Matrix<float,1,3>::Zero();
+
+	// this is a guess. Actual surface area should be approximated
+	float area = 0.1;
+	// drag coefficient for a cylinder. also a guess
+	// todo : make drag coefficient a function of direction
+	float Cd = 0.82; 
+	for (int i = 0; i < 3; i++)
+	{
+		drag_force(0, i) = 0.5 * rho_water * pow(velocity(i), 2) * Cd * area;
+	}
+	// todo : find a way to calculate drag torques. This might be way mathier or it might be simple
+	// v = r x w
+	// drag_torque = r x drag_force
+	// d[drag torque] = 0.5 * rho_water * (r*omega)^2 * Cd * d[A]
+	// drag_torque = integral(d[drag torque]) over A
+	for (int i = 3; i < 6; i++)
+	{
+	}
+
+	std::cout << "Drag Force: " << drag_force << std::endl;	
 	return drag_force;
 }
-Eigen::Matrix<float, 1, 3> Thruster_Commander::predict_drag_torques(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity)
-{
-	// <drag_torque> = <r> x <drag_force> = <r> x < 0.5 * rho_water * (r*omega)^2 * Cd * A >
-	// this will be a little trickier to calculate, might require integration
-	Eigen::Matrix<float, 1, 3> drag_torque = Eigen::Matrix<float, 1, 3>::Zero();
-	return drag_torque;
-}
 
-Eigen::Matrix<float, 1, 3> Thruster_Commander::predict_env_forces(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity)
+Eigen::Matrix<float, 1, 6> Thruster_Commander::predict_env_forces(Eigen::Matrix<float, 1, 6> velocity)
 {
 	// environmental forces such as weight, boyancy, drag, ect
-	Eigen::Matrix<float, 1, 3> env_forces = Eigen::Matrix<float, 1, 3>::Zero();
+	Eigen::Matrix<float, 1, 6> env_forces = predict_drag_forces(velocity) /*+ weight_force()*/;
 	return env_forces;
 }
-Eigen::Matrix<float, 1, 3> Thruster_Commander::predict_env_torques(Eigen::Matrix<float, 1, 3> velocity, Eigen::Matrix<float, 1, 3> angular_velocity)
+
+std::vector<Command> Thruster_Commander::sequence_to(Eigen::Matrix<float, 1, 6> target_position)
 {
-	// torques produced by environmental forces
-	Eigen::Matrix<float, 1, 3> env_torques = Eigen::Matrix<float, 1, 3>::Zero();
-	return env_torques;
+	Eigen::Matrix<float, 1, 6> start_position;
+	start_position << position, orientation;
+	std::cout << "Start Position: " << start_position << std::endl;
+	std::cout << "Target Position: " << target_position << std::endl;
+	
+	Eigen::Matrix<float, 1, 6> distance = target_position - start_position;
+	std::cout << "Distance: " << distance << std::endl;
+	Eigen::Matrix<float, 1, 6> direction = distance.normalized();
+	std::cout << "Direction: " << direction << std::endl;
+
+	// we need a function to compute the max thrust possible in the prefered direction
+	// then we need to calculate the max speed possible in that direction
+	// should the robot reorient first?
+	// in which orientation is the robot the fastest?
+
+	std::vector<Command> commands;
+	return commands;
 }
