@@ -28,6 +28,25 @@ bool operator==(ParseInterpreterResult const& lhs, ParseInterpreterResult const&
     return lhs.wiringPiSetUp == rhs.wiringPiSetUp && lhs.pinSetEvents == rhs.pinSetEvents && lhs.pinWriteEvents == rhs.pinWriteEvents;
 }
 
+std::ostream& operator<<(std::ostream& os, ParseInterpreterResult const& object) {
+    os << "parseInterpreterResult with:" << std::endl <<  "wiringPiSetUp: " << object.wiringPiSetUp << std::endl;
+    if (!object.pinSetEvents.empty()) {
+        os << "pinSetEvents: " << std::endl;
+        for (auto pinSetEvent : object.pinSetEvents) {
+            os << "pin " << pinSetEvent.pinNumber << " set to mode " << pinSetEvent.pinMode << std::endl;
+        }
+    }
+
+    if (!object.pinWriteEvents.empty()) {
+        os << "pinWriteEvents: " << std::endl;
+        for (auto pinWriteEvent : object.pinWriteEvents) {
+            os << "value " << pinWriteEvent.valueWritten << " written to pin " << pinWriteEvent.pinNumber << std::endl;
+        }
+    }
+    return os;
+}
+
+
 ParseInterpreterResult parseInterpreterOutput(const std::string& output) {
     ParseInterpreterResult parseResult;
     auto index = output.find("[Mock]") + 7;
