@@ -290,7 +290,21 @@ thruster_set Thruster_Commander::thrust_compute_fx(float x_force)
 {
 	// fy, fz and mz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	thruster_set forces;
+	float force_per_thruster = x_force / 4;
+	thruster_set forces = thruster_set();
+	for (int i = 0; i < 4; i++)
+	{
+		forces(i) = 0;
+	}
+	for (int i = 4; i < 8; i++)
+	{
+		forces(i) = force_per_thruster;
+	}
+	// Print the thruster set
+	for (int i = 0; i < num_thrusters; i++)
+	{
+		std::cout << i << " " << forces(i) << std::endl;
+	}
 	return forces;
 }
 thruster_set Thruster_Commander::thrust_compute_fx_fy(float x_force, float y_force)
@@ -370,7 +384,6 @@ std::vector<Command> Thruster_Commander::sequence_to(six_axis target_position)
 	std::cout << "Start Position: " << start_position << std::endl;
 	std::cout << "Target Position: " << target_position << std::endl;
 
-	Eigen::Matrix<float, 1, 6> distance = target_position - start_position;
 	std::cout << "Distance: " << distance << std::endl;
 	Eigen::Matrix<float, 1, 6> direction = distance.normalized();
 	std::cout << "Direction: " << direction << std::endl;
