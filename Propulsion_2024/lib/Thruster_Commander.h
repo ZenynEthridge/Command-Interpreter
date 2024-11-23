@@ -37,6 +37,7 @@ protected:
 	float weight_magnitude; // Weight of the vehicle (N)
 	float buoyant_magnitude; // Buoyant force on the vehicle (N)
 	
+	// todo: make these six axis
 	three_axis orientation; // roll, puitch, yaw in rad. sign convention is right hand rule
 	three_axis position;    // x, y, z, relative to start position in m
 	three_axis velocity;    // Velocity of the vehicle (surge, sway, heave) in m/s
@@ -77,26 +78,19 @@ public:
 	six_axis predict_drag_forces(six_axis velocity);
 
 	// environmental forces such as weight, boyancy, drag, ect
-	six_axis predict_env_forces(six_axis velocity, three_axis oritation);
-
-	// torques produced by environmental forces
-	Eigen::Matrix<float, 1, 3> predict_env_torques(
-		Eigen::Matrix<float, 1, 3> velocity,
-		Eigen::Matrix<float, 1, 3> angular_velocity);
+	six_axis predict_env_forces(six_axis velocity, six_axis oritation);
 
 	// this function will integrate the environmental forces and thruster
 	// forces to calculate the linear and angular impulse (change in momentum) 
 	// on the vehicle
-	Eigen::Matrix<float, 1, 6> integrate_impulse(
-		Eigen::Matrix<float, 1, 3> start_velocity,
-		Eigen::Matrix<float, 1, 3> start_angular_velocity,
-		Eigen::Matrix<float, 1, 8> thruster_sets, float duration, int n);
+	six_axis integrate_impulse(
+		six_axis start_velocity, 
+		thruster_set_1D thruster_sets, 
+		float duration, int n);
 
 	// net force produced by thrusters at a particular set of pwms. This will mostly be used for testing
-	Eigen::Matrix<float, 1, 3> predict_net_force(Eigen::Matrix<float, 1, 8> pwms);
+	six_axis predict_net_force(pwm_array pwms);
 
-	// net torque produced by thrusters at a particular set of pwms. This will mostly be used for testing
-	Eigen::Matrix<float, 1, 3> predict_net_torque(Eigen::Matrix<float, 1, 8> pwms);
 	// functions begining with 'simple_' make the assumption that the vehicle is stable about the x and y axes
 	// these functions only need to consider forces in the x, y, and z directions, and moments about the z axis
 	// these should output 1x8 arrays of pwm signals, not commands
@@ -128,18 +122,18 @@ public:
 	// this is the general case force function
 	// it will call other force functions depending on what forces and torques are specified
 	// if simple=true, mz and my will be neglected
-	force_array thrust_compute(Eigen::Matrix<float, 1, 6> force_torque, bool simple=true);
+	force_array thrust_compute(six_axis force_torque, bool simple=true);
 
 	// computes a force array from an acceleration vector (surge, sway, heave) in m/s^2, and (roll, pitch, yaw) in rad/s^2
 	// this function will consider the mass of the vehicle and external forces such as drag
-	force_array acceleration_compute(Eigen::Matrix<float, 1, 6> acceleration, bool simple=true);
+	force_array acceleration_compute(six_axis acceleration, bool simple=true);
 
 	// generates a command to a target velocity
 	// target velocity is a 1x6 matrix with (sway, surge, heave) linear velocities in m/s and (roll, pitch, yaw) angular velocities in r/s
-	Command accelerate_to(Eigen::Matrix<float, 1, 6> target_velocity);
+	Command accelerate_to(six_axis target_velocity);
 
 
 	// this is the big, important, general case function which we're building up to
-	std::vector<Command> sequence_to(Eigen::Matrix<float, 1, 6> target_position);
+	std::vector<Command> sequence_to(six_axis target_position);
 };
 
