@@ -9,11 +9,9 @@ Thruster_Commander::Thruster_Commander()
 	// TODO: Move all the hardcoded values in this constructor to a config file
 	//       this will make unit testing simpler
 	
-	
-	
 	// Values come from Onshape 2024 Vehicle V10 11/12/24
 	num_thrusters = 8;
-	Eigen::Matrix<float, 1, 3> mass_center_inches = { 0.466, 0, 1.561 };
+	three_axis mass_center_inches = { 0.466, 0, 1.561 };
 	mass_center = mass_center_inches * 0.0254; // convert to meters
 	
 	volume_center = mass_center; // volume center, currently, is a complete guess
@@ -23,7 +21,7 @@ Thruster_Commander::Thruster_Commander()
 	// front left top, front right top, rear left top, rear right top, front left bottom, front right bottom, rear left bottom, rear right bottom
 	// x, y, z coordinates here are how the appear on onshape. May need to be corrected to match surge, sway, heave
 
-	thruster_positions = Eigen::Matrix<float, 8, 3>::Zero();
+	thruster_positions = thruster_set_3D::Zero();
 	thruster_positions.row(0) <<   .2535, -.2035, .042 ;
 	thruster_positions.row(1) <<  .2535, .2035, -.042;
 	thruster_positions.row(2) <<  -.2545, -.2035, .042;
@@ -40,7 +38,7 @@ Thruster_Commander::Thruster_Commander()
 	// force direction will be reversed
 	const double PI = 3.141592653589793;
 	float sin45 = sin(45 * PI / 180);
-	thruster_directions = Eigen::Matrix<float, 8, 3>::Zero();
+	thruster_directions = thruster_set_3D::Zero();
 	thruster_directions.row(0) << 0, 0, 1;
 	thruster_directions.row(1) << 0, 0, 1;
 	thruster_directions.row(2) << 0, 0, 1;
@@ -64,12 +62,12 @@ Thruster_Commander::Thruster_Commander()
 	weight_magnitude = mass * gravity;
 	buoyant_magnitude = -rho_water * gravity * volume;
 	// all zeros for now
-	position = Eigen::Matrix<float, 1, 3>::Zero();
-	orientation = Eigen::Matrix<float, 1, 3>::Zero();
-	velocity = Eigen::Matrix<float, 1, 3>::Zero();
-	angular_velocity = Eigen::Matrix<float, 1, 3>::Zero();
-	acceleration = Eigen::Matrix<float, 1, 3>::Zero();
-	angular_acceleration = Eigen::Matrix<float, 1, 3>::Zero();
+	position = three_axis::Zero();
+	orientation = three_axis::Zero();
+	velocity = three_axis::Zero();
+	angular_velocity = three_axis::Zero();
+	acceleration = three_axis::Zero();
+	angular_acceleration = three_axis::Zero();
 }
 Thruster_Commander::Thruster_Commander(std::string file)
 {
@@ -160,18 +158,18 @@ six_axis Thruster_Commander::graviational_forces(three_axis orientation)
 	return result;
 }
 
-Eigen::Matrix<float, 1, 3> Thruster_Commander::compute_forces(force_array forces)
+three_axis Thruster_Commander::compute_forces(force_array forces)
 {
-	Eigen::Matrix<float, 1, 3> total_force = Eigen::Matrix<float, 1, 3>::Zero();
+	three_axis total_force = three_axis::Zero();
 	for (int i = 0; i < num_thrusters; i++)
 	{
 		total_force += forces.forces[i] * thruster_directions.row(i);
 	}
 	return total_force;
 }
-Eigen::Matrix<float, 1, 3> Thruster_Commander::compute_torques(force_array forces)
+three_axis Thruster_Commander::compute_torques(force_array forces)
 {
-	Eigen::Matrix<float, 1, 3> total_torque = Eigen::Matrix<float, 1, 3>::Zero();
+	three_axis total_torque = three_axis::Zero();
 	for (int i = 0; i < num_thrusters; i++)
 	{
 		total_torque += forces.forces[i] * thruster_torques.row(i);
@@ -289,7 +287,7 @@ force_array Thruster_Commander::thrust_compute_fx_fy_fz_mx_my_mz(float x_force, 
 	force_array forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute(Eigen::Matrix<float, 1, 6> force_torque, bool simple)
+force_array Thruster_Commander::thrust_compute(six_axis force_torque, bool simple)
 {
 	// this is a general case force function
 	// it will call other force functions depending on what forces and torques are specified
@@ -303,7 +301,7 @@ six_axis Thruster_Commander::predict_drag_forces(six_axis velocity)
 	// Drag force = 0.5 * rho_water * v^2 * Cd * A
 	// where cd is the drag coefficient, and A is the reference area
 	
-	Eigen::Matrix<float, 1, 6> drag_force = Eigen::Matrix<float,1,6>::Zero();
+	Eigen::Matrix<float, 1, 6> drag_force = six_axis::Zero();
 
 	// this is a guess. Actual surface area should be approximated
 	float area = 0.1;
@@ -330,7 +328,7 @@ six_axis Thruster_Commander::predict_drag_forces(six_axis velocity)
 
 
 
-std::vector<Command> Thruster_Commander::sequence_to(Eigen::Matrix<float, 1, 6> target_position)
+std::vector<Command> Thruster_Commander::sequence_to(six_axis target_position)
 {
 	Eigen::Matrix<float, 1, 6> start_position;
 	start_position << position, orientation;
