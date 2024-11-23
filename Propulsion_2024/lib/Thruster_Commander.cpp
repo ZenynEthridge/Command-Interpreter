@@ -1,3 +1,6 @@
+// Zenyn Ethridge, 2024
+// zjethridge@ucdavis.edu
+
 #include <iostream>
 #include <cmath>
 #include <string>
@@ -69,13 +72,7 @@ Thruster_Commander::Thruster_Commander()
 	acceleration = three_axis::Zero();
 	angular_acceleration = three_axis::Zero();
 }
-Thruster_Commander::Thruster_Commander(std::string file)
-{
-	
-}
-Thruster_Commander::~Thruster_Commander()
-{
-}
+Thruster_Commander::~Thruster_Commander(){}
 
 void Thruster_Commander::print_info() 
 {
@@ -187,28 +184,18 @@ three_axis Thruster_Commander::compute_torques(force_array forces)
 
 six_axis Thruster_Commander::predict_drag_forces(six_axis velocity)
 {
-	// Drag force = 0.5 * rho_water * v^2 * Cd * A
-	// where cd is the drag coefficient, and A is the reference area
-
-	Eigen::Matrix<float, 1, 6> drag_force = six_axis::Zero();
-
-	// this is a guess. Actual surface area should be approximated
-	float area = 0.1;
-	// drag coefficient for a cylinder. also a guess
-	// todo : make drag coefficient a function of direction
-	float Cd = 0.82;
-	for (int i = 0; i < 3; i++)
+	six_axis drag_force = six_axis::Zero();
+	
+	// explanation on notion: 
+	// https://www.notion.so/crsucd/
+	// Rotational-drag-analyssi-1478a3eca2f0801d86f2e0c8fb675c0d
+	float acd[6] = { 0.041, 0.005, 0.007, 0.005, 0.005, 0.005 };
+	
+	for (int i = 0; i < 6; i++)
 	{
-		drag_force(0, i) = 0.5 * rho_water * pow(velocity(i), 2) * Cd * area;
+		drag_force(0, i) = rho_water * pow(velocity(i), 2) * acd[i];
 	}
-	// todo : find a way to calculate drag torques. This might be way mathier or it might be simple
-	// v = r x w
-	// drag_torque = r x drag_force
-	// d[drag torque] = 0.5 * rho_water * (r*omega)^2 * Cd * d[A]
-	// drag_torque = integral(d[drag torque]) over A
-	// this might simplify to something less mathy. try pen&paper
-	for (int i = 3; i < 6; i++){/*insert math*/ }
-
+	
 	std::cout << "Drag Force: " << drag_force << std::endl;
 	return drag_force;
 }

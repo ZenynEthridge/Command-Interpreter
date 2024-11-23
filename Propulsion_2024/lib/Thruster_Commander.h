@@ -1,3 +1,6 @@
+// Zenyn Ethridge, 2024
+// zjethridge@ucdavis.edu
+
 #pragma once
 #include "eigen-3.4.0/Eigen/Dense"
 #include "Command.h"
@@ -5,7 +8,7 @@
 
 
 /// @breif a set of values for each thruster
-typedef Eigen::Matrix<float, 8, 1> thruster_set_1D;
+typedef Eigen::Matrix<float, 8, 1> thruster_set;
 typedef Eigen::Matrix<float, 8, 3> thruster_set_3D;
 typedef Eigen::Matrix<float, 8, 6> thruster_set_6D;
 
@@ -27,7 +30,7 @@ protected:
 	thruster_set_3D thruster_moment_arms;  // Distance from thruster to mass center (m)
 	thruster_set_3D thruster_directions;  // Direction of thruster force (unit vector)
 	thruster_set_3D thruster_torques;   // Torque of thruster on sub about x,y,z (Nm)
-	thruster_set_1D thruster_voltages; // voltage supplied to each thruster (V) 
+	thruster_set thruster_voltages; // voltage supplied to each thruster (V) 
 
 	int num_thrusters;  // Number of thrusters on the vehicle
 	float mass;        // Mass of the vehicle (kg)
@@ -80,12 +83,14 @@ public:
 	// environmental forces such as weight, boyancy, drag, ect
 	six_axis net_env_forces(six_axis velocity, three_axis oritation);
 
+	float top_speed(three_axis direction);
+
 	// this function will integrate the environmental forces and thruster
 	// forces to calculate the linear and angular impulse (change in momentum) 
 	// on the vehicle
 	six_axis integrate_impulse(
 		six_axis start_velocity, 
-		thruster_set_1D thruster_sets, 
+		thruster_set thruster_sets, 
 		float duration, int n);
 
 	// net force produced by thrusters at a particular set of pwms. This will mostly be used for testing
@@ -131,7 +136,6 @@ public:
 	// generates a command to a target velocity
 	// target velocity is a 1x6 matrix with (sway, surge, heave) linear velocities in m/s and (roll, pitch, yaw) angular velocities in r/s
 	Command accelerate_to(six_axis target_velocity);
-
 
 	// this is the big, important, general case function which we're building up to
 	std::vector<Command> sequence_to(six_axis target_position);

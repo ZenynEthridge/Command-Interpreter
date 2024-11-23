@@ -9,7 +9,6 @@ enum Direction {Forwards, Backwards};
 struct force_array{
 	float forces[8];
 };
- 
 struct pwm_array {
     int pwm_signals[8];
 };
