@@ -98,6 +98,7 @@ StyleCopReport.xml
 *.svclog
 *.scc
 *.sln
+*.wsp
 
 # Chutzpah Test files
 _Chutzpah*
@@ -362,6 +363,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/Propulsion_2024/.idea
-/Propulsion_2024/cmake-build-debug
-/Propulsion_2024/build/
+/.idea/
+/cmake-build-debug/
+/build/
