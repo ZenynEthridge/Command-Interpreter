@@ -6,7 +6,7 @@
 
 int main()
 {
-    auto data_file = YAML::LoadFile("jfdklfjlkdsf");
+//    auto data_file = YAML::LoadFile("jfdklfjlkdsf");
     /*Thruster_Commander control = Thruster_Commander();
     control.print_info();
     control.predict_drag_forces({0.5, 0.5, 0.1, 0.1, 0.1, 0.1});	control.weight_force({ 3.14/2, 0, 0 });
