@@ -21,13 +21,13 @@ protected:
 	// Shouldn't usually change
 	three_axis mass_center;
 	three_axis volume_center;
-	three_axis mass_moment_of_inertia;  // Moment of inertia of the vehicle about the x, y, and z axes (kg*m^2)
+	three_axis mass_moment_of_inertia;  
 	thruster_set_3D thruster_positions;
 	
 	thruster_set_3D thruster_moment_arms;  // Distance from thruster to mass center (m)
 	thruster_set_3D thruster_directions;  // Direction of thruster force (unit vector)
-	thruster_set_3D thruster_torques;    // Torque of thruster on the sub about the x,y and z axes (N*m)
-	thruster_set_1D thruster_voltages;  // voltage supplied to each thruster (V) (this might not be a constant)
+	thruster_set_3D thruster_torques;   // Torque of thruster on sub about x,y,z (Nm)
+	thruster_set_1D thruster_voltages; // voltage supplied to each thruster (V) 
 
 	int num_thrusters;  // Number of thrusters on the vehicle
 	float mass;        // Mass of the vehicle (kg)
@@ -70,15 +70,15 @@ public:
 	Eigen::Matrix<float, 1, 3> compute_forces(force_array);
 	Eigen::Matrix<float, 1, 3> compute_torques(force_array);
 
-	
-	three_axis weight_force(three_axis orientation); 
-	three_axis bouyant_force(three_axis orientation);
+	//todo: make these functions 6-axis
+	six_axis weight_force(three_axis orientation); 
+	six_axis bouyant_force(three_axis orientation);
 	three_axis bouyant_torque(three_axis bouyant_force);
 	six_axis graviational_forces(three_axis orientation);
 	six_axis predict_drag_forces(six_axis velocity);
 
 	// environmental forces such as weight, boyancy, drag, ect
-	six_axis predict_env_forces(six_axis velocity, six_axis oritation);
+	six_axis net_env_forces(six_axis velocity, six_axis oritation);
 
 	// this function will integrate the environmental forces and thruster
 	// forces to calculate the linear and angular impulse (change in momentum) 

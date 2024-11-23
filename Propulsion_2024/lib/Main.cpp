@@ -11,7 +11,6 @@ int main()
 
 	control.weight_force({ 3.14/2, 0, 0 });
 	control.bouyant_force({ 3.14/2, 0, 0 });
-	control.bouyant_torque({ 0, 3.14/2, 0 });
 	control.graviational_forces({ 3.14 / 2, 0, 0 });
     return 0;
 }

@@ -121,39 +121,43 @@ int Thruster_Commander::get_pwm(int thruster_num, float force) {
 	return 1500;
 }
 
-three_axis Thruster_Commander::weight_force(three_axis orientation)
+six_axis Thruster_Commander::weight_force(three_axis orientation)
 {
-	three_axis result = weight_magnitude * three_axis::UnitZ();
+	six_axis result = six_axis::Zero();
+	result.segment(0, 3) = weight_magnitude * three_axis::UnitZ();
 	std::cout << "Weight force: \n" << result << std::endl;
-	result *= - Eigen::AngleAxisf(orientation(0), Eigen::Vector3f::UnitX()).toRotationMatrix();
-	result *= - Eigen::AngleAxisf(orientation(1), Eigen::Vector3f::UnitY()).toRotationMatrix();
-	result *= - Eigen::AngleAxisf(orientation(2), Eigen::Vector3f::UnitZ()).toRotationMatrix();
+
+	result.segment(0,3) *= - Eigen::AngleAxisf(orientation(0), 
+		Eigen::Vector3f::UnitX()).toRotationMatrix();
+	result.segment(0, 3) *= - Eigen::AngleAxisf(orientation(1), 
+		Eigen::Vector3f::UnitY()).toRotationMatrix();
+	result.segment(0, 3) *= - Eigen::AngleAxisf(orientation(2), 
+		Eigen::Vector3f::UnitZ()).toRotationMatrix();
+
 	std::cout << "Weight force: \n" << result << std::endl;
 	return result;
 }
-three_axis Thruster_Commander::bouyant_force(three_axis orientation) 
-{
-	three_axis result = buoyant_magnitude * three_axis::UnitZ();
-	std::cout << "Buoyant force: \n" << result << std::endl;
-	result *= - Eigen::AngleAxisf(orientation(0), Eigen::Vector3f::UnitX()).toRotationMatrix();
-	result *= - Eigen::AngleAxisf(orientation(1), Eigen::Vector3f::UnitY()).toRotationMatrix();
-	result *= - Eigen::AngleAxisf(orientation(2), Eigen::Vector3f::UnitZ()).toRotationMatrix();
-	std::cout << "Buoyant force: \n" << result << std::endl;
-	return result;
-}
-three_axis Thruster_Commander::bouyant_torque(three_axis bouyant_force)
-{
-	three_axis result = bouyant_force.cross(volume_center - mass_center);
-	std::cout << "Buoyant torque: \n" << result << std::endl;
-	return result;
-}
-six_axis Thruster_Commander::graviational_forces(three_axis orientation)
+six_axis Thruster_Commander::bouyant_force(three_axis orientation) 
 {
 	six_axis result = six_axis::Zero();
 	
-	result.segment(0, 3) += bouyant_force(orientation);
-	result.segment(3, 3) += bouyant_torque(result.segment(0,3));
-	result.segment(0, 3) += weight_force(orientation);
+	three_axis bouyant_force_linear = buoyant_magnitude * three_axis::UnitZ();	
+	bouyant_force_linear *= - Eigen::AngleAxisf(orientation(0), Eigen::Vector3f::UnitX()).toRotationMatrix();
+	bouyant_force_linear *= - Eigen::AngleAxisf(orientation(1), Eigen::Vector3f::UnitY()).toRotationMatrix();
+	bouyant_force_linear *= - Eigen::AngleAxisf(orientation(2), Eigen::Vector3f::UnitZ()).toRotationMatrix();
+	
+	three_axis bouyant_force_rotational = bouyant_force_linear.cross(volume_center - mass_center);
+	
+	result.segment(0, 3) = bouyant_force_linear;
+	result.segment(3, 3) = bouyant_force_rotational;
+	return result;
+}
+
+six_axis Thruster_Commander::graviational_forces(three_axis orientation)
+{
+	six_axis result = six_axis::Zero();
+	result += bouyant_force(orientation);
+	result += weight_force(orientation);
 	std::cout << "Gravitational forces: \n" << result << std::endl;
 	return result;
 }
@@ -176,6 +180,37 @@ three_axis Thruster_Commander::compute_torques(force_array forces)
 	}
 	return total_torque;
 }
+
+six_axis Thruster_Commander::predict_drag_forces(six_axis velocity)
+{
+	// Drag force = 0.5 * rho_water * v^2 * Cd * A
+	// where cd is the drag coefficient, and A is the reference area
+
+	Eigen::Matrix<float, 1, 6> drag_force = six_axis::Zero();
+
+	// this is a guess. Actual surface area should be approximated
+	float area = 0.1;
+	// drag coefficient for a cylinder. also a guess
+	// todo : make drag coefficient a function of direction
+	float Cd = 0.82;
+	for (int i = 0; i < 3; i++)
+	{
+		drag_force(0, i) = 0.5 * rho_water * pow(velocity(i), 2) * Cd * area;
+	}
+	// todo : find a way to calculate drag torques. This might be way mathier or it might be simple
+	// v = r x w
+	// drag_torque = r x drag_force
+	// d[drag torque] = 0.5 * rho_water * (r*omega)^2 * Cd * d[A]
+	// drag_torque = integral(d[drag torque]) over A
+	// this might simplify to something less mathy. try pen&paper
+	for (int i = 3; i < 6; i++)
+	{
+	}
+
+	std::cout << "Drag Force: " << drag_force << std::endl;
+	return drag_force;
+}
+
 void Thruster_Commander::test_force_functions()
 {
 	// check thrust_compute_fz
@@ -296,35 +331,6 @@ force_array Thruster_Commander::thrust_compute(six_axis force_torque, bool simpl
 	return forces;
 }
 
-six_axis Thruster_Commander::predict_drag_forces(six_axis velocity)
-{
-	// Drag force = 0.5 * rho_water * v^2 * Cd * A
-	// where cd is the drag coefficient, and A is the reference area
-	
-	Eigen::Matrix<float, 1, 6> drag_force = six_axis::Zero();
-
-	// this is a guess. Actual surface area should be approximated
-	float area = 0.1;
-	// drag coefficient for a cylinder. also a guess
-	// todo : make drag coefficient a function of direction
-	float Cd = 0.82; 
-	for (int i = 0; i < 3; i++)
-	{
-		drag_force(0, i) = 0.5 * rho_water * pow(velocity(i), 2) * Cd * area;
-	}
-	// todo : find a way to calculate drag torques. This might be way mathier or it might be simple
-	// v = r x w
-	// drag_torque = r x drag_force
-	// d[drag torque] = 0.5 * rho_water * (r*omega)^2 * Cd * d[A]
-	// drag_torque = integral(d[drag torque]) over A
-	// this might simplify to something less mathy. try pen&paper
-	for (int i = 3; i < 6; i++)
-	{
-	}
-
-	std::cout << "Drag Force: " << drag_force << std::endl;	
-	return drag_force;
-}
 
 
 
