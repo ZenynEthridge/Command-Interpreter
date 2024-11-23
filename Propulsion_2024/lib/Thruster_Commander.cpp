@@ -189,11 +189,12 @@ six_axis Thruster_Commander::predict_drag_forces(six_axis velocity)
 	// explanation on notion: 
 	// https://www.notion.so/crsucd/
 	// Rotational-drag-analyssi-1478a3eca2f0801d86f2e0c8fb675c0d
-	float acd[6] = { 0.041, 0.005, 0.007, 0.005, 0.005, 0.005 };
+	// theses values are estimates and should be improveded experimentally
+	float c_inf[6] = { 0.041, 0.05, 0.125, 0.005, 0.005, 0.005 };
 	
 	for (int i = 0; i < 6; i++)
 	{
-		drag_force(0, i) = rho_water * pow(velocity(i), 2) * acd[i];
+		drag_force(0, i) = rho_water * pow(velocity(i), 2) * c_inf[i];
 	}
 	
 	std::cout << "Drag Force: " << drag_force << std::endl;
@@ -223,113 +224,108 @@ void Thruster_Commander::test_force_functions()
 	// check thrust_compute_fx_fy_fz_mx_my_mz
 }
 // this one is done and seems to work
-force_array Thruster_Commander::thrust_compute_fz(float z_force)
+thruster_set Thruster_Commander::thrust_compute_fz(float z_force)
 {
 
     // Force is euqally divided by the 4 vertical thrusters for this function
 	
 	float force_per_thruster = z_force / 4;
-	force_array forces = force_array();
-	
+	thruster_set thrusters = thruster_set();
 	for(int i = 0; i < num_thrusters; i++)
 	{
-		if (i < 4) { forces.forces[i] = force_per_thruster; }
-		else { forces.forces[i] = 0; }
-		std::cout << i << " " << forces.forces[i] << std::endl;
+		if (i < 4) { thrusters(i) = force_per_thruster; }
+		else { thrusters(i) = 0; }
+		std::cout << i << " " << thrusters(i) << std::endl;
 	} 
-	return forces;
+	return thrusters;
 }
-force_array Thruster_Commander::thrust_compute_fy(float y_force)
+thruster_set Thruster_Commander::thrust_compute_fy(float y_force)
 {
 
 	// fx, fz and mz should be zero
 	// my and mz should be small enough to keep the vehicle stable
 	
-	force_array forces;
+	thruster_set forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute_fx(float x_force)
+thruster_set Thruster_Commander::thrust_compute_fx(float x_force)
 {
 	// fy, fz and mz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	force_array forces;
+	thruster_set forces;
 	return forces;
 
 }
-force_array Thruster_Commander::thrust_compute_fx_fy(float x_force, float y_force)
+thruster_set Thruster_Commander::thrust_compute_fx_fy(float x_force, float y_force)
 {
 	// fz and mz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	force_array forces;
+	thruster_set forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute_mz(float z_torque)
+thruster_set Thruster_Commander::thrust_compute_mz(float z_torque)
 {
 	// fx, fy and fz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	force_array forces;
+	thruster_set forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute_fz_mz(float z_force, float z_torque) 
+thruster_set Thruster_Commander::thrust_compute_fz_mz(float z_force, float z_torque) 
 {
 	// fx and fy should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	force_array forces;
+	thruster_set forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute_fy_mz(float y_force, float z_torque) 
+thruster_set Thruster_Commander::thrust_compute_fy_mz(float y_force, float z_torque) 
 {
 	// fx and fz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	force_array forces;
+	thruster_set forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute_fx_mz(float x_force, float z_torque) 
+thruster_set Thruster_Commander::thrust_compute_fx_mz(float x_force, float z_torque) 
 {
 	// fy and fz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	force_array forces;
+	thruster_set forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute_fx_fy_mz(float x_force, float y_force, float z_torque)
+thruster_set Thruster_Commander::thrust_compute_fx_fy_mz(float x_force, float y_force, float z_torque)
 {
 	// fz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	force_array forces;
+	thruster_set forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute_fx_fy_fz(float x_force, float y_force) 
+thruster_set Thruster_Commander::thrust_compute_fx_fy_fz(float x_force, float y_force) 
 {
 	// mz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	force_array forces;
+	thruster_set forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute_fx_fy_fz_mz(float x_distance, float y_force, float z_force, float z_torque) 
+thruster_set Thruster_Commander::thrust_compute_fx_fy_fz_mz(float x_distance, float y_force, float z_force, float z_torque) 
 {
 	// mx and my should be small enough to keep the vehicle stable
-	force_array forces;
+	thruster_set forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute_fx_fy_fz_mx_my_mz(float x_force, float y_force, float z_force, float x_torque, float y_torque, float z_torque) 
+thruster_set Thruster_Commander::thrust_compute_fx_fy_fz_mx_my_mz(six_axis force_torques) 
 {
 	// this is the most general case
 	// all forces and torques are specified
-	force_array forces;
+	thruster_set forces;
 	return forces;
 }
-force_array Thruster_Commander::thrust_compute(six_axis force_torque, bool simple)
+thruster_set Thruster_Commander::thrust_compute(six_axis force_torque, bool simple)
 {
 	// this is a general case force function
 	// it will call other force functions depending on what forces and torques are specified
 	// if simple=true, mz and my will be neglected
-	force_array forces;
+	thruster_set forces;
 	return forces;
 }
-
-
-
-
 std::vector<Command> Thruster_Commander::sequence_to(six_axis target_position)
 {
 	Eigen::Matrix<float, 1, 6> start_position;
