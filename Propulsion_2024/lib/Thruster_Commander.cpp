@@ -270,20 +270,15 @@ thruster_set Thruster_Commander::thrust_compute_fy(float y_force)
 	// fx, fz and mz should be zero
 	// my and mz should be small enough to keep the vehicle stable
 	float force_per_thruster = y_force / 4;
-	thruster_set forces = thruster_set();
-	for (int i = 0; i < 4; i++)
-	{
-		forces(i) = 0;
-	}
-	for (int i = 4; i < 8; i++)
-	{
-		forces(i) = force_per_thruster;
-	}
-	// Print the thruster set
-	for (int i = 0; i < num_thrusters; i++)
-	{
-		std::cout << i << " " << forces(i) << std::endl;
-	}
+	thruster_set forces = thruster_set::Zero();
+	forces(0) = 0;
+	forces(1) = 0;
+	forces(2) = 0;
+	forces(3) = 0;
+	forces(4) = -force_per_thruster;
+	forces(5) = force_per_thruster;
+	forces(6) = force_per_thruster;
+	forces(7) = -force_per_thruster;
 	return forces;
 }
 thruster_set Thruster_Commander::thrust_compute_fx(float x_force)
@@ -291,20 +286,15 @@ thruster_set Thruster_Commander::thrust_compute_fx(float x_force)
 	// fy, fz and mz should be zero
 	// mx and my should be small enough to keep the vehicle stable
 	float force_per_thruster = x_force / 4;
-	thruster_set forces = thruster_set();
-	for (int i = 0; i < 4; i++)
-	{
-		forces(i) = 0;
-	}
-	for (int i = 4; i < 8; i++)
-	{
-		forces(i) = force_per_thruster;
-	}
-	// Print the thruster set
-	for (int i = 0; i < num_thrusters; i++)
-	{
-		std::cout << i << " " << forces(i) << std::endl;
-	}
+	thruster_set forces = thruster_set::Zero();
+	forces(0) = 0;
+	forces(1) = 0;
+	forces(2) = 0;
+	forces(3) = 0;
+	forces(4) = -force_per_thruster;
+	forces(5) = -force_per_thruster;
+	forces(6) = -force_per_thruster;
+	forces(7) = -force_per_thruster;
 	return forces;
 }
 thruster_set Thruster_Commander::thrust_compute_fx_fy(float x_force, float y_force)
