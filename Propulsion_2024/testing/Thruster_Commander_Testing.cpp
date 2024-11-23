@@ -9,3 +9,4 @@ TEST(ThrusterCommanderTest, SimpleVertical) {
 
     std::string output = testing::internal::GetCapturedStdout(); // TODO: check that output matches expected output
 }
+
