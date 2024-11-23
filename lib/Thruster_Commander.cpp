@@ -6,6 +6,10 @@
 #include <string>
 #include "Thruster_Commander.h"
 #include "eigen-3.4.0/Eigen/Dense"
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 
 Thruster_Commander::Thruster_Commander()
 {
@@ -71,6 +75,10 @@ Thruster_Commander::Thruster_Commander()
 	angular_velocity = three_axis::Zero();
 	acceleration = three_axis::Zero();
 	angular_acceleration = three_axis::Zero();
+
+	// int standard_voltages[6] = {}
+	// std::string thruster_files = {}
+	// Eigen::Matrix<float, 2, 6> min_max_voltages = {}
 }
 Thruster_Commander::~Thruster_Commander(){}
 
@@ -85,38 +93,85 @@ void Thruster_Commander::print_info()
 	std::cout << "Thruster Torques: \n" << thruster_torques << std::endl;
 	std::cout << "Mass: \n" << mass << std::endl;
 	std::cout << "Volume: \n" << volume << std::endl;
+
 }
 int Thruster_Commander::get_pwm(int thruster_num, float force) {
- //   std::ifstream dataset("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
- //   std::string line;
-	//std::string PWM;
-	//int PWM_value;
+/// todo the thruster number will be taken in to determine the voltage and thereby the CSV files to be used. Interpolation between CSV file value will be used to find in between voltages.
 
- //   // Get the header line (if exists)
- //   if (std::getline(file, line)) {
-	//	for( auto s: line){
-	//	while(s != ','){
-	//		PWM += s;
-	//	}
-	//	}
-	//	PWM_value = stoi(PWM);
- //       while (low <= high) {
- //       int mid = low + (high - low) / 2;
 
- //       // Check if x is present at mid
- //       if (arr[mid] == x)
- //           return mid;
+// Check if the force is within bounds if ((force > )
+	int PWM_value;
+	std::ifstream file("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
 
- //       // If x greater, ignore left half
- //       if (arr[mid] < x)
- //           low = mid + 1;
+		//Number of Rows and Columns of the CSV file
+		int csvRows = 201;
+		int csvColumns = 7;
 
- //       // If x is smaller, ignore right half
- //       else
- //           high = mid - 1;
- //   }
-	return 1500;
-}
+		double numericData[csvRows][csvColumns];  // Numeric array for storing the converted values
+
+		using namespace std;
+
+		//Checks to see if file is open
+		if (!file.is_open()) {
+			cerr << "Error opening file!" << endl;
+			return 1;
+		}
+
+
+		//Parses through csv lines and reads the numbers prior to commas as a string in a 2D array
+		string line;
+		int row = 1;
+		while (getline(file, line) && row <= (csvRows + 1)) {
+			stringstream ss(line);
+			string cell;
+			int col = 0;
+			while (getline(ss, cell, ',') && col < csvColumns) {
+				numericData[row][col] = stod(cell);  // Convert string to double
+				col++;
+			}
+			row++;
+		}
+
+file.close();
+
+		double smallestDifference = 100000; //Arbitrarily large number to ensure it runs the first time
+		double difference;
+		int closestRowValue;
+
+		for (int i = 0; i < (csvRows + 1); i++){
+			difference = force - numericData[i][6];
+			if (std::abs(difference) < smallestDifference){
+				smallestDifference = difference;
+				closestRowValue = i;
+			}
+		}
+
+		//Variables used for linear interpolation calculation
+		double y1;
+		double y2;
+		double x1;
+		double x2;
+
+
+		//Case when closest row/force is larger than inputted force
+		if (difference < 0){ 
+			y1 = numericData[(closestRowValue - 1)][1];
+			y2 = numericData[(closestRowValue)][1];
+			x1 = numericData[(closestRowValue - 1)][7];
+			x2 = numericData[(closestRowValue)][7];
+
+		 //Case when closest row/force value is smaller than inputted force
+		} else {
+			y1 = numericData[(closestRowValue)][1];
+			y2 = numericData[(closestRowValue + 1)][1];
+			x1 = numericData[(closestRowValue)][7];
+			x2 = numericData[(closestRowValue + 1)][7];
+		}
+
+		PWM_value = y1 + (force - x1) * ((y2 - y1)/(x2 - x1));
+	
+		return PWM_value;
+	}
 
 six_axis Thruster_Commander::weight_force(three_axis orientation)
 {
