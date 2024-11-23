@@ -20,10 +20,6 @@ class Thruster_Commander
 
 protected:
 
-
-	
-	
-	
 	// Shouldn't usually change
 	three_axis mass_center;
 	three_axis volume_center;
@@ -42,16 +38,14 @@ protected:
 	float gravity;  // Acceleration due to gravity (m/s^2)
 	float weight_magnitude; // Weight of the vehicle (N)
 	float buoyant_magnitude; // Buoyant force on the vehicle (N)
-
-
-	/// @breif : (roll, pitch, yaw) in radians relative to starting orientation.
-	three_axis orientation; // sign convention is right hand rule
-	three_axis position;    // Position of the vehicle (x, y, z) in meters relative to starting position
+	
+	three_axis orientation; // roll, puitch, yaw in rad. sign convention is right hand rule
+	three_axis position;    // x, y, z, relative to start position in m
 	three_axis velocity;    // Velocity of the vehicle (surge, sway, heave) in m/s
-	three_axis angular_velocity; // Angular velocity of the vehicle (roll, pitch, yaw) in rad/s
-	three_axis acceleration; // Acceleration of the vehicle (surge, sway, heave) in m/s^2
-	three_axis angular_acceleration; // Angular acceleration of the vehicle (roll, pitch, yaw) in rad/s^2
-	three_axis water_current_velocity; // velocity of the water current in m/s. Should be near 0 in controlled environments
+	three_axis angular_velocity; // rad/s
+	three_axis acceleration; // x, y, z m/s^2
+	three_axis angular_acceleration; // roll, pitch, yaw in rad/s^2
+	three_axis water_current_velocity; // velocity of water in x, y, z in m/s
 
 public:
 	Thruster_Commander();
