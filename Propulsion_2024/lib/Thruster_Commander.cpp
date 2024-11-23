@@ -133,7 +133,7 @@ three_axis Thruster_Commander::weight_force(three_axis orientation)
 	std::cout << "Weight force: \n" << result << std::endl;
 	return result;
 }
-three_axis Thruster_Commander::buoyant_force(three_axis orientation) 
+three_axis Thruster_Commander::bouyant_force(three_axis orientation) 
 {
 	three_axis result = buoyant_magnitude * three_axis::UnitZ();
 	std::cout << "Buoyant force: \n" << result << std::endl;
@@ -149,6 +149,17 @@ three_axis Thruster_Commander::bouyant_torque(three_axis bouyant_force)
 	std::cout << "Buoyant torque: \n" << result << std::endl;
 	return result;
 }
+six_axis Thruster_Commander::graviational_forces(three_axis orientation)
+{
+	six_axis result = six_axis::Zero();
+	
+	result.segment(0, 3) += bouyant_force(orientation);
+	result.segment(3, 3) += bouyant_torque(result.segment(0,3));
+	result.segment(0, 3) += weight_force(orientation);
+	std::cout << "Gravitational forces: \n" << result << std::endl;
+	return result;
+}
+
 Eigen::Matrix<float, 1, 3> Thruster_Commander::compute_forces(force_array forces)
 {
 	Eigen::Matrix<float, 1, 3> total_force = Eigen::Matrix<float, 1, 3>::Zero();
@@ -287,7 +298,7 @@ force_array Thruster_Commander::thrust_compute(Eigen::Matrix<float, 1, 6> force_
 	return forces;
 }
 
-Eigen::Matrix<float, 1, 6> Thruster_Commander::predict_drag_forces(Eigen::Matrix<float, 1, 6> velocity)
+six_axis Thruster_Commander::predict_drag_forces(six_axis velocity)
 {
 	// Drag force = 0.5 * rho_water * v^2 * Cd * A
 	// where cd is the drag coefficient, and A is the reference area

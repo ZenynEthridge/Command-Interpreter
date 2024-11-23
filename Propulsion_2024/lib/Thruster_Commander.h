@@ -73,20 +73,13 @@ public:
 
 	
 	three_axis weight_force(three_axis orientation); 
-	three_axis buoyant_force(three_axis orientation);
+	three_axis bouyant_force(three_axis orientation);
 	three_axis bouyant_torque(three_axis bouyant_force);
-
-
-	// Drag force = 0.5 * rho_water * v^2 * Cd * A
-	// rho water is known, A can be found as a function of direction, 
-	// v is input, Cd is unknown, but can be estimated or found through trail and error
-	Eigen::Matrix<float, 1, 6> predict_drag_forces(Eigen::Matrix<float, 1, 6> velocity);
-
-
+	six_axis graviational_forces(three_axis orientation);
+	six_axis predict_drag_forces(six_axis velocity);
 
 	// environmental forces such as weight, boyancy, drag, ect
-	Eigen::Matrix<float, 1, 6> predict_env_forces(
-		Eigen::Matrix<float, 1, 6> velocity);
+	six_axis predict_env_forces(six_axis velocity, three_axis oritation);
 
 	// torques produced by environmental forces
 	Eigen::Matrix<float, 1, 3> predict_env_torques(
