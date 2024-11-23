@@ -57,6 +57,13 @@ Thruster_Commander::Thruster_Commander()
 		thruster_torques.row(i) = thruster_moment_arms.row(i).cross(thruster_directions.row(i));
 	}
 
+    wrench_matrix = thruster_set_6D::Zero();
+    for (int i = 0; i < num_thrusters; i++)
+    {
+        wrench_matrix.row(i).segment(0, 3) = thruster_directions.row(i);
+        wrench_matrix.row(i).segment(3, 3) = thruster_torques.row(i);
+    }
+
 	float volume_inches = 449.157;            // volume of vehicle in inches^3, from onshape. This is likley less than the displacement volume and should be corrected
 	volume = volume_inches * pow(0.0254, 3); // convert to meters^3
 	mass = 5.51; // mass of vehicle in kg, from onshape
@@ -246,16 +253,35 @@ thruster_set Thruster_Commander::thrust_compute_fy(float y_force)
 
 	// fx, fz and mz should be zero
 	// my and mz should be small enough to keep the vehicle stable
+    float force_per_thruster = y_force / 4;
+    thruster_set forces = thruster_set::Zero();
+    forces(0) = 0;
+    forces(1) = 0;
+    forces(2) = 0;
+    forces(3) = 0;
+    forces(4) = -force_per_thruster;
+    forces(5) = force_per_thruster;
+    forces(6) = force_per_thruster;
+    forces(7) = -force_per_thruster;
 
-	thruster_set forces;
-	return forces;
+    return forces;
 }
 thruster_set Thruster_Commander::thrust_compute_fx(float x_force)
 {
 	// fy, fz and mz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	thruster_set forces;
-	return forces;
+    float force_per_thruster = x_force / 4;
+    thruster_set forces = thruster_set::Zero();
+    forces(0) = 0;
+    forces(1) = 0;
+    forces(2) = 0;
+    forces(3) = 0;
+    forces(4) = -force_per_thruster;
+    forces(5) = -force_per_thruster;
+    forces(6) = -force_per_thruster;
+    forces(7) = -force_per_thruster;
+
+    return forces;
 
 }
 thruster_set Thruster_Commander::thrust_compute_fx_fy(float x_force, float y_force)
