@@ -84,7 +84,7 @@ private:
     /// @brief Converts a pwm frequency between 1100 and 1900 into a Thruster Spec.
     /// @param pwmFrequency a pwm frequency between 1100 and 1900
     /// @return A Thruster Spec with a pwm magnitude between 0 and MAX_PWM_VALUE and a Direction
-    static ThrusterSpec convertPwmValue(int pwmFrequency);
+    static ThrusterSpec convertPwmValue(double pwmFrequency);
 public:
     explicit Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins);
 

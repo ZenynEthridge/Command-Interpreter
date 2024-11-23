@@ -123,7 +123,7 @@ void Command_Interpreter_RPi5::initializePins() {
     }
 }
 
-Command_Interpreter_RPi5::ThrusterSpec Command_Interpreter_RPi5::convertPwmValue(int pwmFrequency) {
+Command_Interpreter_RPi5::ThrusterSpec Command_Interpreter_RPi5::convertPwmValue(double pwmFrequency) {
 
     // 1100 - 1464 = negative
     // 1536 - 1900 = positive
