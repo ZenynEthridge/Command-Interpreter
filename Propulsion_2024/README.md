@@ -93,6 +93,9 @@ different depending on whether you're on a Unix system or a Windows machine.
 3. Confirm that all tests pass (are green). If there are any failed (red) tests, check why they're failing and get them fixed!
 
 ### Making Unit Tests
+You should write your tests in the `testing/` folder, in the testing file that corresponds with the file or class that
+you're testing.
+
 The format for a unit test is:
 ```C++
 TEST(Test_Category, Test_Name) {
