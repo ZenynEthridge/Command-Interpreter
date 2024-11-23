@@ -14,25 +14,25 @@ Thruster_Commander::Thruster_Commander()
 
 	// Values come from Onshape 2024 Vehicle V10 11/12/24
 	num_thrusters = 8;
-	three_axis mass_center_inches = {0.466, 0, 1.561};
+	three_axis mass_center_inches = { 0.466, 0, 1.561 };
 	mass_center = mass_center_inches * 0.0254; // convert to meters
 
 	volume_center = mass_center; // volume center, currently, is a complete guess
-	volume_center(0, 2) += 0.1;	 // add 0.1 meters to z coordinate to account for the volume center being slightly above the mass center
+	volume_center(0, 2) += 0.1; // add 0.1 meters to z coordinate to account for the volume center being slightly above the mass center
 
 	// avg(max distance, min distance) of motor part 4 cylindrical surface to orgin
 	// front left top, front right top, rear left top, rear right top, front left bottom, front right bottom, rear left bottom, rear right bottom
 	// x, y, z coordinates here are how the appear on onshape. May need to be corrected to match surge, sway, heave
 
 	thruster_positions = thruster_set_3D::Zero();
-	thruster_positions.row(0) << .2535, -.2035, .042;
-	thruster_positions.row(1) << .2535, .2035, -.042;
-	thruster_positions.row(2) << -.2545, -.2035, .042;
-	thruster_positions.row(3) << -.2545, .2035, .042;
-	thruster_positions.row(4) << .167, -.1375, -.049;
-	thruster_positions.row(5) << .167, .1375, -.049;
-	thruster_positions.row(6) << -.1975, -.1165, -.049;
-	thruster_positions.row(7) << -.1975, .1165, -.049;
+	thruster_positions.row(0) <<   .2535, -.2035, .042 ;
+	thruster_positions.row(1) <<  .2535, .2035, -.042;
+	thruster_positions.row(2) <<  -.2545, -.2035, .042;
+	thruster_positions.row(3) <<  -.2545, .2035, .042;
+	thruster_positions.row(4) <<  .167, -.1375, -.049;
+	thruster_positions.row(5) <<  .167, .1375, -.049;
+	thruster_positions.row(6) <<  -.1975, -.1165, -.049;
+	thruster_positions.row(7) <<  -.1975, .1165, -.049;
 
 	// torques will be calulated about the center of mass
 	thruster_moment_arms = thruster_positions - mass_center.replicate(8, 1);
@@ -47,7 +47,7 @@ Thruster_Commander::Thruster_Commander()
 	thruster_directions.row(2) << 0, 0, 1;
 	thruster_directions.row(3) << 0, 0, 1;
 	thruster_directions.row(4) << -sin45, -sin45, 0;
-	thruster_directions.row(5) << -sin45, sin45, 0;
+	thruster_directions.row(5) <<  -sin45, sin45, 0;
 	thruster_directions.row(6) << -sin45, sin45, 0;
 	thruster_directions.row(7) << -sin45, -sin45, 0;
 
@@ -56,16 +56,10 @@ Thruster_Commander::Thruster_Commander()
 	{
 		thruster_torques.row(i) = thruster_moment_arms.row(i).cross(thruster_directions.row(i));
 	}
-	wrench_matrix = thruster_set_6D::Zero();
-	for (int i = 0; i < num_thrusters; i++)
-	{
-		wrench_matrix.row(i).segment(0, 3) = thruster_directions.row(i);
-		wrench_matrix.row(i).segment(3, 3) = thruster_torques.row(i);
-	}
 
-	float volume_inches = 449.157;			 // volume of vehicle in inches^3, from onshape. This is likley less than the displacement volume and should be corrected
+	float volume_inches = 449.157;            // volume of vehicle in inches^3, from onshape. This is likley less than the displacement volume and should be corrected
 	volume = volume_inches * pow(0.0254, 3); // convert to meters^3
-	mass = 5.51;							 // mass of vehicle in kg, from onshape
+	mass = 5.51; // mass of vehicle in kg, from onshape
 	gravity = -9.81;
 	rho_water = 1025; // Density of water (kg/m^3)
 	weight_magnitude = mass * gravity;
@@ -78,58 +72,49 @@ Thruster_Commander::Thruster_Commander()
 	acceleration = three_axis::Zero();
 	angular_acceleration = three_axis::Zero();
 }
-Thruster_Commander::~Thruster_Commander() {}
+Thruster_Commander::~Thruster_Commander(){}
 
 void Thruster_Commander::print_info()
 {
 
-	std::cout << "Mass Center: \n"
-			  << mass_center << std::endl;
-	std::cout << "Volume Center: \n"
-			  << volume_center << std::endl;
-	std::cout << "Thruster Positions: \n"
-			  << thruster_positions << std::endl;
-	std::cout << "Thruster Moment Arms: \n"
-			  << thruster_moment_arms << std::endl;
-	std::cout << "Thruster Directions: \n"
-			  << thruster_directions << std::endl;
-	std::cout << "Thruster Torques: \n"
-			  << thruster_torques << std::endl;
-	std::cout << "Mass: \n"
-			  << mass << std::endl;
-	std::cout << "Volume: \n"
-			  << volume << std::endl;
+	std::cout << "Mass Center: \n" << mass_center << std::endl;
+	std::cout << "Volume Center: \n" << volume_center << std::endl;
+	std::cout << "Thruster Positions: \n" << thruster_positions << std::endl;
+	std::cout << "Thruster Moment Arms: \n" << thruster_moment_arms << std::endl;
+	std::cout << "Thruster Directions: \n" << thruster_directions << std::endl;
+	std::cout << "Thruster Torques: \n" << thruster_torques << std::endl;
+	std::cout << "Mass: \n" << mass << std::endl;
+	std::cout << "Volume: \n" << volume << std::endl;
 }
-int Thruster_Commander::get_pwm(int thruster_num, float force)
-{
-	//   std::ifstream dataset("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
-	//   std::string line;
-	// std::string PWM;
-	// int PWM_value;
+int Thruster_Commander::get_pwm(int thruster_num, float force) {
+ //   std::ifstream dataset("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
+ //   std::string line;
+	//std::string PWM;
+	//int PWM_value;
 
-	//   // Get the header line (if exists)
-	//   if (std::getline(file, line)) {
+ //   // Get the header line (if exists)
+ //   if (std::getline(file, line)) {
 	//	for( auto s: line){
 	//	while(s != ','){
 	//		PWM += s;
 	//	}
 	//	}
 	//	PWM_value = stoi(PWM);
-	//       while (low <= high) {
-	//       int mid = low + (high - low) / 2;
+ //       while (low <= high) {
+ //       int mid = low + (high - low) / 2;
 
-	//       // Check if x is present at mid
-	//       if (arr[mid] == x)
-	//           return mid;
+ //       // Check if x is present at mid
+ //       if (arr[mid] == x)
+ //           return mid;
 
-	//       // If x greater, ignore left half
-	//       if (arr[mid] < x)
-	//           low = mid + 1;
+ //       // If x greater, ignore left half
+ //       if (arr[mid] < x)
+ //           low = mid + 1;
 
-	//       // If x is smaller, ignore right half
-	//       else
-	//           high = mid - 1;
-	//   }
+ //       // If x is smaller, ignore right half
+ //       else
+ //           high = mid - 1;
+ //   }
 	return 1500;
 }
 
@@ -137,21 +122,16 @@ six_axis Thruster_Commander::weight_force(three_axis orientation)
 {
 	six_axis result = six_axis::Zero();
 	result.segment(0, 3) = weight_magnitude * three_axis::UnitZ();
-	std::cout << "Weight force: \n"
-			  << result << std::endl;
+	std::cout << "Weight force: \n" << result << std::endl;
 
-	result.segment(0, 3) *= -Eigen::AngleAxisf(orientation(0),
-											   Eigen::Vector3f::UnitX())
-								 .toRotationMatrix();
-	result.segment(0, 3) *= -Eigen::AngleAxisf(orientation(1),
-											   Eigen::Vector3f::UnitY())
-								 .toRotationMatrix();
-	result.segment(0, 3) *= -Eigen::AngleAxisf(orientation(2),
-											   Eigen::Vector3f::UnitZ())
-								 .toRotationMatrix();
+	result.segment(0,3) *= - Eigen::AngleAxisf(orientation(0),
+		Eigen::Vector3f::UnitX()).toRotationMatrix();
+	result.segment(0, 3) *= - Eigen::AngleAxisf(orientation(1),
+		Eigen::Vector3f::UnitY()).toRotationMatrix();
+	result.segment(0, 3) *= - Eigen::AngleAxisf(orientation(2),
+		Eigen::Vector3f::UnitZ()).toRotationMatrix();
 
-	std::cout << "Weight force: \n"
-			  << result << std::endl;
+	std::cout << "Weight force: \n" << result << std::endl;
 	return result;
 }
 six_axis Thruster_Commander::bouyant_force(three_axis orientation)
@@ -159,15 +139,12 @@ six_axis Thruster_Commander::bouyant_force(three_axis orientation)
 	six_axis result = six_axis::Zero();
 
 	three_axis bouyant_force_linear = buoyant_magnitude * three_axis::UnitZ();
-	bouyant_force_linear *= -Eigen::AngleAxisf(orientation(0),
-											   Eigen::Vector3f::UnitX())
-								 .toRotationMatrix();
-	bouyant_force_linear *= -Eigen::AngleAxisf(orientation(1),
-											   Eigen::Vector3f::UnitY())
-								 .toRotationMatrix();
-	bouyant_force_linear *= -Eigen::AngleAxisf(orientation(2),
-											   Eigen::Vector3f::UnitZ())
-								 .toRotationMatrix();
+	bouyant_force_linear *= - Eigen::AngleAxisf(orientation(0),
+		Eigen::Vector3f::UnitX()).toRotationMatrix();
+	bouyant_force_linear *= - Eigen::AngleAxisf(orientation(1),
+		Eigen::Vector3f::UnitY()).toRotationMatrix();
+	bouyant_force_linear *= - Eigen::AngleAxisf(orientation(2),
+		Eigen::Vector3f::UnitZ()).toRotationMatrix();
 
 	three_axis bouyant_force_rotational =
 		bouyant_force_linear.cross(volume_center - mass_center);
@@ -182,8 +159,7 @@ six_axis Thruster_Commander::graviational_forces(three_axis orientation)
 	six_axis result = six_axis::Zero();
 	result += bouyant_force(orientation);
 	result += weight_force(orientation);
-	std::cout << "Gravitational forces: \n"
-			  << result << std::endl;
+	std::cout << "Gravitational forces: \n" << result << std::endl;
 	return result;
 }
 
@@ -214,7 +190,7 @@ six_axis Thruster_Commander::predict_drag_forces(six_axis velocity)
 	// https://www.notion.so/crsucd/
 	// Rotational-drag-analyssi-1478a3eca2f0801d86f2e0c8fb675c0d
 	// theses values are estimates and should be improveded experimentally
-	float c_inf[6] = {0.041, 0.05, 0.125, 0.005, 0.005, 0.005};
+	float c_inf[6] = { 0.041, 0.05, 0.125, 0.005, 0.005, 0.005 };
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -229,8 +205,7 @@ six_axis Thruster_Commander::net_env_forces(six_axis velocity, three_axis orient
 	six_axis result = six_axis::Zero();
 	result += predict_drag_forces(velocity);
 	result += graviational_forces(orientation);
-	std::cout << "Net Environmental Forces: \n"
-			  << result << std::endl;
+	std::cout << "Net Environmental Forces: \n" << result << std::endl;
 	return result;
 }
 void Thruster_Commander::test_force_functions()
@@ -252,7 +227,7 @@ void Thruster_Commander::test_force_functions()
 thruster_set Thruster_Commander::thrust_compute_fz(float z_force)
 {
 
-	// Force is euqally divided by the 4 vertical thrusters for this function
+    // Force is euqally divided by the 4 vertical thrusters for this function
 
 	float force_per_thruster = z_force / 4;
 	thruster_set thrusters = thruster_set::Zero();
@@ -271,33 +246,17 @@ thruster_set Thruster_Commander::thrust_compute_fy(float y_force)
 
 	// fx, fz and mz should be zero
 	// my and mz should be small enough to keep the vehicle stable
-	float force_per_thruster = y_force / 4;
-	thruster_set forces = thruster_set::Zero();
-	forces(0) = 0;
-	forces(1) = 0;
-	forces(2) = 0;
-	forces(3) = 0;
-	forces(4) = -force_per_thruster;
-	forces(5) = force_per_thruster;
-	forces(6) = force_per_thruster;
-	forces(7) = -force_per_thruster;
+
+	thruster_set forces;
 	return forces;
 }
 thruster_set Thruster_Commander::thrust_compute_fx(float x_force)
 {
 	// fy, fz and mz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	float force_per_thruster = x_force / 4;
-	thruster_set forces = thruster_set::Zero();
-	forces(0) = 0;
-	forces(1) = 0;
-	forces(2) = 0;
-	forces(3) = 0;
-	forces(4) = -force_per_thruster;
-	forces(5) = -force_per_thruster;
-	forces(6) = -force_per_thruster;
-	forces(7) = -force_per_thruster;
+	thruster_set forces;
 	return forces;
+
 }
 thruster_set Thruster_Commander::thrust_compute_fx_fy(float x_force, float y_force)
 {
@@ -376,6 +335,7 @@ std::vector<Command> Thruster_Commander::sequence_to(six_axis target_position)
 	std::cout << "Start Position: " << start_position << std::endl;
 	std::cout << "Target Position: " << target_position << std::endl;
 
+	Eigen::Matrix<float, 1, 6> distance = target_position - start_position;
 	std::cout << "Distance: " << distance << std::endl;
 	Eigen::Matrix<float, 1, 6> direction = distance.normalized();
 	std::cout << "Direction: " << direction << std::endl;
