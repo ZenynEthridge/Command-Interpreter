@@ -255,19 +255,15 @@ thruster_set Thruster_Commander::thrust_compute_fz(float z_force)
 	// Force is euqally divided by the 4 vertical thrusters for this function
 
 	float force_per_thruster = z_force / 4;
-	thruster_set thrusters = thruster_set();
-	for (int i = 0; i < num_thrusters; i++)
-	{
-		if (i < 4)
-		{
-			thrusters(i) = force_per_thruster;
-		}
-		else
-		{
-			thrusters(i) = 0;
-		}
-		std::cout << i << " " << thrusters(i) << std::endl;
-	}
+	thruster_set thrusters = thruster_set::Zero();
+	thrusters(0) = force_per_thruster;
+	thrusters(1) = force_per_thruster;
+	thrusters(2) = force_per_thruster;
+	thrusters(3) = force_per_thruster;
+	thrusters(4) = 0;
+	thrusters(5) = 0;
+	thrusters(6) = 0;
+	thrusters(7) = 0;
 	return thrusters;
 }
 thruster_set Thruster_Commander::thrust_compute_fy(float y_force)
