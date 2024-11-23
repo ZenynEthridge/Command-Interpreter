@@ -16,8 +16,6 @@ typedef Eigen::Matrix<float, 1, 3> three_axis;
 // A command object is a simple instruction to the vehicle
 class Thruster_Commander
 {
-	
-
 protected:
 
 	// Shouldn't usually change
