@@ -142,11 +142,15 @@ six_axis Thruster_Commander::bouyant_force(three_axis orientation)
 	six_axis result = six_axis::Zero();
 	
 	three_axis bouyant_force_linear = buoyant_magnitude * three_axis::UnitZ();	
-	bouyant_force_linear *= - Eigen::AngleAxisf(orientation(0), Eigen::Vector3f::UnitX()).toRotationMatrix();
-	bouyant_force_linear *= - Eigen::AngleAxisf(orientation(1), Eigen::Vector3f::UnitY()).toRotationMatrix();
-	bouyant_force_linear *= - Eigen::AngleAxisf(orientation(2), Eigen::Vector3f::UnitZ()).toRotationMatrix();
+	bouyant_force_linear *= - Eigen::AngleAxisf(orientation(0), 
+		Eigen::Vector3f::UnitX()).toRotationMatrix();
+	bouyant_force_linear *= - Eigen::AngleAxisf(orientation(1), 
+		Eigen::Vector3f::UnitY()).toRotationMatrix();
+	bouyant_force_linear *= - Eigen::AngleAxisf(orientation(2), 
+		Eigen::Vector3f::UnitZ()).toRotationMatrix();
 	
-	three_axis bouyant_force_rotational = bouyant_force_linear.cross(volume_center - mass_center);
+	three_axis bouyant_force_rotational = 
+		bouyant_force_linear.cross(volume_center - mass_center);
 	
 	result.segment(0, 3) = bouyant_force_linear;
 	result.segment(3, 3) = bouyant_force_rotational;
@@ -203,14 +207,19 @@ six_axis Thruster_Commander::predict_drag_forces(six_axis velocity)
 	// d[drag torque] = 0.5 * rho_water * (r*omega)^2 * Cd * d[A]
 	// drag_torque = integral(d[drag torque]) over A
 	// this might simplify to something less mathy. try pen&paper
-	for (int i = 3; i < 6; i++)
-	{
-	}
+	for (int i = 3; i < 6; i++){/*insert math*/ }
 
 	std::cout << "Drag Force: " << drag_force << std::endl;
 	return drag_force;
 }
-
+six_axis Thruster_Commander::net_env_forces(six_axis velocity, three_axis orientation)
+{
+	six_axis result = six_axis::Zero();
+	result += predict_drag_forces(velocity);
+	result += graviational_forces(orientation);
+	std::cout << "Net Environmental Forces: \n" << result << std::endl;
+	return result;
+}
 void Thruster_Commander::test_force_functions()
 {
 	// check thrust_compute_fz

@@ -78,7 +78,7 @@ public:
 	six_axis predict_drag_forces(six_axis velocity);
 
 	// environmental forces such as weight, boyancy, drag, ect
-	six_axis net_env_forces(six_axis velocity, six_axis oritation);
+	six_axis net_env_forces(six_axis velocity, three_axis oritation);
 
 	// this function will integrate the environmental forces and thruster
 	// forces to calculate the linear and angular impulse (change in momentum) 
