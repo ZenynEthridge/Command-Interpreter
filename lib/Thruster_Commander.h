@@ -49,6 +49,8 @@ protected:
 	three_axis angular_acceleration; // roll, pitch, yaw in rad/s^2
 	three_axis water_current_velocity; // velocity of water in x, y, z in m/s
 
+	thruster_set_6D wrench_matrix; // 6x8 matrix of forces and torques produced by each thruster
+
 public:
 	Thruster_Commander();
 
@@ -70,8 +72,8 @@ public:
 	void test_force_functions();
 
 	// also mostly for testing
-	Eigen::Matrix<float, 1, 3> compute_forces(force_array);
-	Eigen::Matrix<float, 1, 3> compute_torques(force_array);
+	three_axis compute_forces(force_array);
+	three_axis compute_torques(force_array);
 
 	//todo: make these functions 6-axis
 	six_axis weight_force(three_axis orientation); 
@@ -128,7 +130,7 @@ public:
 
 	// computes a force array from an acceleration vector (surge, sway, heave) in m/s^2, and (roll, pitch, yaw) in rad/s^2
 	// this function will consider the mass of the vehicle and external forces such as drag
-	force_array acceleration_compute(six_axis acceleration, bool simple=true);
+	thruster_set acceleration_compute(six_axis acceleration, bool simple=true);
 
 	// generates a command to a target velocity
 	// target velocity is a 1x6 matrix with (sway, surge, heave) linear velocities in m/s and (roll, pitch, yaw) angular velocities in r/s
