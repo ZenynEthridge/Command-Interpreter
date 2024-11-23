@@ -17,7 +17,7 @@
 2. In the terminal, navigate to the project root.
 3. Run the command `git add {args}`, where `{args}` is every file that you changed and wish to push to the repo.
     - For example, if you changed the files `Command.h`, `Command_Interpreter.cpp`, and `Command_Interpreter.h`, your
-   command would look like:
+   command could look like:
    ```bash
     git add Command.h Command_Interpreter.* 
    ```
@@ -26,9 +26,10 @@
 6. Close the text editor.
    - Note: if you want to cancel the commit, delete your commit notes and then close the text editor.
 7. Run the command `git push`
-   - You will need to enter credentials here. If you don't have a Personal Access Token configured, you will probably
-   need to do so:
-     https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
+   - You will need to enter credentials here. If you don't have a Personal Access Token (PAT) configured, you will probably
+   need to do so. You want a "classic" token. When prompted to authenticate, you'll type your username as your GitHub
+   username and your password as your PAT (**not** your password!). More information here:
+   https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
 
 ### Pulling Code
 1. In the terminal, navigate to the project directory.
@@ -58,7 +59,7 @@
 
 ### Basic Terminal Commands
 - `ls` or `dir`: These are for Unix (Linux or macOS) and Windows respectively. These list all the files and folders in 
-your current location.
+your current location, excluding hidden files.
 - `cd {path}`: This means to **c**hange **d**irectory to the directory specified in `{path}`. Path can be either a 
 "relative" path or an "absolute" path.
   - A relative path is a path defined from your current location. If you're used to a graphical file explorer, you can
