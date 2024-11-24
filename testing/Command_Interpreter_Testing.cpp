@@ -1,4 +1,4 @@
-#include "Command_Interpreter.cpp"
+#include "Command_Interpreter.h"
 #include "Parser.h"
 #include <gtest/gtest.h>
 
