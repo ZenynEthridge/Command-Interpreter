@@ -57,12 +57,13 @@ Thruster_Commander::Thruster_Commander()
 		thruster_torques.row(i) = thruster_moment_arms.row(i).cross(thruster_directions.row(i));
 	}
 
-    wrench_matrix = thruster_set_6D::Zero();
-    for (int i = 0; i < num_thrusters; i++)
+    wrench_matrix_transposed = six_axis::Zero();
+   /* for (int i = 0; i < num_thrusters; i++)
     {
-        wrench_matrix.row(i).segment(0, 3) = thruster_directions.row(i);
-        wrench_matrix.row(i).segment(3, 3) = thruster_torques.row(i);
-    }
+        wrench_matrix_transposed.row(i).segment(0, 3) = thruster_directions.row(i);
+        wrench_matrix_transposed.row(i).segment(3, 3) = thruster_torques.row(i);
+    }*/
+	//wrench_matrix = wrench_matrix_transposed.transpose();
 
 	float volume_inches = 449.157;            // volume of vehicle in inches^3, from onshape. This is likley less than the displacement volume and should be corrected
 	volume = volume_inches * pow(0.0254, 3); // convert to meters^3

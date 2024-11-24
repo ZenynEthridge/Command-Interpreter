@@ -49,8 +49,8 @@ protected:
 	three_axis angular_acceleration; // roll, pitch, yaw in rad/s^2
 	three_axis water_current_velocity; // velocity of water in x, y, z in m/s
 
-    thruster_set_6D wrench_matrix; // 6x8 matrix of forces and torques produced by each thruster
-
+    six_axis wrench_matrix_transposed; // 8x6 matrix of forces and torques produced by each thruster
+	Eigen::Matrix<float, 6, 8> wrench_matrix; 
 public:
 	Thruster_Commander();
 
