@@ -61,6 +61,8 @@ Thruster_Commander::Thruster_Commander()
 		thruster_torques.row(i) = thruster_moment_arms.row(i).cross(thruster_directions.row(i));
 	}
 
+
+
 	float volume_inches = 449.157;            // volume of vehicle in inches^3, from onshape. This is likley less than the displacement volume and should be corrected
 	volume = volume_inches * pow(0.0254, 3); // convert to meters^3
 	mass = 5.51; // mass of vehicle in kg, from onshape
@@ -93,15 +95,24 @@ void Thruster_Commander::print_info()
 	std::cout << "Thruster Torques: \n" << thruster_torques << std::endl;
 	std::cout << "Mass: \n" << mass << std::endl;
 	std::cout << "Volume: \n" << volume << std::endl;
+#include <cerrno>
+#include <cstring>
+#include <filesystem>
 
 }
 int Thruster_Commander::get_pwm(int thruster_num, float force) {
-/// todo the thruster number will be taken in to determine the voltage and thereby the CSV files to be used. Interpolation between CSV file value will be used to find in between voltages.
+// TODO: the thruster number will be taken in to determine the voltage and thereby the CSV files to be used. Interpolation between CSV file value will be used to find in between voltages.
 
 
 // Check if the force is within bounds if ((force > )
 	int PWM_value;
-	std::ifstream file("data/14V_PWM_Correlation.csv"); // Replace with your CSV file name
+
+	//Currently inputted my OWN ABSOLUTE directory for the file. Use YOUR OWN absolute directroy
+	std::ifstream file(R"(C:\Users\zafak\C++ Repository\Propulsion_2024_CPP\data\14V_Correlation.csv)", std::ios::in); // Replace with your CSV file name
+
+	//Attempted to use filesystem (did not work)
+	// auto cwd = std::filesystem::current_path();
+
 
 		//Number of Rows and Columns of the CSV file
 		int csvRows = 201;
@@ -109,24 +120,23 @@ int Thruster_Commander::get_pwm(int thruster_num, float force) {
 
 		double numericData[csvRows][csvColumns];  // Numeric array for storing the converted values
 
-		using namespace std;
 
 		//Checks to see if file is open
 		if (!file.is_open()) {
-			cerr << "Error opening file!" << endl;
-			return 1;
+			std::cerr << "Error opening file!" << std::endl;
+			return -1;
 		}
 
 
 		//Parses through csv lines and reads the numbers prior to commas as a string in a 2D array
-		string line;
+		std::string line;
 		int row = 1;
 		while (getline(file, line) && row <= (csvRows + 1)) {
-			stringstream ss(line);
-			string cell;
+			std::stringstream ss(line);
+			std::string cell;
 			int col = 0;
 			while (getline(ss, cell, ',') && col < csvColumns) {
-				numericData[row][col] = stod(cell);  // Convert string to double
+				numericData[row][col] = std::stod(cell);  // Convert string to double
 				col++;
 			}
 			row++;
@@ -301,16 +311,35 @@ thruster_set Thruster_Commander::thrust_compute_fy(float y_force)
 
 	// fx, fz and mz should be zero
 	// my and mz should be small enough to keep the vehicle stable
+    float force_per_thruster = y_force / 4;
+    thruster_set forces = thruster_set::Zero();
+    forces(0) = 0;
+    forces(1) = 0;
+    forces(2) = 0;
+    forces(3) = 0;
+    forces(4) = -force_per_thruster;
+    forces(5) = force_per_thruster;
+    forces(6) = force_per_thruster;
+    forces(7) = -force_per_thruster;
 
-	thruster_set forces;
-	return forces;
+    return forces;
 }
 thruster_set Thruster_Commander::thrust_compute_fx(float x_force)
 {
 	// fy, fz and mz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	thruster_set forces;
-	return forces;
+    float force_per_thruster = x_force / 4;
+    thruster_set forces = thruster_set::Zero();
+    forces(0) = 0;
+    forces(1) = 0;
+    forces(2) = 0;
+    forces(3) = 0;
+    forces(4) = -force_per_thruster;
+    forces(5) = -force_per_thruster;
+    forces(6) = -force_per_thruster;
+    forces(7) = -force_per_thruster;
+
+    return forces;
 
 }
 thruster_set Thruster_Commander::thrust_compute_fx_fy(float x_force, float y_force)
