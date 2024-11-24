@@ -32,6 +32,11 @@ add_executable(
         run_tests
         testing/Command_Interpreter_Testing.cpp
         testing/Thruster_Commander_Testing.cpp
+        lib/Command.h
+        lib/Command_Interpreter.cpp
+        lib/Command_Interpreter.h
+        lib/Thruster_Commander.cpp
+        lib/Thruster_Commander.h
 )
 target_link_libraries(
         run_tests
@@ -43,8 +48,6 @@ gtest_discover_tests(run_tests)
 #Gtest end
 
 #YAML start
-include(FetchContent)
-
 FetchContent_Declare(
         yaml-cpp
         GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git

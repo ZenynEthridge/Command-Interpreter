@@ -1,4 +1,4 @@
-#include "Thruster_Commander.cpp"
+#include "Thruster_Commander.h"
 #include <gtest/gtest.h>
 
 TEST(ThrusterCommanderTest, SimpleVertical) {
