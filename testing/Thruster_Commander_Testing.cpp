@@ -11,10 +11,10 @@ TEST(ThrusterCommanderTest, SimpleVertical) {
 }
 
 TEST(ThrusterCommanderTest, GetPwm) {
-    auto thrusterCommander = new ThrusterCommander();
-    int result = thrusterCommander->get_pwm();
-    ASSERT_EQ(result, 15);
-    int result = thrusterCommander->get_pwm();
-    ASSERT_EQ(result, 20);
+    auto thrusterCommander = new Thruster_Commander();
+    int result = thrusterCommander->get_pwm(1, -3);
+    ASSERT_EQ(result, 1148);
+    result = thrusterCommander->get_pwm(1, 1);
+    ASSERT_EQ(result, 1652);
     delete thrusterCommander;
 }
