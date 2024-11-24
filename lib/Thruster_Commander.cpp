@@ -97,86 +97,103 @@ void Thruster_Commander::print_info()
 	std::cout << "Volume: \n" << volume << std::endl;
 }
 
-int Thruster_Commander::get_pwm(int thruster_num, float force) {
-// TODO: the thruster number will be taken in to determine the voltage and thereby the CSV files to be used. Interpolation between CSV file value will be used to find in between voltages.
+void parseCsv(const std::string& filePath, double** *numericData, int numRows, int numCols) {
+    std::ifstream file(filePath, std::ios::in); // Replace with your CSV file name
 
-
-// Check if the force is within bounds if ((force > )
-    int PWM_value;
-
-    std::ifstream file("../data/14V_Correlation.csv", std::ios::in); // Replace with your CSV file name
-
-
-    //Number of Rows and Columns of the CSV file
-    int csvRows = 201;
-    int csvColumns = 7;
-
-    double numericData[csvRows][csvColumns];  // Numeric array for storing the converted values
-
-
-    //Checks to see if file is open
     if (!file.is_open()) {
         std::cerr << "Error opening file!" << std::endl;
-        return -1;
+        return; //TODO: throw exception?
     }
 
-
-    //Parses through csv lines and reads the numbers prior to commas as a string in a 2D array
     std::string line;
     std::string empty;
     int row = 0;
     getline(file, empty); // eat table headers at top of CSV
-    while (getline(file, line) && row <= (csvRows + 1)) {
+    while (getline(file, line) && row <= numRows) {
         std::stringstream ss(line);
         std::string cell;
         int col = 0;
-        while (getline(ss, cell, ',') && col < csvColumns) {
-            numericData[row][col] = std::stod(cell);  // Convert string to double
+        while (getline(ss, cell, ',') && col < numCols) {
+            (*numericData)[row][col] = std::stod(cell);  // Convert string to double
             col++;
         }
         row++;
     }
-
     file.close();
+}
+
+double determinePwmValue(double force, double **numericData, double smallestDifference,
+                         int closestRowIndex) {
+    double x1;
+    double y1;
+    double x2;
+    double y2;
+
+    double pwmValue;
+
+    if (smallestDifference < 0) { //Case when closest row/force is smaller than desired force
+        if (numericData[(closestRowIndex)][0] == 0 && numericData[(closestRowIndex + 1)][0] == 0) {
+            closestRowIndex++;
+        }
+
+        x1 = numericData[(closestRowIndex)][0];
+        y1 = numericData[(closestRowIndex)][5];
+        x2 = numericData[(closestRowIndex + 1)][0];
+        y2 = numericData[(closestRowIndex + 1)][5];
+        pwmValue = y1 + (force - x1) * ((y2 - y1) / (x2 - x1));
+    }
+    else if (smallestDifference > 0) { //Case when closest row/force value is larger than desired force
+        if (numericData[(closestRowIndex)][0] == 0 && numericData[(closestRowIndex - 1)][0] == 0) {
+            closestRowIndex--;
+        }
+
+        x1 = numericData[(closestRowIndex - 1)][0];
+        y1 = numericData[(closestRowIndex - 1)][5];
+        x2 = numericData[(closestRowIndex)][0];
+        y2 = numericData[(closestRowIndex)][5];
+        pwmValue = y1 + (force - x1) * ((y2 - y1) / (x2 - x1));
+    }
+    else {
+        pwmValue = numericData[closestRowIndex][5];
+    }
+    return pwmValue;
+}
+
+double Thruster_Commander::get_pwm(int thruster_num, double force) {
+    // TODO: the thruster number will be taken in to determine the voltage and thereby the CSV files to be used. Interpolation between CSV file value will be used to find in between voltages.
+
+    int csvRows = 186;
+    int csvColumns = 7;
+
+    double** numericData = (double**)malloc(csvRows * sizeof(double*));
+    for (int i = 0; i < csvRows; i++) {
+        numericData[i] = (double*)malloc(csvColumns * sizeof(double));
+    }
+
+    parseCsv("../data/14V_Correlation.csv", &numericData, csvRows, csvColumns);
+
+    if (force < numericData[0][0]) {
+        std::cerr << "Force too large of a negative number! No corresponding PWM found." << std::endl;
+        return 1100;//TODO: throw exception?
+    }
+    if (force > numericData[csvRows - 1][0]) {
+        std::cerr << "Force too large of a positive number! No corresponding PWM found." << std::endl;
+        return 1896;//TODO: throw exception?
+    }
 
     double smallestDifference = INT_MAX; //Arbitrarily large number to ensure it runs the first time
     double difference;
-    int closestRowValue;
+    int closestRowIndex;
 
-    for (int i = 0; i < (csvRows + 1); i++) {
-        difference = force - numericData[i][6];
-        if (std::abs(difference) < smallestDifference) {
+    for (int i = 0; i < csvRows; i++) {
+        difference = numericData[i][0] - force;
+        if (std::abs(difference) < std::abs(smallestDifference)) {
             smallestDifference = difference;
-            closestRowValue = i;
+            closestRowIndex = i;
         }
     }
 
-    //Variables used for linear interpolation calculation
-    double y1;
-    double y2;
-    double x1;
-    double x2;
-
-
-    //Case when closest row/force is larger than inputted force
-    if (difference < 0) {
-        y1 = numericData[(closestRowValue - 1)][1];
-        y2 = numericData[(closestRowValue)][1];
-        x1 = numericData[(closestRowValue - 1)][7];
-        x2 = numericData[(closestRowValue)][7];
-
-        //Case when closest row/force value is smaller than inputted force
-    }
-    else {
-        y1 = numericData[(closestRowValue)][1];
-        y2 = numericData[(closestRowValue + 1)][1];
-        x1 = numericData[(closestRowValue)][7];
-        x2 = numericData[(closestRowValue + 1)][7];
-    }
-
-    PWM_value = y1 + (force - x1) * ((y2 - y1) / (x2 - x1));
-
-    return PWM_value;
+    return determinePwmValue(force, numericData, smallestDifference, closestRowIndex);
 }
 
 six_axis Thruster_Commander::weight_force(three_axis orientation)
