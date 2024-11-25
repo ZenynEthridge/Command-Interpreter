@@ -30,7 +30,7 @@ Thruster_Commander::Thruster_Commander()
 
 	thruster_positions = thruster_set_3D::Zero();
 	thruster_positions.row(0) <<   .2535, -.2035, .042 ;
-	thruster_positions.row(1) <<  .2535, .2035, -.042;
+	thruster_positions.row(1) <<  .2535, .2035, -.042; 
 	thruster_positions.row(2) <<  -.2545, -.2035, .042;
 	thruster_positions.row(3) <<  -.2545, .2035, .042;
 	thruster_positions.row(4) <<  .167, -.1375, -.049;
@@ -78,13 +78,11 @@ Thruster_Commander::Thruster_Commander()
 	rho_water = 1025; // Density of water (kg/m^3)
 	weight_magnitude = mass * gravity;
 	buoyant_magnitude = -rho_water * gravity * volume;
-	// all zeros for now
-	position = three_axis::Zero();
-	orientation = three_axis::Zero();
-	velocity = three_axis::Zero();
-	angular_velocity = three_axis::Zero();
-	acceleration = three_axis::Zero();
-	angular_acceleration = three_axis::Zero();
+	
+	// values are relative to start values (zeros)
+	position = six_axis::Zero();
+	velocity = six_axis::Zero();
+	acceleration = six_axis::Zero();
 
 	// int standard_voltages[6] = {}
 	// std::string thruster_files = {}
@@ -436,7 +434,7 @@ thruster_set Thruster_Commander::thrust_compute(six_axis force_torque, bool simp
 std::vector<Command> Thruster_Commander::sequence_to(six_axis target_position)
 {
 	Eigen::Matrix<float, 1, 6> start_position;
-	start_position << position, orientation;
+	start_position << position;
 	std::cout << "Start Position: " << start_position << std::endl;
 	std::cout << "Target Position: " << target_position << std::endl;
 

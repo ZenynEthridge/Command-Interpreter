@@ -40,14 +40,12 @@ protected:
 	float weight_magnitude; // Weight of the vehicle (N)
 	float buoyant_magnitude; // Buoyant force on the vehicle (N)
 	
-	// todo: make these six axis
-	three_axis orientation; // roll, puitch, yaw in rad. sign convention is right hand rule
-	three_axis position;    // x, y, z, relative to start position in m
-	three_axis velocity;    // Velocity of the vehicle (surge, sway, heave) in m/s
-	three_axis angular_velocity; // rad/s
-	three_axis acceleration; // x, y, z m/s^2
-	three_axis angular_acceleration; // roll, pitch, yaw in rad/s^2
 	three_axis water_current_velocity; // velocity of water in x, y, z in m/s
+
+	// six axis replacements for the above
+	six_axis position;  
+	six_axis velocity;    
+	six_axis acceleration; 
 
     six_axis wrench_matrix_transposed; // 8x6 matrix of forces and torques produced by each thruster
 	Eigen::Matrix<float, 6, 8> wrench_matrix; 
@@ -72,6 +70,7 @@ public:
 	void test_force_functions();
 
 	// also mostly for testing
+	// tod: merge into six-axis function
     three_axis compute_forces(force_array);
     three_axis compute_torques(force_array);
 
