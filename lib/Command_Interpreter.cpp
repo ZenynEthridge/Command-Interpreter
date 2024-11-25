@@ -62,7 +62,7 @@ void DigitalPin::disable() {
             digitalWrite(gpioNumber, HIGH);
             break;
         default:
-            std::cerr << "Impossible pin mode!" << std::endl; //throw exception?
+            std::cerr << "Impossible pin mode!" << std::endl; //TODO: throw exception?
     }
     pinStatus = Disabled;
 }

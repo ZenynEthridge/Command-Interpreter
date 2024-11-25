@@ -61,7 +61,7 @@ public:
 	// mostly for debugging purposes
 	void print_info();
 	// Returns the PWM value for a given thruster and force
-	int get_pwm(int thruster_num, float force);
+	double get_pwm(int thruster_num, double force);
 
 	// Returns the PWM values for a given set of forces
 	pwm_array get_pwms(force_array forces);
@@ -139,4 +139,8 @@ public:
 	// this is the big, important, general case function which we're building up to
 	std::vector<Command> sequence_to(six_axis target_position);
 };
+
+void parseCsv(const std::string& filePath, double** *numericData, int numRows, int numCols);
+double determinePwmValue(double force, double **numericData, double smallestDifference,
+                         int closestRowIndex);
 
