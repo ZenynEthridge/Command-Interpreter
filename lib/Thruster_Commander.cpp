@@ -55,7 +55,7 @@ Thruster_Commander::Thruster_Commander()
 	thruster_directions.row(6) << -sin45, sin45, 0;
 	thruster_directions.row(7) << -sin45, -sin45, 0;
 
-	thruster_torques = Eigen::Matrix<float, 8, 3>::Zero();
+	thruster_torques = thruster_set_3D::Zero();
 	for (int i = 0; i < num_thrusters; i++)
 	{
 		thruster_torques.row(i) = thruster_moment_arms.row(i).cross(thruster_directions.row(i));
