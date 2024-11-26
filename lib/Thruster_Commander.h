@@ -135,6 +135,8 @@ public:
 	// target velocity is a 1x6 matrix with (sway, surge, heave) linear velocities in m/s and (roll, pitch, yaw) angular velocities in r/s
 	Command accelerate_to(six_axis target_velocity);
 
+	Command accelate_x(float velocity, float target_velocity);
+
 	// this is the big, important, general case function which we're building up to
 	std::vector<Command> sequence_to(six_axis target_position);
 };

@@ -432,6 +432,8 @@ thruster_set Thruster_Commander::thrust_compute(six_axis force_torque, bool simp
 	thruster_set forces;
 	return forces;
 }
+
+
 std::vector<Command> Thruster_Commander::sequence_to(six_axis target_position)
 {
 	Eigen::Matrix<float, 1, 6> start_position;
