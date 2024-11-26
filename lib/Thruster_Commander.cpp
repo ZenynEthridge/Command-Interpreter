@@ -116,7 +116,7 @@ void parseCsv(const std::string& filePath, double** numericData, int numRows, in
     std::string empty;
     int row = 0;
     getline(file, empty); // eat table headers at top of CSV
-    while (getline(file, line) && row <= numRows) {
+    while (getline(file, line) && row < numRows) {
         std::stringstream ss(line);
         std::string cell;
         int col = 0;
