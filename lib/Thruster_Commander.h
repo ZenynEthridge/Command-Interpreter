@@ -139,7 +139,7 @@ public:
 	std::vector<Command> sequence_to(six_axis target_position);
 };
 
-void parseCsv(const std::string& filePath, double** *numericData, int numRows, int numCols);
+void parseCsv(const std::string& filePath, double** numericData, int numRows, int numCols);
 double determinePwmValue(double force, double **numericData, double smallestDifference,
                          int closestRowIndex);
 

@@ -104,7 +104,7 @@ void Thruster_Commander::print_info()
 	std::cout << "Wrench Matrix: \n" << wrench_matrix << std::endl;
 }
 
-void parseCsv(const std::string& filePath, double** *numericData, int numRows, int numCols) {
+void parseCsv(const std::string& filePath, double** numericData, int numRows, int numCols) {
     std::ifstream file(filePath, std::ios::in); // Replace with your CSV file name
 
     if (!file.is_open()) {
@@ -121,7 +121,7 @@ void parseCsv(const std::string& filePath, double** *numericData, int numRows, i
         std::string cell;
         int col = 0;
         while (getline(ss, cell, ',') && col < numCols) {
-            (*numericData)[row][col] = std::stod(cell);  // Convert string to double
+            (numericData)[row][col] = std::stod(cell);  // Convert string to double
             col++;
         }
         row++;
@@ -177,7 +177,7 @@ double Thruster_Commander::get_pwm(int thruster_num, double force) {
         numericData[i] = (double*)malloc(csvColumns * sizeof(double));
     }
 
-    parseCsv("../data/14V_Correlation.csv", &numericData, csvRows, csvColumns);
+    parseCsv("../data/14V_Correlation.csv", numericData, csvRows, csvColumns);
 
     if (force < numericData[0][0]) {
         std::cerr << "Force too large of a negative number! No corresponding PWM found." << std::endl;
