@@ -62,13 +62,13 @@ Thruster_Commander::Thruster_Commander()
 	}
 
 
-    wrench_matrix_transposed = six_axis::Zero();
-   /* for (int i = 0; i < num_thrusters; i++)
+    wrench_matrix_transposed = thruster_set_6D::Zero();
+    for (int i = 0; i < num_thrusters; i++)
     {
         wrench_matrix_transposed.row(i).segment(0, 3) = thruster_directions.row(i);
         wrench_matrix_transposed.row(i).segment(3, 3) = thruster_torques.row(i);
-    }*/
-	//wrench_matrix = wrench_matrix_transposed.transpose();
+    }
+	wrench_matrix = wrench_matrix_transposed.transpose();
 
 
 	float volume_inches = 449.157;            // volume of vehicle in inches^3, from onshape. This is likley less than the displacement volume and should be corrected
@@ -101,6 +101,7 @@ void Thruster_Commander::print_info()
 	std::cout << "Thruster Torques: \n" << thruster_torques << std::endl;
 	std::cout << "Mass: \n" << mass << std::endl;
 	std::cout << "Volume: \n" << volume << std::endl;
+	std::cout << "Wrench Matrix: \n" << wrench_matrix << std::endl;
 }
 
 void parseCsv(const std::string& filePath, double** *numericData, int numRows, int numCols) {
