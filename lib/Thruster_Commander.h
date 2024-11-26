@@ -77,7 +77,7 @@ public:
 	//todo: make these functions 6-axis
 	six_axis weight_force(three_axis orientation); 
 	six_axis bouyant_force(three_axis orientation);
-	six_axis graviational_forces(three_axis orientation);
+	six_axis gravitational_forces(three_axis orientation);
 	six_axis predict_drag_forces(six_axis velocity);
 
 	// environmental forces such as weight, boyancy, drag, ect

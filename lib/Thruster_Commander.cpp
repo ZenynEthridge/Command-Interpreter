@@ -239,7 +239,7 @@ six_axis Thruster_Commander::bouyant_force(three_axis orientation)
 	return result;
 }
 
-six_axis Thruster_Commander::graviational_forces(three_axis orientation)
+six_axis Thruster_Commander::gravitational_forces(three_axis orientation)
 {
 	six_axis result = six_axis::Zero();
 	result += bouyant_force(orientation);
@@ -289,7 +289,7 @@ six_axis Thruster_Commander::net_env_forces(six_axis velocity, three_axis orient
 {
 	six_axis result = six_axis::Zero();
 	result += predict_drag_forces(velocity);
-	result += graviational_forces(orientation);
+	result += gravitational_forces(orientation);
 	std::cout << "Net Environmental Forces: \n" << result << std::endl;
 	return result;
 }
