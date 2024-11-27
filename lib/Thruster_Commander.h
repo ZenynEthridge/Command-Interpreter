@@ -139,10 +139,15 @@ public:
 
 	Command accelate_x(float velocity, float target_velocity);
 
-	// these functions assume inital velcoity is zero, vehicle stable on x and y axes
+	// these functions assume inital and final velocities are zero
+	void basic_rotate_x(float angle_x, command_sequence& sequence);
+	void basic_rotate_y(float angle_y, command_sequence& sequence);
 	void basic_rotate_z(float angle_z, command_sequence& sequence);
-	void basic_travel_z(float distance_z, command_sequence& sequence);
 	void basic_travel_x(float distance_x, command_sequence& sequence);
+	void basic_travel_y(float distance_y, command_sequence& sequence);
+	void basic_travel_z(float distance_z, command_sequence& sequence);
+
+	
 	
 
 
