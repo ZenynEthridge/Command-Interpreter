@@ -177,7 +177,7 @@ double Thruster_Commander::get_pwm(int thruster_num, double force) {
         numericData[i] = (double*)malloc(csvColumns * sizeof(double));
     }
 
-    parseCsv("data/14V_Correlation.csv", numericData, csvRows, csvColumns);
+    parseCsv("../data/14V_Correlation.csv", numericData, csvRows, csvColumns);
 
     if (force < numericData[0][0]) {
         std::cerr << "Force too large of a negative number! No corresponding PWM found." << std::endl;
@@ -435,7 +435,15 @@ thruster_set Thruster_Commander::thrust_compute(six_axis force_torque, bool simp
 
 void Thruster_Commander::basic_rotate_z(float angle_z, command_sequence& sequence) {}
 void Thruster_Commander::basic_travel_z(float distance_z, command_sequence& sequence) {}
-void Thruster_Commander::basic_travel_x(float distance_x, command_sequence& sequence) {}
+void Thruster_Commander::basic_travel_x(float distance_x, command_sequence& sequence) 
+{
+	// find top speed
+	// find time to reach top speed
+	// find distance to reach top speed
+	// find time to decelerate
+	// find distance to decelerate
+}
+
 
 command_sequence Thruster_Commander::basic_sequence(six_axis target_position)
 {
