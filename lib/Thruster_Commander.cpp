@@ -7,8 +7,8 @@
 #include "Thruster_Commander.h"
 #include "eigen-3.4.0/Eigen/Dense"
 #include <fstream>
-#include <iostream>
 #include <sstream>
+
 
 
 Thruster_Commander::Thruster_Commander()
@@ -269,7 +269,6 @@ three_axis Thruster_Commander::compute_torques(force_array forces)
 	}
 	return total_torque;
 }
-
 six_axis Thruster_Commander::predict_drag_forces(six_axis velocity)
 {
 	six_axis drag_force = six_axis::Zero();
@@ -434,7 +433,6 @@ thruster_set Thruster_Commander::thrust_compute(six_axis force_torque, bool simp
 	thruster_set forces;
 	return forces;
 }
-
 six_axis Thruster_Commander::velocity_at_time(thruster_set thruster_sets, float duration)
 {
 	six_axis result = six_axis::Zero();
@@ -463,7 +461,6 @@ void Thruster_Commander::basic_travel_x(float distance_x, command_sequence& sequ
 	float d1; // = predict_distance_x(t1, conditions);
 
 }
-
 command_sequence Thruster_Commander::basic_sequence(six_axis target_position)
 {
 	Eigen::Matrix<float, 1, 6> start_position;
@@ -471,8 +468,9 @@ command_sequence Thruster_Commander::basic_sequence(six_axis target_position)
 
 
 	six_axis distance = target_position - start_position;
+	float angle_z = std::atan(distance(1) / distance(0));
 	command_sequence commands;
-	basic_rotate_z(1.0, commands);
+	basic_rotate_z(angle_z, commands);
 	basic_travel_z(distance(2), commands);
 	basic_travel_x(distance(0), commands);
 	return commands;
