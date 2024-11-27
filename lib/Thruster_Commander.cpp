@@ -84,6 +84,10 @@ Thruster_Commander::Thruster_Commander()
 	velocity = six_axis::Zero();
 	acceleration = six_axis::Zero();
 
+	// todo: replace math operation with it's direct result in config file
+	six_axis c_inf = { 0.041, 0.05, 0.125, 0.005, 0.005, 0.005 };
+	combined_drag_coefs = c_inf * rho_water;
+
 	// int standard_voltages[6] = {}
 	// std::string thruster_files = {}
 	// Eigen::Matrix<float, 2, 6> min_max_voltages = {}
@@ -101,6 +105,7 @@ void Thruster_Commander::print_info()
 	std::cout << "Thruster Torques: \n" << thruster_torques << std::endl;
 	std::cout << "Mass: \n" << mass << std::endl;
 	std::cout << "Volume: \n" << volume << std::endl;
+	std::cout << "Combined drag coefs: \n" << combined_drag_coefs << std::endl;
 	std::cout << "Wrench Matrix: \n" << wrench_matrix << std::endl;
 }
 
@@ -238,7 +243,6 @@ six_axis Thruster_Commander::bouyant_force(three_axis orientation)
 	result.segment(3, 3) = bouyant_force_rotational;
 	return result;
 }
-
 six_axis Thruster_Commander::gravitational_forces(three_axis orientation)
 {
 	six_axis result = six_axis::Zero();
@@ -307,7 +311,6 @@ void Thruster_Commander::test_force_functions()
 	// check thrust_compute_fx_fy_fz_mz
 	// check thrust_compute_fx_fy_fz_mx_my_mz
 }
-// this one is done and seems to work
 thruster_set Thruster_Commander::thrust_compute_fz(float z_force)
 {
 
@@ -436,6 +439,7 @@ six_axis Thruster_Commander::velocity_at_time(thruster_set thruster_sets, float 
 {
 	six_axis result = six_axis::Zero();
 	six_axis a = six_axis::Zero();
+	six_axis b = six_axis::Zero();
 	return result;
 }
 void Thruster_Commander::basic_rotate_z(float angle_z, command_sequence& sequence) {}
