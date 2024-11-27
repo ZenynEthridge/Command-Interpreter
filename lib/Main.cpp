@@ -23,6 +23,19 @@ int main()
     control.gravitational_forces({ 3.14 / 2, 0, 0 });
     control.net_env_forces({ 0.5, 0.5, 0, 0, 0, 0 }, { 3.14/2, 0, 0 });
     control.thrust_compute_fz(5);
-    return 0;
+    return 0;*/
+
+    std::string filename = "data\\14V_Correlation.csv";
+    std::ifstream inFile(filename);
+    if (inFile.is_open()) {
+        std::string line;
+        while (std::getline(inFile, line)) {
+            std::cout << line << std::endl;
+        }
+        inFile.close();
+    }
+    else {
+        std::cerr << "Error opening file for reading." << std::endl;
+    }
 }
 
