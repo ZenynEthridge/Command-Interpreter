@@ -14,7 +14,7 @@ add_executable(Propulsion_2024
         lib/Main.cpp
         lib/Thruster_Commander.cpp
         lib/Thruster_Commander.h
- "lib/Relative_Path_fix.h")
+ )
 
 # GTest start
 include(FetchContent)
@@ -37,7 +37,7 @@ add_executable(
         lib/Command_Interpreter.h
         lib/Thruster_Commander.cpp
         lib/Thruster_Commander.h
- "lib/Relative_Path_fix.h")
+ )
 target_link_libraries(
         run_tests
         GTest::gtest_main
