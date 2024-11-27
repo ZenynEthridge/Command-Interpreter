@@ -432,7 +432,12 @@ thruster_set Thruster_Commander::thrust_compute(six_axis force_torque, bool simp
 	return forces;
 }
 
-
+six_axis Thruster_Commander::velocity_at_time(thruster_set thruster_sets, float duration)
+{
+	six_axis result = six_axis::Zero();
+	six_axis a = six_axis::Zero();
+	return result;
+}
 void Thruster_Commander::basic_rotate_z(float angle_z, command_sequence& sequence) {}
 void Thruster_Commander::basic_travel_z(float distance_z, command_sequence& sequence) {}
 void Thruster_Commander::basic_travel_x(float distance_x, command_sequence& sequence) {}

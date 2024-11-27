@@ -139,6 +139,10 @@ public:
 
 	Command accelate_x(float velocity, float target_velocity);
 
+
+	six_axis velocity_at_time(thruster_set thruster_sets, float duration);
+
+
 	// these functions assume inital and final velocities are zero
 	void basic_rotate_x(float angle_x, command_sequence& sequence);
 	void basic_rotate_y(float angle_y, command_sequence& sequence);
