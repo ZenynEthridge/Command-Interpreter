@@ -1,14 +1,8 @@
 #include "Thruster_Commander.h"
 #include <gtest/gtest.h>
 
-TEST(ThrusterCommanderTest, SimpleVertical) {
-    testing::internal::CaptureStdout();
-    Thruster_Commander thruster_commander = Thruster_Commander();
-    thruster_commander.print_info();
-    thruster_commander.thrust_compute_fz(5);
 
-    std::string output = testing::internal::GetCapturedStdout(); // TODO: check that output matches expected output
-}
+
 
 TEST(ThrusterCommanderTest, GetPwmNoInterpolation) {
     auto thrusterCommander = new Thruster_Commander();
@@ -96,3 +90,20 @@ TEST(ThrusterCommanderTest, GetPwmOutOfBounds) {
 }
 
 
+TEST(ThrusterCommandTest, BasicSequenceTo) {
+    auto thrusterCommander = new Thruster_Commander();
+    six_axis target = { 5, 5, 5, 0, 0, 0 };
+    command_sequence sequence = thrusterCommander->basic_sequence(target);
+
+    // TODO: run pencil and paper calulations to determine if the sequence is correct
+    // TODO: add asserts
+    delete thrusterCommander;
+}
+TEST(ThrusterCommanderTest, Thrust_Compute_fz) {
+    testing::internal::CaptureStdout();
+    Thruster_Commander thruster_commander = Thruster_Commander();
+    thruster_commander.print_info();
+    thruster_commander.thrust_compute_fz(5);
+
+    std::string output = testing::internal::GetCapturedStdout(); // TODO: check that output matches expected output
+}

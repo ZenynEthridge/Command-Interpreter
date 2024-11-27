@@ -15,6 +15,8 @@ typedef Eigen::Matrix<float, 8, 6> thruster_set_6D;
 typedef Eigen::Matrix<float, 1, 6> six_axis;
 typedef Eigen::Matrix<float, 1, 3> three_axis;
 
+typedef std::vector<Command> command_sequence;
+
 // The purpose of this class is to generate command objects
 // A command object is a simple instruction to the vehicle
 class Thruster_Commander
@@ -135,8 +137,22 @@ public:
 	// target velocity is a 1x6 matrix with (sway, surge, heave) linear velocities in m/s and (roll, pitch, yaw) angular velocities in r/s
 	Command accelerate_to(six_axis target_velocity);
 
+	Command accelate_x(float velocity, float target_velocity);
+
+	// these functions assume inital and final velocities are zero
+	void basic_rotate_x(float angle_x, command_sequence& sequence);
+	void basic_rotate_y(float angle_y, command_sequence& sequence);
+	void basic_rotate_z(float angle_z, command_sequence& sequence);
+	void basic_travel_x(float distance_x, command_sequence& sequence);
+	void basic_travel_y(float distance_y, command_sequence& sequence);
+	void basic_travel_z(float distance_z, command_sequence& sequence);
+
+	
+	
+
+
 	// this is the big, important, general case function which we're building up to
-	std::vector<Command> sequence_to(six_axis target_position);
+	command_sequence basic_sequence(six_axis target_position);
 };
 
 void parseCsv(const std::string& filePath, double** numericData, int numRows, int numCols);

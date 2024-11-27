@@ -177,7 +177,7 @@ double Thruster_Commander::get_pwm(int thruster_num, double force) {
         numericData[i] = (double*)malloc(csvColumns * sizeof(double));
     }
 
-    parseCsv("../data/14V_Correlation.csv", numericData, csvRows, csvColumns);
+    parseCsv("data/14V_Correlation.csv", numericData, csvRows, csvColumns);
 
     if (force < numericData[0][0]) {
         std::cerr << "Force too large of a negative number! No corresponding PWM found." << std::endl;
@@ -247,7 +247,6 @@ six_axis Thruster_Commander::gravitational_forces(three_axis orientation)
 	std::cout << "Gravitational forces: \n" << result << std::endl;
 	return result;
 }
-
 three_axis Thruster_Commander::compute_forces(force_array forces)
 {
 	three_axis total_force = three_axis::Zero();
@@ -432,23 +431,22 @@ thruster_set Thruster_Commander::thrust_compute(six_axis force_torque, bool simp
 	thruster_set forces;
 	return forces;
 }
-std::vector<Command> Thruster_Commander::sequence_to(six_axis target_position)
+
+
+void Thruster_Commander::basic_rotate_z(float angle_z, command_sequence& sequence) {}
+void Thruster_Commander::basic_travel_z(float distance_z, command_sequence& sequence) {}
+void Thruster_Commander::basic_travel_x(float distance_x, command_sequence& sequence) {}
+
+command_sequence Thruster_Commander::basic_sequence(six_axis target_position)
 {
 	Eigen::Matrix<float, 1, 6> start_position;
 	start_position << position;
-	std::cout << "Start Position: " << start_position << std::endl;
-	std::cout << "Target Position: " << target_position << std::endl;
 
-	Eigen::Matrix<float, 1, 6> distance = target_position - start_position;
-	std::cout << "Distance: " << distance << std::endl;
-	Eigen::Matrix<float, 1, 6> direction = distance.normalized();
-	std::cout << "Direction: " << direction << std::endl;
 
-	// we need a function to compute the max thrust possible in the prefered direction
-	// then we need to calculate the max speed possible in that direction
-	// should the robot reorient first?
-	// in which orientation is the robot the fastest?
-
-	std::vector<Command> commands;
+	six_axis distance = target_position - start_position;
+	command_sequence commands;
+	basic_rotate_z(1.0, commands);
+	basic_travel_z(distance(2), commands);
+	basic_travel_x(distance(0), commands);
 	return commands;
 }
