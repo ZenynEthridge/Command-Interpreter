@@ -438,13 +438,31 @@ thruster_set Thruster_Commander::thrust_compute(six_axis force_torque, bool simp
 six_axis Thruster_Commander::velocity_at_time(thruster_set thruster_sets, float duration)
 {
 	six_axis result = six_axis::Zero();
-	six_axis a = six_axis::Zero();
-	six_axis b = six_axis::Zero();
+	/*
+	* For linear forces:
+	C - ln(|C_d * V - sqrt(C_d * F_t)| / |C_d * V + sqrt(C_d * F_t)|) 
+	    / (2 * sqrt(C_d * F_t) * m)
+	where C is the constant of integration, 
+	      C_d is combined drag coefficient (F_d / V^2)
+		  F_t is force of thrusters, gravity, ect, m is mass
+	* For rotational forces:
+	same as above, but using I instead of m
+
+	Does not account for changes in orientation!
+	*/
+	
+	//todo
 	return result;
 }
 void Thruster_Commander::basic_rotate_z(float angle_z, command_sequence& sequence) {}
 void Thruster_Commander::basic_travel_z(float distance_z, command_sequence& sequence) {}
-void Thruster_Commander::basic_travel_x(float distance_x, command_sequence& sequence) {}
+void Thruster_Commander::basic_travel_x(float distance_x, command_sequence& sequence) 
+{
+	float max_speed; // = max_speed_x(conditions);
+	float t1; // = acceleration_time_x(max_speed, conditions);
+	float d1; // = predict_distance_x(t1, conditions);
+
+}
 
 command_sequence Thruster_Commander::basic_sequence(six_axis target_position)
 {
