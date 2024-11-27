@@ -14,7 +14,7 @@ int main()
     control.bouyant_force({ 3.14/2, 0, 0 });
     control.gravitational_forces({ 3.14 / 2, 0, 0 });
     control.net_env_forces({ 0.5, 0.5, 0, 0, 0, 0 }, { 3.14/2, 0, 0 });
-    control.thrust_compute_fz(5);*/
+    control.thrust_compute_fz(5);
     return 0;
 }
 
