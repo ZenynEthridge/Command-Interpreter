@@ -79,7 +79,7 @@ public:
 	//todo: make these functions 6-axis
 	six_axis weight_force(three_axis orientation); 
 	six_axis bouyant_force(three_axis orientation);
-	six_axis graviational_forces(three_axis orientation);
+	six_axis gravitational_forces(three_axis orientation);
 	six_axis predict_drag_forces(six_axis velocity);
 
 	// environmental forces such as weight, boyancy, drag, ect
@@ -150,7 +150,7 @@ public:
 	command_sequence basic_sequence(six_axis target_position);
 };
 
-void parseCsv(const std::string& filePath, double** *numericData, int numRows, int numCols);
+void parseCsv(const std::string& filePath, double** numericData, int numRows, int numCols);
 double determinePwmValue(double force, double **numericData, double smallestDifference,
                          int closestRowIndex);
 

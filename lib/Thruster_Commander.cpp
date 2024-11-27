@@ -104,7 +104,7 @@ void Thruster_Commander::print_info()
 	std::cout << "Wrench Matrix: \n" << wrench_matrix << std::endl;
 }
 
-void parseCsv(const std::string& filePath, double** *numericData, int numRows, int numCols) {
+void parseCsv(const std::string& filePath, double** numericData, int numRows, int numCols) {
     std::ifstream file(filePath, std::ios::in); // Replace with your CSV file name
 
     if (!file.is_open()) {
@@ -116,12 +116,12 @@ void parseCsv(const std::string& filePath, double** *numericData, int numRows, i
     std::string empty;
     int row = 0;
     getline(file, empty); // eat table headers at top of CSV
-    while (getline(file, line) && row <= numRows) {
+    while (getline(file, line) && row < numRows) {
         std::stringstream ss(line);
         std::string cell;
         int col = 0;
         while (getline(ss, cell, ',') && col < numCols) {
-            (*numericData)[row][col] = std::stod(cell);  // Convert string to double
+            (numericData)[row][col] = std::stod(cell);  // Convert string to double
             col++;
         }
         row++;
@@ -177,7 +177,7 @@ double Thruster_Commander::get_pwm(int thruster_num, double force) {
         numericData[i] = (double*)malloc(csvColumns * sizeof(double));
     }
 
-    parseCsv("../data/14V_Correlation.csv", &numericData, csvRows, csvColumns);
+    parseCsv("../data/14V_Correlation.csv", numericData, csvRows, csvColumns);
 
     if (force < numericData[0][0]) {
         std::cerr << "Force too large of a negative number! No corresponding PWM found." << std::endl;
@@ -238,7 +238,8 @@ six_axis Thruster_Commander::bouyant_force(three_axis orientation)
 	result.segment(3, 3) = bouyant_force_rotational;
 	return result;
 }
-six_axis Thruster_Commander::graviational_forces(three_axis orientation)
+
+six_axis Thruster_Commander::gravitational_forces(three_axis orientation)
 {
 	six_axis result = six_axis::Zero();
 	result += bouyant_force(orientation);
@@ -287,7 +288,7 @@ six_axis Thruster_Commander::net_env_forces(six_axis velocity, three_axis orient
 {
 	six_axis result = six_axis::Zero();
 	result += predict_drag_forces(velocity);
-	result += graviational_forces(orientation);
+	result += gravitational_forces(orientation);
 	std::cout << "Net Environmental Forces: \n" << result << std::endl;
 	return result;
 }
