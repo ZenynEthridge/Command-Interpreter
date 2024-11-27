@@ -33,6 +33,9 @@ TEST(ThrusterCommanderTest, GetPwmNoInterpolation) {
     result = thrusterCommander->get_pwm(1, 4.52);
     ASSERT_DOUBLE_EQ(result, 1900);
 
+    result = thrusterCommander->get_pwm(1, 4.53);
+    ASSERT_DOUBLE_EQ(result, 1896);
+
     delete thrusterCommander;
 }
 
