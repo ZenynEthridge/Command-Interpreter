@@ -14,7 +14,7 @@ add_executable(Propulsion_2024
         lib/Main.cpp
         lib/Thruster_Commander.cpp
         lib/Thruster_Commander.h
- "lib/Relative_Path_fix.h")
+ )
 
 # GTest start
 include(FetchContent)
@@ -37,7 +37,7 @@ add_executable(
         lib/Command_Interpreter.h
         lib/Thruster_Commander.cpp
         lib/Thruster_Commander.h
- "lib/Relative_Path_fix.h")
+ )
 target_link_libraries(
         run_tests
         GTest::gtest_main
@@ -58,7 +58,6 @@ FetchContent_MakeAvailable(yaml-cpp)
 target_link_libraries(Propulsion_2024 PUBLIC yaml-cpp::yaml-cpp) # The library or executable that require yaml-cpp library
 #YAML end
 
-#configure_file(data/14V_Correlation.csv ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
-target_include_directories(run_tests PRIVATE data)
-target_include_directories(Propulsion_2024 PRIVATE data)
+target_include_directories(run_tests PUBLIC data/)
+target_include_directories(Propulsion_2024 PUBLIC data/)
 

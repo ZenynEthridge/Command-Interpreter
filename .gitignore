@@ -366,3 +366,4 @@ FodyWeavers.xsd
 /.idea/
 /cmake-build-debug/
 /build/
+CMakeSettings.json
