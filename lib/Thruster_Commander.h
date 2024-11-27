@@ -34,6 +34,11 @@ protected:
 	thruster_set_3D thruster_torques;   // Torque of thruster on sub about x,y,z (Nm)
 	thruster_set thruster_voltages; // voltage supplied to each thruster (V) 
 
+	float max_thruster_level; // between 0 and 1
+	
+	thruster_set min_thruster_force;
+	thruster_set max_thruster_force;
+	
 	int num_thrusters;  // Number of thrusters on the vehicle
 	float mass;        // Mass of the vehicle (kg)
 	float volume;     // Displacement volume of the vehicle (m^3)
@@ -86,18 +91,11 @@ public:
 	// environmental forces such as weight, boyancy, drag, ect
 	six_axis net_env_forces(six_axis velocity, three_axis oritation);
 
-	float top_speed(three_axis direction);
 
-	// this function will integrate the environmental forces and thruster
-	// forces to calculate the linear and angular impulse (change in momentum) 
-	// on the vehicle
-	six_axis integrate_impulse(
-		six_axis start_velocity, 
-		thruster_set thruster_sets, 
-		float duration, int n);
+	
 
 	// net force produced by thrusters at a particular set of pwms. This will mostly be used for testing
-	six_axis predict_net_force(pwm_array pwms);
+	six_axis net_force_from_thrusters(thruster_set& thrusters);
 
 	// functions begining with 'simple_' make the assumption that the vehicle is stable about the x and y axes
 	// these functions only need to consider forces in the x, y, and z directions, and moments about the z axis
@@ -143,6 +141,7 @@ public:
 
 	six_axis velocity_at_time(thruster_set thruster_sets, float duration);
 
+	float top_speed_x(bool forward=true);
 
 	// these functions assume inital and final velocities are zero
 	void basic_rotate_x(float angle_x, command_sequence& sequence);
@@ -153,9 +152,6 @@ public:
 	void basic_travel_z(float distance_z, command_sequence& sequence);
 
 	
-	
-
-
 	// this is the big, important, general case function which we're building up to
 	command_sequence basic_sequence(six_axis target_position);
 };

@@ -78,7 +78,8 @@ Thruster_Commander::Thruster_Commander()
 	rho_water = 1025; // Density of water (kg/m^3)
 	weight_magnitude = mass * gravity;
 	buoyant_magnitude = -rho_water * gravity * volume;
-	
+	max_thruster_level = 0.9;
+
 	// values are relative to start values (zeros)
 	position = six_axis::Zero();
 	velocity = six_axis::Zero();
@@ -170,7 +171,6 @@ double determinePwmValue(double force, double **numericData, double smallestDiff
     }
     return pwmValue;
 }
-
 double Thruster_Commander::get_pwm(int thruster_num, double force) {
     // TODO: the thruster number will be taken in to determine the voltage and thereby the CSV files to be used. Interpolation between CSV file value will be used to find in between voltages.
 
@@ -207,7 +207,6 @@ double Thruster_Commander::get_pwm(int thruster_num, double force) {
 
     return determinePwmValue(force, numericData, smallestDifference, closestRowIndex);
 }
-
 six_axis Thruster_Commander::weight_force(three_axis orientation)
 {
 	six_axis result = six_axis::Zero();
@@ -295,6 +294,11 @@ six_axis Thruster_Commander::net_env_forces(six_axis velocity, three_axis orient
 	std::cout << "Net Environmental Forces: \n" << result << std::endl;
 	return result;
 }
+six_axis Thruster_Commander::net_force_from_thrusters(thruster_set& thrusters)
+{
+	six_axis result = six_axis::Zero();
+	return wrench_matrix * thrusters;
+}
 void Thruster_Commander::test_force_functions()
 {
 	// check thrust_compute_fz
@@ -332,6 +336,8 @@ thruster_set Thruster_Commander::thrust_compute_fy(float y_force)
 
 	// fx, fz and mz should be zero
 	// my and mz should be small enough to keep the vehicle stable
+
+	// TODO: correct trig error
     float force_per_thruster = y_force / 4;
     thruster_set forces = thruster_set::Zero();
     forces(0) = 0;
@@ -349,6 +355,8 @@ thruster_set Thruster_Commander::thrust_compute_fx(float x_force)
 {
 	// fy, fz and mz should be zero
 	// mx and my should be small enough to keep the vehicle stable
+
+	// TODO: correct trig error
     float force_per_thruster = x_force / 4;
     thruster_set forces = thruster_set::Zero();
     forces(0) = 0;
@@ -452,13 +460,31 @@ six_axis Thruster_Commander::velocity_at_time(thruster_set thruster_sets, float 
 	//todo
 	return result;
 }
+float Thruster_Commander::top_speed_x(bool forward)
+{
+	// F = F_t - F_d = ma = 0  ->  F_t = F_d = C_d * v^2
+	// v = sqrt(F_t / C_d)
+	float cd = combined_drag_coefs(0);
+	thruster_set forces = thrust_compute_fx(0);
+
+
+	return 0;
+}
 void Thruster_Commander::basic_rotate_z(float angle_z, command_sequence& sequence) {}
 void Thruster_Commander::basic_travel_z(float distance_z, command_sequence& sequence) {}
 void Thruster_Commander::basic_travel_x(float distance_x, command_sequence& sequence) 
 {
-	float max_speed; // = max_speed_x(conditions);
-	float t1; // = acceleration_time_x(max_speed, conditions);
-	float d1; // = predict_distance_x(t1, conditions);
+	float top_speed; // a percentage of the vehicles top speed in x direction
+	
+	float accel_time; // = acceleration_time_x(max_speed, conditions);
+	float accel_distance;
+	
+	float deccel_time;
+	float deccel_distance;
+
+	float steady_speed_time;
+	float steady_speed_distance;
+	
 
 }
 command_sequence Thruster_Commander::basic_sequence(six_axis target_position)
