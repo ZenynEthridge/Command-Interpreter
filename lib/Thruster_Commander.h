@@ -144,6 +144,7 @@ public:
 	six_axis velocity_at_time(thruster_set thruster_sets, float duration);
 
 	float top_speed_x(bool forward=true);
+	float accel_time_from_zero_x(float target_velocity);
 
 	// these functions assume inital and final velocities are zero
 	void basic_rotate_x(float angle_x, command_sequence& sequence);

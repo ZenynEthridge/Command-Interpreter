@@ -2,7 +2,15 @@
 #include <gtest/gtest.h>
 
 
+TEST(ThrusterCommanderTest, Accel_Time_From_Zero_x) {
+	auto control = new Thruster_Commander();
+	
+	float v = 0.9 * control->top_speed_x(true);
+	float t = control->accel_time_from_zero_x(v);
 
+    // math makes no sense currently
+    delete control;
+}
 TEST(ThrusterCommanderTest, Top_Speed_X) {
 	auto control = new Thruster_Commander();
 	float max_fwd = control->top_speed_x(true);
