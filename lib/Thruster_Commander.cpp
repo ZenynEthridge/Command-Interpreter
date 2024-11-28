@@ -441,12 +441,12 @@ six_axis Thruster_Commander::velocity_at_time(thruster_set thruster_sets, float 
 	//todo
 	return result;
 }
-float Thruster_Commander::accel_time_from_zero_x(float v) 
+float Thruster_Commander::accel_time_from_zero_x(float velocity) 
 {
 	float cd = combined_drag_coefs(0);
 	float m = mass;
 
-	bool forward = v > 0;
+	bool forward = velocity > 0;
 	float force_per_thruster;
 
 	if (forward) { force_per_thruster = min_thruster_force; }
@@ -458,15 +458,15 @@ float Thruster_Commander::accel_time_from_zero_x(float v)
 	forces(6) = force_per_thruster;
 	forces(7) = force_per_thruster;
 
-	float fx = net_force_from_thrusters(forces)(0);
-
+	float fx = abs(net_force_from_thrusters(forces)(0));
 	float e = 2.71828;
+	float v = abs(velocity);
 	
-	// the output of this function, and the function its self, make no sense
 	float t = 
 		-m * log(abs(cd * v - sqrt(cd * fx)) 
 		/ abs(cd * v + sqrt(cd * fx))) 
 		/ (2 * sqrt(cd * fx));
+
 	return t;
 
 }

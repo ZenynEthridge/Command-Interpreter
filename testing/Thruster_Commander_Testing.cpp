@@ -5,9 +5,23 @@
 TEST(ThrusterCommanderTest, Accel_Time_From_Zero_x) {
 	auto control = new Thruster_Commander();
 	
-	float v = 0.99 * control->top_speed_x(true);
+	float v = 0.999 * control->top_speed_x(true);
 	float t = control->accel_time_from_zero_x(v);
-    
+	ASSERT_TRUE(t > 0);
+	
+    v = control->top_speed_x(true);
+	t = control->accel_time_from_zero_x(v);
+	ASSERT_TRUE(t == INFINITY);
+
+	v = 0.999 * control->top_speed_x(false);
+	t = control->accel_time_from_zero_x(v);
+	ASSERT_TRUE(t > 0);
+
+
+	v = control->top_speed_x(false);
+	t = control->accel_time_from_zero_x(v);
+	ASSERT_TRUE(t == INFINITY);
+
     // TODO: double check math on seperable DE
     // TODO: add assertations based on config file, math
     delete control;
