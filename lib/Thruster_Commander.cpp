@@ -397,12 +397,35 @@ thruster_set Thruster_Commander::thrust_compute_fx_mz(float x_force, float z_tor
 	thruster_set forces;
 	return forces;
 }
+
+/* Changes Made By Nico Start Here */
+typedef Eigen::Matrix<float, 8, 1> thruster_set;
+typedef Eigen::Matrix<float, 6, 1> six_axis;
+
+// pseudoinverse of a matrix (equivelent to np
+_Matrix_Type_  pseudoInverse(const _Matrix_Type_  &a, double epsilon = std::numeric_limits<float>::epsilon())
+{
+	Eigen::JacobiSVD<_Matrix_Type_ > svd(a, Eigen::ComputeThinU | Eigen::ComputeThinV);
+	float tolerance = epsilon * std::max(a.cols(), a.rows()) * svd.singularValues().array().abs().maxCoeff();
+	return svd.matrixV() *
+		(svd.singularValues().array().abs()>tolerance)
+			.select(svd.singularValues().array().inverse(), 0)
+			.matrix()
+			.asDiagonal()*
+		svd.matrixU().transpose();
+	;
+}
+
 thruster_set Thruster_Commander::thrust_compute_fx_fy_mz(float x_force, float y_force, float z_torque)
 {
 	// fz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	thruster_set forces;
-	return forces;
+	six_axis F_calc;
+	F_calc << x_force, y_force, 0.0f, 0.0f, 0.0f, z_torque;
+	Eigen::Matrix<float, 8, 6> wrench_matrix_pinv = pseudoInverse(wrench_matrix, F_calc);
+	thruster_set T = wrench_matrix_pinv * F_calc;
+	return T;
+	//return forces;
 }
 thruster_set Thruster_Commander::thrust_compute_fx_fy_fz(float x_force, float y_force)
 {
