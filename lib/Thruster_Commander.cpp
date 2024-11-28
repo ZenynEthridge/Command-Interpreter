@@ -299,11 +299,6 @@ six_axis Thruster_Commander::net_force_from_thrusters(thruster_set& thrusters)
 	six_axis result = six_axis::Zero();
 	return wrench_matrix * thrusters;
 }
-void Thruster_Commander::test_force_functions()
-{
-
-	
-}
 thruster_set Thruster_Commander::thrust_compute_fz(float z_force)
 {
 
@@ -327,8 +322,9 @@ thruster_set Thruster_Commander::thrust_compute_fy(float y_force)
 	// fx, fz and mz should be zero
 	// my and mz should be small enough to keep the vehicle stable
 
-	// TODO: correct trig error
-    float force_per_thruster = y_force / 4;
+	float sin_45 = sin(45 * 3.141592653589793 / 180);
+
+    float force_per_thruster = y_force / (4*sin_45);
     thruster_set forces = thruster_set::Zero();
     forces(0) = 0;
     forces(1) = 0;
@@ -347,7 +343,8 @@ thruster_set Thruster_Commander::thrust_compute_fx(float x_force)
 	// mx and my should be small enough to keep the vehicle stable
 
 	// TODO: correct trig error
-    float force_per_thruster = x_force / 4;
+	float sin_45 = sin(45 * 3.141592653589793 / 180);
+    float force_per_thruster = x_force / (4*sin_45);
     thruster_set forces = thruster_set::Zero();
     forces(0) = 0;
     forces(1) = 0;
