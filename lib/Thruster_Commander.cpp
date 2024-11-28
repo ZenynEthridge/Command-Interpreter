@@ -464,9 +464,9 @@ float Thruster_Commander::accel_time_from_zero_x(float v)
 	
 	// the output of this function, and the function its self, make no sense
 	float t = 
-		- log(abs(cd * v - sqrt(cd * fx)) 
+		-m * log(abs(cd * v - sqrt(cd * fx)) 
 		/ abs(cd * v + sqrt(cd * fx))) 
-		/ (2 * sqrt(cd * fx) * m);
+		/ (2 * sqrt(cd * fx));
 	return t;
 
 }

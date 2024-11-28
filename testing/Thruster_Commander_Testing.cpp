@@ -5,10 +5,11 @@
 TEST(ThrusterCommanderTest, Accel_Time_From_Zero_x) {
 	auto control = new Thruster_Commander();
 	
-	float v = 0.9 * control->top_speed_x(true);
+	float v = 0.99 * control->top_speed_x(true);
 	float t = control->accel_time_from_zero_x(v);
-
-    // math makes no sense currently
+    
+    // TODO: double check math on seperable DE
+    // TODO: add assertations based on config file, math
     delete control;
 }
 TEST(ThrusterCommanderTest, Top_Speed_X) {
