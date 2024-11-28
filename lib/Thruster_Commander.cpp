@@ -446,15 +446,19 @@ float Thruster_Commander::top_speed_x(bool forward)
 	// F = F_t - F_d = ma = 0  ->  F_t = F_d = C_d * v^2
 	// v = sqrt(F_t / C_d)
 	float cd = combined_drag_coefs(0);
-	float force_per_thruster = min_thruster_force;
+	float force_per_thruster;
+
+	if (forward) { force_per_thruster = min_thruster_force; }
+	else { force_per_thruster = max_thruster_force; }
+
 	thruster_set forces = thruster_set::Zero();
 	forces(4) = force_per_thruster;
 	forces(5) = force_per_thruster;
 	forces(6) = force_per_thruster;
 	forces(7) = force_per_thruster;
 
-
-	return 0;
+	float fx = net_force_from_thrusters(forces)(0);
+	return (fx/abs(fx)) * sqrt(abs(fx) / cd);
 }
 void Thruster_Commander::basic_rotate_z(float angle_z, command_sequence& sequence) {}
 void Thruster_Commander::basic_travel_z(float distance_z, command_sequence& sequence) {}

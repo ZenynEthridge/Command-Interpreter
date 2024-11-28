@@ -3,6 +3,16 @@
 
 
 
+TEST(ThrusterCommanderTest, Top_Speed_X) {
+	auto control = new Thruster_Commander();
+	float max_fwd = control->top_speed_x(true);
+	float max_rev = control->top_speed_x(false);
+
+    // TODO: calculate asserts based on config file
+	ASSERT_TRUE(max_fwd > 0);
+	ASSERT_TRUE(max_rev < 0);
+}
+
 TEST(ThrusterCommanderTest, Thrust_Compute_Fx) {
 	auto control = new Thruster_Commander();
 

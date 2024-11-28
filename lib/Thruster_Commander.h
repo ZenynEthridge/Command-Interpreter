@@ -57,6 +57,8 @@ protected:
 
     thruster_set_6D wrench_matrix_transposed; // 8x6 matrix of forces and torques produced by each thruster
 	Eigen::Matrix<float, 6, 8> wrench_matrix; 
+
+
 public:
 	Thruster_Commander();
 
