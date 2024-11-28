@@ -460,7 +460,6 @@ float Thruster_Commander::accel_time_x(float v_i, float v)
 
 	float fx = abs(net_force_from_thrusters(forces)(0));
 	float e = 2.71828;
-	
 
 	// time to reach initial velocity from zero
 	float t_i = 
@@ -474,9 +473,7 @@ float Thruster_Commander::accel_time_x(float v_i, float v)
 		/ abs(cd * abs(v) + sqrt(cd * fx))) 
 		/ (2 * sqrt(cd * fx));
 
-	
 	return t_v - t_i;
-
 }
 float Thruster_Commander::top_speed_x(bool forward)
 {
@@ -508,16 +505,13 @@ void Thruster_Commander::basic_travel_x(float distance_x, command_sequence& sequ
 	
 	float accel_time = accel_time_x(0, steady_speed);
 	float accel_distance; // need a dist function
+	// sequence.push_back(accelate_x(0, steady_speed));
 	
-	// TODO: solve for integration constant c for gen case accel time function
-	// woudn't c just be the initial velocity?
-	float deccel_time; // need a gen case accel time function
+	float deccel_time = accel_time_x(steady_speed, 0);
 	float deccel_distance; // need a dist function
 
 	float steady_speed_distance; // dist - accel dist - deccel dist
 	float steady_speed_time; // ss_dist / ss_speed
-	
-	
 
 }
 command_sequence Thruster_Commander::basic_sequence(six_axis target_position)
