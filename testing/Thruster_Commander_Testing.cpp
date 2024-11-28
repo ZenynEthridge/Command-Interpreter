@@ -2,25 +2,42 @@
 #include <gtest/gtest.h>
 
 
-TEST(ThrusterCommanderTest, Accel_Time_From_Zero_x) {
+TEST(ThrusterCommanderTest, Accel_Time_x) {
 	auto control = new Thruster_Commander();
 	
-	float v = 0.999 * control->top_speed_x(true);
-	float t = control->accel_time_from_zero_x(v);
-	ASSERT_TRUE(t > 0);
+	float v0 = 0.999 * control->top_speed_x(true);
+	float t0 = control->accel_time_x(0, v0);
+	ASSERT_TRUE(t0 > 0);
+
+    float v1 = v0 / 2;
+    float t1 = control->accel_time_x(0, v1);
+
+    ASSERT_TRUE(t1 > 0);
+	ASSERT_TRUE(t1 < t0);
+
+    float v2 = v0;
+    float t2 = control->accel_time_x(v1, v2);
+    ASSERT_TRUE(t2 > t1);
+    ASSERT_NEAR(t2 + t1, t0, 0.00001);
+
+    float v3 = 0.999 * control->top_speed_x(false);
+    float t3 = control->accel_time_x(0, v3);
+    ASSERT_TRUE(t3 > 0);
+
+    float v4 = v3 / 2;
+    float t4 = control->accel_time_x(0, v4);
+
+    ASSERT_TRUE(t4 > 0);
+    ASSERT_TRUE(t4 < t3);
+
+    float v5 = v3;
+    float t5 = control->accel_time_x(v4, v5);
+    ASSERT_TRUE(t5 > t4);
+    ASSERT_NEAR(t4 + t5, t3, 0.00001);
+
+
 	
-    v = control->top_speed_x(true);
-	t = control->accel_time_from_zero_x(v);
-	ASSERT_TRUE(t == INFINITY);
-
-	v = 0.999 * control->top_speed_x(false);
-	t = control->accel_time_from_zero_x(v);
-	ASSERT_TRUE(t > 0);
-
-
-	v = control->top_speed_x(false);
-	t = control->accel_time_from_zero_x(v);
-	ASSERT_TRUE(t == INFINITY);
+ 
 
     // TODO: double check math on seperable DE
     // TODO: add assertations based on config file, math

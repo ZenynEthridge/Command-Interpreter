@@ -441,12 +441,12 @@ six_axis Thruster_Commander::velocity_at_time(thruster_set thruster_sets, float 
 	//todo
 	return result;
 }
-float Thruster_Commander::accel_time_from_zero_x(float velocity) 
+float Thruster_Commander::accel_time_x(float v_i, float v) 
 {
 	float cd = combined_drag_coefs(0);
 	float m = mass;
 
-	bool forward = velocity > 0;
+	bool forward = v > v_i;
 	float force_per_thruster;
 
 	if (forward) { force_per_thruster = min_thruster_force; }
@@ -460,14 +460,22 @@ float Thruster_Commander::accel_time_from_zero_x(float velocity)
 
 	float fx = abs(net_force_from_thrusters(forces)(0));
 	float e = 2.71828;
-	float v = abs(velocity);
 	
-	float t = 
-		-m * log(abs(cd * v - sqrt(cd * fx)) 
-		/ abs(cd * v + sqrt(cd * fx))) 
+
+	// time to reach initial velocity from zero
+	float t_i = 
+		- m * log(abs(cd * abs(v_i) - sqrt(cd * fx))
+		/ abs(cd * abs(v_i) + sqrt(cd * fx)))
+		/ (2 * sqrt(cd * fx));
+	
+	// time to reach target velocity from zero
+	float t_v = 
+		- m * log(abs(cd * abs(v) - sqrt(cd * fx)) 
+		/ abs(cd * abs(v) + sqrt(cd * fx))) 
 		/ (2 * sqrt(cd * fx));
 
-	return t;
+	
+	return t_v - t_i;
 
 }
 float Thruster_Commander::top_speed_x(bool forward)
@@ -494,16 +502,21 @@ void Thruster_Commander::basic_travel_z(float distance_z, command_sequence& sequ
 void Thruster_Commander::basic_travel_x(float distance_x, command_sequence& sequence) 
 {
 	bool forward = distance_x > 0;
-	float top_speed = top_speed_x(true); // a percentage of the vehicles top speed in x direction
-	
-	float accel_time; // = acceleration_time_x(max_speed, conditions);
-	float accel_distance;
-	
-	float deccel_time;
-	float deccel_distance;
+	float speed_limiter = 0.9;
 
-	float steady_speed_time;
-	float steady_speed_distance;
+	float steady_speed = speed_limiter * top_speed_x(forward);
+	
+	float accel_time = accel_time_x(0, steady_speed);
+	float accel_distance; // need a dist function
+	
+	// TODO: solve for integration constant c for gen case accel time function
+	// woudn't c just be the initial velocity?
+	float deccel_time; // need a gen case accel time function
+	float deccel_distance; // need a dist function
+
+	float steady_speed_distance; // dist - accel dist - deccel dist
+	float steady_speed_time; // ss_dist / ss_speed
+	
 	
 
 }
