@@ -36,8 +36,8 @@ protected:
 
 	float max_thruster_level; // between 0 and 1
 	
-	thruster_set min_thruster_force;
-	thruster_set max_thruster_force;
+	float min_thruster_force;
+	float max_thruster_force;
 	
 	int num_thrusters;  // Number of thrusters on the vehicle
 	float mass;        // Mass of the vehicle (kg)

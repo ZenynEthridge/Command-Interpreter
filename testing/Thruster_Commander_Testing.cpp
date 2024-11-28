@@ -6,7 +6,7 @@
 TEST(ThrusterCommanderTest, Thrust_Compute_Fx) {
 	auto control = new Thruster_Commander();
 
-    // TODO: decrease tolerances
+    // TODO: decrease tolerances by using vertical thrusters to correct mx, my
 	six_axis tolerances = { 0.001, 0.001, 0.001, 0.5, 0.5, 0.001 };
     six_axis desired = { 3,0,0,0,0,0 };
     thruster_set thrusts = control->thrust_compute_fx(desired(0));
@@ -15,10 +15,11 @@ TEST(ThrusterCommanderTest, Thrust_Compute_Fx) {
 		ASSERT_NEAR(result(i), desired(i), tolerances(i));
 	}
     delete control;
-}TEST(ThrusterCommanderTest, Thrust_Compute_Fy) {
+}
+TEST(ThrusterCommanderTest, Thrust_Compute_Fy) {
     auto control = new Thruster_Commander();
     
-    // TODO: decrease tolerances
+    // TODO: decrease tolerances by using vertical thrusters to correct mx, my
     six_axis tolerances = { 0.001, 0.001, 0.001, 0.5, 0.5, 0.1 };
     six_axis desired = { 0,3,0,0,0,0 };
     thruster_set thrusts = control->thrust_compute_fy(desired(1));
@@ -27,8 +28,10 @@ TEST(ThrusterCommanderTest, Thrust_Compute_Fx) {
         ASSERT_NEAR(result(i), desired(i), tolerances(i));
     }
     delete control;
-}TEST(ThrusterCommanderTest, Thrust_Compute_Fz) {
+}
+TEST(ThrusterCommanderTest, Thrust_Compute_Fz) {
     auto control = new Thruster_Commander();
+
     six_axis tolerances = { 0.001, 0.001, 0.001, 0.1, 0.1, 0.001 };
     six_axis desired = { 0,0,3,0,0,0 };
     thruster_set thrusts = control->thrust_compute_fz(desired(2));

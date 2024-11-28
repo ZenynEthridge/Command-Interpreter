@@ -78,7 +78,12 @@ Thruster_Commander::Thruster_Commander()
 	rho_water = 1025; // Density of water (kg/m^3)
 	weight_magnitude = mass * gravity;
 	buoyant_magnitude = -rho_water * gravity * volume;
+	
 	max_thruster_level = 0.9;
+
+	// TODO: read these in from csv file based on voltage
+	max_thruster_force = 4.5;
+	min_thruster_force = -3.5;
 
 	// values are relative to start values (zeros)
 	position = six_axis::Zero();
@@ -109,7 +114,6 @@ void Thruster_Commander::print_info()
 	std::cout << "Combined drag coefs: \n" << combined_drag_coefs << std::endl;
 	std::cout << "Wrench Matrix: \n" << wrench_matrix << std::endl;
 }
-
 void parseCsv(const std::string& filePath, double** numericData, int numRows, int numCols) {
     std::ifstream file(filePath, std::ios::in); // Replace with your CSV file name
 
@@ -134,7 +138,6 @@ void parseCsv(const std::string& filePath, double** numericData, int numRows, in
     }
     file.close();
 }
-
 double determinePwmValue(double force, double **numericData, double smallestDifference,
                          int closestRowIndex) {
     double x1;
@@ -305,15 +308,13 @@ thruster_set Thruster_Commander::thrust_compute_fz(float z_force)
     // Force is euqally divided by the 4 vertical thrusters for this function
 
 	float force_per_thruster = z_force / 4;
+	
 	thruster_set thrusters = thruster_set::Zero();
 	thrusters(0) = force_per_thruster;
 	thrusters(1) = force_per_thruster;
 	thrusters(2) = force_per_thruster;
 	thrusters(3) = force_per_thruster;
-	thrusters(4) = 0;
-	thrusters(5) = 0;
-	thrusters(6) = 0;
-	thrusters(7) = 0;
+	
 	return thrusters;
 }
 thruster_set Thruster_Commander::thrust_compute_fy(float y_force)
@@ -326,10 +327,7 @@ thruster_set Thruster_Commander::thrust_compute_fy(float y_force)
 
     float force_per_thruster = y_force / (4*sin_45);
     thruster_set forces = thruster_set::Zero();
-    forces(0) = 0;
-    forces(1) = 0;
-    forces(2) = 0;
-    forces(3) = 0;
+  
     forces(4) = -force_per_thruster;
     forces(5) = force_per_thruster;
     forces(6) = force_per_thruster;
@@ -344,15 +342,12 @@ thruster_set Thruster_Commander::thrust_compute_fx(float x_force)
 
 	float sin_45 = sin(45 * 3.141592653589793 / 180);
     float force_per_thruster = x_force / (4*sin_45);
-    thruster_set forces = thruster_set::Zero();
-    forces(0) = 0;
-    forces(1) = 0;
-    forces(2) = 0;
-    forces(3) = 0;
-    forces(4) = -force_per_thruster;
-    forces(5) = -force_per_thruster;
-    forces(6) = -force_per_thruster;
-    forces(7) = -force_per_thruster;
+	
+	thruster_set forces = thruster_set::Zero();
+	forces(4) = -force_per_thruster;
+	forces(5) = -force_per_thruster;
+	forces(6) = -force_per_thruster;
+	forces(7) = -force_per_thruster;
 
     return forces;
 
@@ -451,7 +446,12 @@ float Thruster_Commander::top_speed_x(bool forward)
 	// F = F_t - F_d = ma = 0  ->  F_t = F_d = C_d * v^2
 	// v = sqrt(F_t / C_d)
 	float cd = combined_drag_coefs(0);
-	thruster_set forces = thrust_compute_fx(0);
+	float force_per_thruster = min_thruster_force;
+	thruster_set forces = thruster_set::Zero();
+	forces(4) = force_per_thruster;
+	forces(5) = force_per_thruster;
+	forces(6) = force_per_thruster;
+	forces(7) = force_per_thruster;
 
 
 	return 0;
