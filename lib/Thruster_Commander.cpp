@@ -342,7 +342,6 @@ thruster_set Thruster_Commander::thrust_compute_fx(float x_force)
 	// fy, fz and mz should be zero
 	// mx and my should be small enough to keep the vehicle stable
 
-	// TODO: correct trig error
 	float sin_45 = sin(45 * 3.141592653589793 / 180);
     float force_per_thruster = x_force / (4*sin_45);
     thruster_set forces = thruster_set::Zero();
