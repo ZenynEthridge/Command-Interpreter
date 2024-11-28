@@ -3,7 +3,21 @@
 
 
 
+TEST(ThrusterCommanderTest, Thrust_Compute_fz_Test) {
+	auto control = new Thruster_Commander();
+	six_axis tolerances = { 0.001, 0.001, 0.001, 0.1, 0.1, 0.001 };
+    six_axis desired = { 0,0,3,0,0,0 };
+    thruster_set thrusts = control->thrust_compute_fz(desired(2));
+    six_axis result = control->net_force_from_thrusters(thrusts);
+    delete control;
+	
+    std::cout << "Result: " << result << std::endl; 
 
+	for (int i = 0; i < 6; i++) {
+		ASSERT_NEAR(result(i), desired(i), tolerances(i));
+	}
+    
+}
 TEST(ThrusterCommanderTest, GetPwmNoInterpolation) {
     auto thrusterCommander = new Thruster_Commander();
     double result = thrusterCommander->get_pwm(1, -3.52);

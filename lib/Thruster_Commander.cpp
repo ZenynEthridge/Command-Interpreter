@@ -301,18 +301,8 @@ six_axis Thruster_Commander::net_force_from_thrusters(thruster_set& thrusters)
 }
 void Thruster_Commander::test_force_functions()
 {
-	// check thrust_compute_fz
-	// check thrust_compute_fy
-	// check thrust_compute_fx
-	// check thrust_compute_fx_fy
-	// check thrust_compute_mz
-	// check thrust_compute_fz_mz
-	// check thrust_compute_fy_mz
-	// check thrust_compute_fx_mz
-	// check thrust_compute_fx_fy_mz
-	// check thrust_compute_fx_fy_fz
-	// check thrust_compute_fx_fy_fz_mz
-	// check thrust_compute_fx_fy_fz_mx_my_mz
+
+	
 }
 thruster_set Thruster_Commander::thrust_compute_fz(float z_force)
 {
