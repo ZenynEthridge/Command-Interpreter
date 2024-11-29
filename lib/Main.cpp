@@ -19,19 +19,6 @@ int main()
     */
 	// Optionally, you can still call other functions or print additional info
 	// control.print_info();
-
-	Thruster_Commander commander;
-	float x_force = 20.0f;
-	float y_force = 50.0f;
-	float z_torque = 12.0f;
-
-	thruster_set forces = commander.thrust_compute_fx_fy_mz(x_force, y_force, z_torque);
-
-	std::cout << "Thruster outputs:" << std::endl;
-	for (int i = 0; i < forces.size(); ++i) {
-		std::cout << "T" << i << ": " << forces(i) << std::endl;
-	}
-
 	return 0;
 
 }
