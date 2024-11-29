@@ -116,7 +116,7 @@ void parseCsv(const std::string& filePath, double** numericData, int numRows, in
     std::string empty;
     int row = 0;
     getline(file, empty); // eat table headers at top of CSV
-    while (getline(file, line) && row <= numRows) {
+    while (getline(file, line) && row < numRows) {
         std::stringstream ss(line);
         std::string cell;
         int col = 0;
@@ -398,34 +398,30 @@ thruster_set Thruster_Commander::thrust_compute_fx_mz(float x_force, float z_tor
 	return forces;
 }
 
-/* Changes Made By Nico Start Here */
-typedef Eigen::Matrix<float, 8, 1> thruster_set;
-typedef Eigen::Matrix<float, 6, 1> six_axis;
-
-// pseudoinverse of a matrix (equivelent to np
-_Matrix_Type_  pseudoInverse(const _Matrix_Type_  &a, double epsilon = std::numeric_limits<float>::epsilon())
-{
-	Eigen::JacobiSVD<_Matrix_Type_ > svd(a, Eigen::ComputeThinU | Eigen::ComputeThinV);
-	float tolerance = epsilon * std::max(a.cols(), a.rows()) * svd.singularValues().array().abs().maxCoeff();
-	return svd.matrixV() *
-		(svd.singularValues().array().abs()>tolerance)
-			.select(svd.singularValues().array().inverse(), 0)
-			.matrix()
-			.asDiagonal()*
-		svd.matrixU().transpose();
-	;
-}
-
 thruster_set Thruster_Commander::thrust_compute_fx_fy_mz(float x_force, float y_force, float z_torque)
 {
 	// fz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-	six_axis F_calc;
-	F_calc << x_force, y_force, 0.0f, 0.0f, 0.0f, z_torque;
-	Eigen::Matrix<float, 8, 6> wrench_matrix_pinv = pseudoInverse(wrench_matrix, F_calc);
-	thruster_set T = wrench_matrix_pinv * F_calc;
-	return T;
-	//return forces;
+	Eigen::VectorXf inputs(6);
+	inputs << x_force, y_force, 0.0f, 0.0f, 0.0f, z_torque;
+
+	// Coefficient matrix (8 x 6) calculated using a python script
+	Eigen::MatrixXf coefficients(8, 6);
+	coefficients <<
+		-8.72533307e-02f,  1.08905877e-01f,  2.62141732e-01f, -1.22850123e+00f, -9.84251969e-01f,  4.77297359e-17f,
+		-8.72533307e-02f, -1.08905877e-01f,  2.62141732e-01f,  1.22850123e+00f, -9.84251969e-01f, -9.09843115e-17f,
+		 8.72533307e-02f,  1.08905877e-01f,  2.37858268e-01f, -1.22850123e+00f,  9.84251969e-01f, -9.54417065e-17f,
+		 8.72533307e-02f, -1.08905877e-01f,  2.37858268e-01f,  1.22850123e+00f,  9.84251969e-01f,  1.38809793e-16f,
+		-3.53553281e-01f, -3.72516112e-01f,  6.51614355e-18f,  2.10534883e-16f,  3.48410154e-18f, -1.14326218e+00f,
+		-3.53553281e-01f,  3.72516112e-01f, -4.08974566e-18f, -6.72643856e-17f, -6.94539325e-18f,  1.14326218e+00f,
+		-3.53553281e-01f,  3.34590450e-01f, -4.95362255e-18f, -1.01890400e-17f, -4.07608820e-18f, -1.14326218e+00f,
+		-3.53553281e-01f, -3.34590450e-01f,  7.38002044e-18f,  2.75362748e-17f,  6.14796494e-19f,  1.14326218e+00f;
+
+	// Compute the thruster outputs: T = coefficients * inputs
+	Eigen::VectorXf T = coefficients * inputs;
+	// Assign the computed thruster outputs to the forces vector
+	thruster_set forces = T;
+	return forces;
 }
 thruster_set Thruster_Commander::thrust_compute_fx_fy_fz(float x_force, float y_force)
 {
