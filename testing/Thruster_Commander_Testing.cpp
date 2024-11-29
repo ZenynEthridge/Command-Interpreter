@@ -92,6 +92,21 @@ TEST(ThrusterCommanderTest, Thrust_Compute_Fz) {
     }
     delete control;
 }
+TEST(ThursterCommanderTest, Thrust_Compute_fx_fy_mz) {
+    auto control = new Thruster_Commander();
+
+    six_axis tolerances = { 0.001, 0.001, 0.001, 0.001, 0.001, 0.1 };
+    six_axis desired = { 3.0f,2.0f,0.0f,0.0f,0.0f,1.0f};
+
+    thruster_set thrusts = control->thrust_compute_fx_fy_mz(desired(0), desired(1), desired(5));
+    six_axis result = control->net_force_from_thrusters(thrusts);
+
+    for (int i = 0; i < 6; i++) {
+        ASSERT_NEAR(result(i), desired(i), tolerances(i));
+    }
+
+    delete control;
+}
 TEST(ThrusterCommanderTest, GetPwmNoInterpolation) {
     auto thrusterCommander = new Thruster_Commander();
     double result = thrusterCommander->get_pwm(1, -3.52);
