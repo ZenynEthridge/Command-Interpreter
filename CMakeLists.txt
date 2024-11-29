@@ -14,7 +14,9 @@ add_executable(Propulsion_2024
         lib/Main.cpp
         lib/Thruster_Commander.cpp
         lib/Thruster_Commander.h
-)
+        lib/LQR_Control.h
+        lib/Physics.h "lib/Physics.cpp")
+  #"lib/LQR_Control.h" "lib/Physics.h" "testing/Physics_Testing.cpp")
 
 # GTest start
 include(FetchContent)
@@ -32,12 +34,14 @@ add_executable(
         run_tests
         testing/Command_Interpreter_Testing.cpp
         testing/Thruster_Commander_Testing.cpp
+        testing/Physics_Testing.cpp
         lib/Command.h
+        lib/Physics.h
         lib/Command_Interpreter.cpp
         lib/Command_Interpreter.h
         lib/Thruster_Commander.cpp
-        lib/Thruster_Commander.h
-)
+        lib/Thruster_Commander.h "lib/Physics.cpp")
+  #"lib/LQR_Control.h" "lib/Physics.h" "testing/Physics_Testing.cpp")
 target_link_libraries(
         run_tests
         GTest::gtest_main
@@ -57,3 +61,7 @@ FetchContent_MakeAvailable(yaml-cpp)
 
 target_link_libraries(Propulsion_2024 PUBLIC yaml-cpp::yaml-cpp) # The library or executable that require yaml-cpp library
 #YAML end
+
+target_include_directories(run_tests PUBLIC data/)
+target_include_directories(Propulsion_2024 PUBLIC data/)
+

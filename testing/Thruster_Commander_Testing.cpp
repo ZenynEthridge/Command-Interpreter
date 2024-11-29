@@ -1,15 +1,97 @@
 #include "Thruster_Commander.h"
 #include <gtest/gtest.h>
 
-TEST(ThrusterCommanderTest, SimpleVertical) {
-    testing::internal::CaptureStdout();
-    Thruster_Commander thruster_commander = Thruster_Commander();
-    thruster_commander.print_info();
-    thruster_commander.thrust_compute_fz(5);
 
-    std::string output = testing::internal::GetCapturedStdout(); // TODO: check that output matches expected output
+TEST(ThrusterCommanderTest, Accel_Time_x) {
+	auto control = new Thruster_Commander();
+	
+	float v0 = 0.999 * control->top_speed_x(true);
+	float t0 = control->accel_time_x(0, v0);
+	ASSERT_TRUE(t0 > 0);
+
+    float v1 = v0 / 2;
+    float t1 = control->accel_time_x(0, v1);
+
+    ASSERT_TRUE(t1 > 0);
+	ASSERT_TRUE(t1 < t0);
+
+    float v2 = v0;
+    float t2 = control->accel_time_x(v1, v2);
+    ASSERT_TRUE(t2 > t1);
+    ASSERT_NEAR(t2 + t1, t0, 0.00001);
+
+    float v3 = 0.999 * control->top_speed_x(false);
+    float t3 = control->accel_time_x(0, v3);
+    ASSERT_TRUE(t3 > 0);
+
+    float v4 = v3 / 2;
+    float t4 = control->accel_time_x(0, v4);
+
+    ASSERT_TRUE(t4 > 0);
+    ASSERT_TRUE(t4 < t3);
+
+    float v5 = v3;
+    float t5 = control->accel_time_x(v4, v5);
+    ASSERT_TRUE(t5 > t4);
+    ASSERT_NEAR(t4 + t5, t3, 0.00001);
+
+
+	
+ 
+
+    // TODO: double check math on seperable DE
+    // TODO: add assertations based on config file, math
+    delete control;
+}
+TEST(ThrusterCommanderTest, Top_Speed_X) {
+	auto control = new Thruster_Commander();
+	float max_fwd = control->top_speed_x(true);
+	float max_rev = control->top_speed_x(false);
+
+    // TODO: calculate asserts based on config file
+	ASSERT_TRUE(max_fwd > 0);
+	ASSERT_TRUE(max_rev < 0);
 }
 
+TEST(ThrusterCommanderTest, Thrust_Compute_Fx) {
+	auto control = new Thruster_Commander();
+
+    // TODO: decrease tolerances by using vertical thrusters to correct mx, my
+	six_axis tolerances = { 0.001, 0.001, 0.001, 0.5, 0.5, 0.001 };
+    six_axis desired = { 3,0,0,0,0,0 };
+    thruster_set thrusts = control->thrust_compute_fx(desired(0));
+    six_axis result = control->net_force_from_thrusters(thrusts);
+	for (int i = 0; i < 6; i++) {
+		ASSERT_NEAR(result(i), desired(i), tolerances(i));
+	}
+    delete control;
+}
+TEST(ThrusterCommanderTest, Thrust_Compute_Fy) {
+    auto control = new Thruster_Commander();
+    
+    // TODO: decrease tolerances by using vertical thrusters to correct mx, my
+    six_axis tolerances = { 0.001, 0.001, 0.001, 0.5, 0.5, 0.1 };
+    six_axis desired = { 0,3,0,0,0,0 };
+    thruster_set thrusts = control->thrust_compute_fy(desired(1));
+    six_axis result = control->net_force_from_thrusters(thrusts);
+    for (int i = 0; i < 6; i++) {
+        ASSERT_NEAR(result(i), desired(i), tolerances(i));
+    }
+    delete control;
+}
+TEST(ThrusterCommanderTest, Thrust_Compute_Fz) {
+    auto control = new Thruster_Commander();
+
+    six_axis tolerances = { 0.001, 0.001, 0.001, 0.1, 0.1, 0.001 };
+    six_axis desired = { 0,0,3,0,0,0 };
+    thruster_set thrusts = control->thrust_compute_fz(desired(2));
+    six_axis result = control->net_force_from_thrusters(thrusts);
+
+    for (int i = 0; i < 6; i++) {
+        ASSERT_NEAR(result(i), desired(i), tolerances(i));
+    }
+    delete control;
+}
 TEST(ThrusterCommanderTest, GetPwmNoInterpolation) {
     auto thrusterCommander = new Thruster_Commander();
     double result = thrusterCommander->get_pwm(1, -3.52);
@@ -32,6 +114,9 @@ TEST(ThrusterCommanderTest, GetPwmNoInterpolation) {
 
     result = thrusterCommander->get_pwm(1, 4.52);
     ASSERT_DOUBLE_EQ(result, 1900);
+
+    result = thrusterCommander->get_pwm(1, 4.53);
+    ASSERT_DOUBLE_EQ(result, 1896);
 
     delete thrusterCommander;
 }
@@ -93,3 +178,20 @@ TEST(ThrusterCommanderTest, GetPwmOutOfBounds) {
 }
 
 
+TEST(ThrusterCommandTest, BasicSequenceTo) {
+    auto thrusterCommander = new Thruster_Commander();
+    six_axis target = { 5, 5, 5, 0, 0, 0 };
+    command_sequence sequence = thrusterCommander->basic_sequence(target);
+
+    // TODO: run pencil and paper calulations to determine if the sequence is correct
+    // TODO: add asserts
+    delete thrusterCommander;
+}
+TEST(ThrusterCommanderTest, Thrust_Compute_fz) {
+    testing::internal::CaptureStdout();
+    Thruster_Commander thruster_commander = Thruster_Commander();
+    thruster_commander.print_info();
+    thruster_commander.thrust_compute_fz(5);
+
+    std::string output = testing::internal::GetCapturedStdout(); // TODO: check that output matches expected output
+}

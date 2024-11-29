@@ -7,8 +7,9 @@
 #include "Thruster_Commander.h"
 #include "eigen-3.4.0/Eigen/Dense"
 #include <fstream>
-#include <iostream>
 #include <sstream>
+
+
 
 
 Thruster_Commander::Thruster_Commander()
@@ -79,10 +80,20 @@ Thruster_Commander::Thruster_Commander()
 	weight_magnitude = mass * gravity;
 	buoyant_magnitude = -rho_water * gravity * volume;
 	
+	max_thruster_level = 0.9;
+
+	// TODO: read these in from csv file based on voltage
+	max_thruster_force = 4.5;
+	min_thruster_force = -3.5;
+
 	// values are relative to start values (zeros)
 	position = six_axis::Zero();
 	velocity = six_axis::Zero();
 	acceleration = six_axis::Zero();
+
+	// todo: replace math operation with it's direct result in config file
+	six_axis c_inf = { 0.041, 0.05, 0.125, 0.005, 0.005, 0.005 };
+	combined_drag_coefs = c_inf * rho_water;
 
 	// int standard_voltages[6] = {}
 	// std::string thruster_files = {}
@@ -101,9 +112,9 @@ void Thruster_Commander::print_info()
 	std::cout << "Thruster Torques: \n" << thruster_torques << std::endl;
 	std::cout << "Mass: \n" << mass << std::endl;
 	std::cout << "Volume: \n" << volume << std::endl;
+	std::cout << "Combined drag coefs: \n" << combined_drag_coefs << std::endl;
 	std::cout << "Wrench Matrix: \n" << wrench_matrix << std::endl;
 }
-
 void parseCsv(const std::string& filePath, double** numericData, int numRows, int numCols) {
     std::ifstream file(filePath, std::ios::in); // Replace with your CSV file name
 
@@ -128,7 +139,6 @@ void parseCsv(const std::string& filePath, double** numericData, int numRows, in
     }
     file.close();
 }
-
 double determinePwmValue(double force, double **numericData, double smallestDifference,
                          int closestRowIndex) {
     double x1;
@@ -165,7 +175,6 @@ double determinePwmValue(double force, double **numericData, double smallestDiff
     }
     return pwmValue;
 }
-
 double Thruster_Commander::get_pwm(int thruster_num, double force) {
     // TODO: the thruster number will be taken in to determine the voltage and thereby the CSV files to be used. Interpolation between CSV file value will be used to find in between voltages.
 
@@ -177,7 +186,7 @@ double Thruster_Commander::get_pwm(int thruster_num, double force) {
         numericData[i] = (double*)malloc(csvColumns * sizeof(double));
     }
 
-    parseCsv("../data/14V_Correlation.csv", numericData, csvRows, csvColumns);
+    parseCsv("14V_Correlation.csv", numericData, csvRows, csvColumns);
 
     if (force < numericData[0][0]) {
         std::cerr << "Force too large of a negative number! No corresponding PWM found." << std::endl;
@@ -202,7 +211,6 @@ double Thruster_Commander::get_pwm(int thruster_num, double force) {
 
     return determinePwmValue(force, numericData, smallestDifference, closestRowIndex);
 }
-
 six_axis Thruster_Commander::weight_force(three_axis orientation)
 {
 	six_axis result = six_axis::Zero();
@@ -238,7 +246,6 @@ six_axis Thruster_Commander::bouyant_force(three_axis orientation)
 	result.segment(3, 3) = bouyant_force_rotational;
 	return result;
 }
-
 six_axis Thruster_Commander::gravitational_forces(three_axis orientation)
 {
 	six_axis result = six_axis::Zero();
@@ -247,7 +254,6 @@ six_axis Thruster_Commander::gravitational_forces(three_axis orientation)
 	std::cout << "Gravitational forces: \n" << result << std::endl;
 	return result;
 }
-
 three_axis Thruster_Commander::compute_forces(force_array forces)
 {
 	three_axis total_force = three_axis::Zero();
@@ -266,7 +272,6 @@ three_axis Thruster_Commander::compute_torques(force_array forces)
 	}
 	return total_torque;
 }
-
 six_axis Thruster_Commander::predict_drag_forces(six_axis velocity)
 {
 	six_axis drag_force = six_axis::Zero();
@@ -293,37 +298,24 @@ six_axis Thruster_Commander::net_env_forces(six_axis velocity, three_axis orient
 	std::cout << "Net Environmental Forces: \n" << result << std::endl;
 	return result;
 }
-void Thruster_Commander::test_force_functions()
+six_axis Thruster_Commander::net_force_from_thrusters(thruster_set& thrusters)
 {
-	// check thrust_compute_fz
-	// check thrust_compute_fy
-	// check thrust_compute_fx
-	// check thrust_compute_fx_fy
-	// check thrust_compute_mz
-	// check thrust_compute_fz_mz
-	// check thrust_compute_fy_mz
-	// check thrust_compute_fx_mz
-	// check thrust_compute_fx_fy_mz
-	// check thrust_compute_fx_fy_fz
-	// check thrust_compute_fx_fy_fz_mz
-	// check thrust_compute_fx_fy_fz_mx_my_mz
+	six_axis result = six_axis::Zero();
+	return wrench_matrix * thrusters;
 }
-// this one is done and seems to work
 thruster_set Thruster_Commander::thrust_compute_fz(float z_force)
 {
 
     // Force is euqally divided by the 4 vertical thrusters for this function
 
 	float force_per_thruster = z_force / 4;
+	
 	thruster_set thrusters = thruster_set::Zero();
 	thrusters(0) = force_per_thruster;
 	thrusters(1) = force_per_thruster;
 	thrusters(2) = force_per_thruster;
 	thrusters(3) = force_per_thruster;
-	thrusters(4) = 0;
-	thrusters(5) = 0;
-	thrusters(6) = 0;
-	thrusters(7) = 0;
+	
 	return thrusters;
 }
 thruster_set Thruster_Commander::thrust_compute_fy(float y_force)
@@ -331,12 +323,12 @@ thruster_set Thruster_Commander::thrust_compute_fy(float y_force)
 
 	// fx, fz and mz should be zero
 	// my and mz should be small enough to keep the vehicle stable
-    float force_per_thruster = y_force / 4;
+
+	float sin_45 = sin(45 * 3.141592653589793 / 180);
+
+    float force_per_thruster = y_force / (4*sin_45);
     thruster_set forces = thruster_set::Zero();
-    forces(0) = 0;
-    forces(1) = 0;
-    forces(2) = 0;
-    forces(3) = 0;
+  
     forces(4) = -force_per_thruster;
     forces(5) = force_per_thruster;
     forces(6) = force_per_thruster;
@@ -348,16 +340,15 @@ thruster_set Thruster_Commander::thrust_compute_fx(float x_force)
 {
 	// fy, fz and mz should be zero
 	// mx and my should be small enough to keep the vehicle stable
-    float force_per_thruster = x_force / 4;
-    thruster_set forces = thruster_set::Zero();
-    forces(0) = 0;
-    forces(1) = 0;
-    forces(2) = 0;
-    forces(3) = 0;
-    forces(4) = -force_per_thruster;
-    forces(5) = -force_per_thruster;
-    forces(6) = -force_per_thruster;
-    forces(7) = -force_per_thruster;
+
+	float sin_45 = sin(45 * 3.141592653589793 / 180);
+    float force_per_thruster = x_force / (4*sin_45);
+	
+	thruster_set forces = thruster_set::Zero();
+	forces(4) = -force_per_thruster;
+	forces(5) = -force_per_thruster;
+	forces(6) = -force_per_thruster;
+	forces(7) = -force_per_thruster;
 
     return forces;
 
@@ -451,23 +442,98 @@ thruster_set Thruster_Commander::thrust_compute(six_axis force_torque, bool simp
 	thruster_set forces;
 	return forces;
 }
-std::vector<Command> Thruster_Commander::sequence_to(six_axis target_position)
+six_axis Thruster_Commander::velocity_at_time(thruster_set thruster_sets, float duration)
+{
+	six_axis result = six_axis::Zero();
+	/*
+	* For linear forces:
+	C - ln(|C_d * V - sqrt(C_d * F_t)| / |C_d * V + sqrt(C_d * F_t)|) 
+	    / (2 * sqrt(C_d * F_t) * m)
+	where C is the constant of integration, 
+	      C_d is combined drag coefficient (F_d / V^2)
+		  F_t is force of thrusters, gravity, ect, m is mass
+	* For rotational forces:
+	same as above, but using I instead of m
+
+	Does not account for changes in orientation!
+	*/
+	
+	//todo
+	return result;
+}
+float Thruster_Commander::accel_time_x(float v_i, float v) 
+{
+	float cd = combined_drag_coefs(0);
+	float m = mass;
+
+	bool forward = v > v_i;
+	float force_per_thruster;
+
+	if (forward) { force_per_thruster = min_thruster_force; }
+	else { force_per_thruster = max_thruster_force; }
+
+	thruster_set forces = thruster_set::Zero();
+	forces(4) = force_per_thruster;
+	forces(5) = force_per_thruster;
+	forces(6) = force_per_thruster;
+	forces(7) = force_per_thruster;
+
+	float fx = net_force_from_thrusters(forces)(0);
+	
+	float t = physics::accel_time(v_i, v, cd, m, fx);
+
+	return t;
+}
+float Thruster_Commander::top_speed_x(bool forward)
+{
+	// F = F_t - F_d = ma = 0  ->  F_t = F_d = C_d * v^2
+	// v = sqrt(F_t / C_d)
+	float cd = combined_drag_coefs(0);
+	float force_per_thruster;
+
+	if (forward) { force_per_thruster = min_thruster_force; }
+	else { force_per_thruster = max_thruster_force; }
+
+	thruster_set forces = thruster_set::Zero();
+	forces(4) = force_per_thruster;
+	forces(5) = force_per_thruster;
+	forces(6) = force_per_thruster;
+	forces(7) = force_per_thruster;
+
+	float fx = net_force_from_thrusters(forces)(0);
+	return (fx/abs(fx)) * sqrt(abs(fx) / cd);
+}
+void Thruster_Commander::basic_rotate_z(float angle_z, command_sequence& sequence) {}
+void Thruster_Commander::basic_travel_z(float distance_z, command_sequence& sequence) {}
+void Thruster_Commander::basic_travel_x(float distance_x, command_sequence& sequence) 
+{
+	bool forward = distance_x > 0;
+	float speed_limiter = 0.9;
+
+	float steady_speed = speed_limiter * top_speed_x(forward);
+	
+	float accel_time = accel_time_x(0, steady_speed);
+	float accel_distance; // need a dist function
+	// sequence.push_back(accelate_x(0, steady_speed));
+	
+	float deccel_time = accel_time_x(steady_speed, 0);
+	float deccel_distance; // need a dist function
+
+	float steady_speed_distance; // dist - accel dist - deccel dist
+	float steady_speed_time; // ss_dist / ss_speed
+
+}
+command_sequence Thruster_Commander::basic_sequence(six_axis target_position)
 {
 	Eigen::Matrix<float, 1, 6> start_position;
 	start_position << position;
-	std::cout << "Start Position: " << start_position << std::endl;
-	std::cout << "Target Position: " << target_position << std::endl;
 
-	Eigen::Matrix<float, 1, 6> distance = target_position - start_position;
-	std::cout << "Distance: " << distance << std::endl;
-	Eigen::Matrix<float, 1, 6> direction = distance.normalized();
-	std::cout << "Direction: " << direction << std::endl;
 
-	// we need a function to compute the max thrust possible in the prefered direction
-	// then we need to calculate the max speed possible in that direction
-	// should the robot reorient first?
-	// in which orientation is the robot the fastest?
-
-	std::vector<Command> commands;
+	six_axis distance = target_position - start_position;
+	float angle_z = std::atan(distance(1) / distance(0));
+	command_sequence commands;
+	basic_rotate_z(angle_z, commands);
+	basic_travel_z(distance(2), commands);
+	basic_travel_x(distance(0), commands);
 	return commands;
 }

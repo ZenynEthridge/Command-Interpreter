@@ -4,6 +4,7 @@
 #pragma once
 #include "eigen-3.4.0/Eigen/Dense"
 #include "Command.h"
+#include "Physics.h"
 #include <vector>
 
 
@@ -14,6 +15,8 @@ typedef Eigen::Matrix<float, 8, 6> thruster_set_6D;
 
 typedef Eigen::Matrix<float, 1, 6> six_axis;
 typedef Eigen::Matrix<float, 1, 3> three_axis;
+
+typedef std::vector<Command> command_sequence;
 
 // The purpose of this class is to generate command objects
 // A command object is a simple instruction to the vehicle
@@ -32,6 +35,11 @@ protected:
 	thruster_set_3D thruster_torques;   // Torque of thruster on sub about x,y,z (Nm)
 	thruster_set thruster_voltages; // voltage supplied to each thruster (V) 
 
+	float max_thruster_level; // between 0 and 1
+	
+	float min_thruster_force;
+	float max_thruster_force;
+	
 	int num_thrusters;  // Number of thrusters on the vehicle
 	float mass;        // Mass of the vehicle (kg)
 	float volume;     // Displacement volume of the vehicle (m^3)
@@ -46,9 +54,12 @@ protected:
 	six_axis position;  
 	six_axis velocity;    
 	six_axis acceleration; 
+	six_axis combined_drag_coefs;
 
     thruster_set_6D wrench_matrix_transposed; // 8x6 matrix of forces and torques produced by each thruster
 	Eigen::Matrix<float, 6, 8> wrench_matrix; 
+
+
 public:
 	Thruster_Commander();
 
@@ -83,18 +94,11 @@ public:
 	// environmental forces such as weight, boyancy, drag, ect
 	six_axis net_env_forces(six_axis velocity, three_axis oritation);
 
-	float top_speed(three_axis direction);
 
-	// this function will integrate the environmental forces and thruster
-	// forces to calculate the linear and angular impulse (change in momentum) 
-	// on the vehicle
-	six_axis integrate_impulse(
-		six_axis start_velocity, 
-		thruster_set thruster_sets, 
-		float duration, int n);
+	
 
 	// net force produced by thrusters at a particular set of pwms. This will mostly be used for testing
-	six_axis predict_net_force(pwm_array pwms);
+	six_axis net_force_from_thrusters(thruster_set& thrusters);
 
 	// functions begining with 'simple_' make the assumption that the vehicle is stable about the x and y axes
 	// these functions only need to consider forces in the x, y, and z directions, and moments about the z axis
@@ -135,8 +139,25 @@ public:
 	// target velocity is a 1x6 matrix with (sway, surge, heave) linear velocities in m/s and (roll, pitch, yaw) angular velocities in r/s
 	Command accelerate_to(six_axis target_velocity);
 
+	Command accelate_x(float velocity, float target_velocity);
+
+
+	six_axis velocity_at_time(thruster_set thruster_sets, float duration);
+
+	float top_speed_x(bool forward=true);
+	float accel_time_x(float v_i, float v_t);
+
+	// these functions assume inital and final velocities are zero
+	void basic_rotate_x(float angle_x, command_sequence& sequence);
+	void basic_rotate_y(float angle_y, command_sequence& sequence);
+	void basic_rotate_z(float angle_z, command_sequence& sequence);
+	void basic_travel_x(float distance_x, command_sequence& sequence);
+	void basic_travel_y(float distance_y, command_sequence& sequence);
+	void basic_travel_z(float distance_z, command_sequence& sequence);
+
+	
 	// this is the big, important, general case function which we're building up to
-	std::vector<Command> sequence_to(six_axis target_position);
+	command_sequence basic_sequence(six_axis target_position);
 };
 
 void parseCsv(const std::string& filePath, double** numericData, int numRows, int numCols);
