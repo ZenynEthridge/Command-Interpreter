@@ -11,6 +11,7 @@
 
 
 
+
 Thruster_Commander::Thruster_Commander()
 {
 	// TODO: Move all the hardcoded values in this constructor to a config file
@@ -458,22 +459,11 @@ float Thruster_Commander::accel_time_x(float v_i, float v)
 	forces(6) = force_per_thruster;
 	forces(7) = force_per_thruster;
 
-	float fx = abs(net_force_from_thrusters(forces)(0));
-	float e = 2.71828;
-
-	// time to reach initial velocity from zero
-	float t_i = 
-		- m * log(abs(cd * abs(v_i) - sqrt(cd * fx))
-		/ abs(cd * abs(v_i) + sqrt(cd * fx)))
-		/ (2 * sqrt(cd * fx));
+	float fx = net_force_from_thrusters(forces)(0);
 	
-	// time to reach target velocity from zero
-	float t_v = 
-		- m * log(abs(cd * abs(v) - sqrt(cd * fx)) 
-		/ abs(cd * abs(v) + sqrt(cd * fx))) 
-		/ (2 * sqrt(cd * fx));
+	float t = physics::accel_time(v_i, v, cd, m, fx);
 
-	return t_v - t_i;
+	return t;
 }
 float Thruster_Commander::top_speed_x(bool forward)
 {

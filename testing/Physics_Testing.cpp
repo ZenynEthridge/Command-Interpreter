@@ -2,7 +2,8 @@
 #include <gtest/gtest.h>
 
 
-TEST(PhysicsTest, accel_time) {
+TEST(PhysicsTesting, accel_time) {
+
 
 	float cd = 40;
 	float m = 5;
@@ -11,7 +12,7 @@ TEST(PhysicsTest, accel_time) {
 	float vt[5] = { 0.5, 0,    1, 1, 5 };
 	float t[5];
 	
-	for (int i = 0; i < 5; i++) { t[i] = accel_time(v0[i], vt[i], cd, m, F[i]); }
+	for (int i = 0; i < 5; i++) { t[i] = physics::accel_time(v0[i], vt[i], cd, m, F[i]); }
 
 	ASSERT_TRUE(t[0] > 0);
 	ASSERT_TRUE(t[1] == 0);

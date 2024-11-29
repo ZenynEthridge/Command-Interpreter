@@ -4,6 +4,7 @@
 #pragma once
 #include "eigen-3.4.0/Eigen/Dense"
 #include "Command.h"
+#include "Physics.h"
 #include <vector>
 
 
