@@ -95,7 +95,7 @@ TEST(ThrusterCommanderTest, Thrust_Compute_Fz) {
 TEST(ThursterCommanderTest, Thrust_Compute_fx_fy_mz) {
     auto control = new Thruster_Commander();
 
-    six_axis tolerances = { 0.001, 0.001, 0.001, 0.001, 0.001, 0.1 };
+    six_axis tolerances = { 0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001 };
     six_axis desired = { 3.0f,2.0f,0.0f,0.0f,0.0f,1.0f};
 
     thruster_set thrusts = control->thrust_compute_fx_fy_mz(desired(0), desired(1), desired(5));
