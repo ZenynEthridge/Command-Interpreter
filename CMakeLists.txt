@@ -14,7 +14,7 @@ add_executable(Propulsion_2024
         lib/Main.cpp
         lib/Thruster_Commander.cpp
         lib/Thruster_Commander.h
-  "lib/LQR_Control.h")
+  "lib/LQR_Control.h" "lib/Physics.h" "testing/Physics_Testing.cpp")
 
 # GTest start
 include(FetchContent)
@@ -37,7 +37,7 @@ add_executable(
         lib/Command_Interpreter.h
         lib/Thruster_Commander.cpp
         lib/Thruster_Commander.h
-  "lib/LQR_Control.h")
+  "lib/LQR_Control.h" "lib/Physics.h" "testing/Physics_Testing.cpp")
 target_link_libraries(
         run_tests
         GTest::gtest_main
