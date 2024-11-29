@@ -9,19 +9,6 @@
 
 int main()
 {
-//    auto data_file = YAML::LoadFile("jfdklfjlkdsf");
-    Thruster_Commander control = Thruster_Commander();
-    thruster_set forces = { 1, 1, 1, 1, 0, 0, 0, 0 };
-	std::cout << control.top_speed_x();
-    //std::cout << control.net_force_from_thrusters(forces);
- //   control.print_info();
- //   control.predict_drag_forces({0.5, 0.5, 0.1, 0.1, 0.1, 0.1});	control.weight_force({ 3.14/2, 0, 0 });
- //   control.bouyant_force({ 3.14/2, 0, 0 });
- //   control.gravitational_forces({ 3.14 / 2, 0, 0 });
- //   control.net_env_forces({ 0.5, 0.5, 0, 0, 0, 0 }, { 3.14/2, 0, 0 });
- //   control.thrust_compute_fz(5);
     return 0;
-
-
 }
 

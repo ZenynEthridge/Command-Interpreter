@@ -60,3 +60,36 @@ float physics::accel_time(float vi, float vt, float cd, float m, float f)
 	std::cout << "vi: " << vi << " vt: " << vt << "cd: " << cd << "f: " << f << "m: " << m << std::endl;
 	throw std::invalid_argument("Invalid input");
 }
+float physics::accel_dist(float vi, float vt, float cd, float m, float f, float t)
+{
+	if (cd <= 0) {
+		throw std::invalid_argument("Drag coefficient must be positive");
+	}
+	if (m <= 0) {
+		throw std::invalid_argument("Mass must be positive");
+	}
+
+	if (f == 0) {
+
+	}
+
+	// set f to be positive
+	float direction = f / abs(f);
+	f *= direction;
+
+
+	if (vi == 0 && cd * vt > std::sqrt(cd * f)) {
+
+		float e = 2.7182818284;
+		float A = -m / (2 * std::sqrt(cd * f));
+		float B = 1 + exp(t / A);
+		float C = std::sqrt(cd * f) * B;
+		float D = cd * exp(t / A) - cd;
+
+		return C / D;
+
+
+	}
+
+	return 0;
+}
