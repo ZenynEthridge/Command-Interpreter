@@ -24,7 +24,7 @@ TEST(ThrusterCommanderTest, Accel_Time_x) {
     float t3 = control->accel_time_x(0, v3);
     ASSERT_TRUE(t3 > 0);
 
-    float v4 = v3 / 2;
+    float v4 = v3 / 2.0;
     float t4 = control->accel_time_x(0, v4);
 
     ASSERT_TRUE(t4 > 0);
@@ -41,6 +41,20 @@ TEST(ThrusterCommanderTest, Accel_Time_x) {
 
     // TODO: double check math on seperable DE
     // TODO: add assertations based on config file, math
+    delete control;
+}
+TEST(ThrusterCommanderTest, Thrust_Compute_General) {
+    auto control = new Thruster_Commander();
+
+    six_axis tolerances = { 0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001 };
+    six_axis desired = { 3.0f,2.0f,1.0f,8.0f,9.0f,3.0f};
+
+    thruster_set thrusts = control->thrust_compute_general(desired(0), desired(1), desired(2), desired(3), desired(4), desired(5));
+    six_axis result = control->net_force_from_thrusters(thrusts);
+
+    for (int i = 0; i < 6; i++) {
+        ASSERT_NEAR(result(i), desired(i), tolerances(i));
+    }
     delete control;
 }
 TEST(ThrusterCommanderTest, Top_Speed_X) {

@@ -125,6 +125,8 @@ public:
 	thruster_set thrust_compute_fx_fy_fz(float x_force, float y_force);
 	thruster_set thrust_compute_fx_fy_fz_mz(float x_distance, float y_force, float z_force, float torque);
 	thruster_set thrust_compute_fx_fy_fz_mx_my_mz(six_axis force_torque);
+	thruster_set thrust_compute_general(float x_force, float y_force, float z_force, float x_torque, float y_torque, float z_torque);
+
 
 	// this is the general case force function
 	// it will call other force functions depending on what forces and torques are specified
