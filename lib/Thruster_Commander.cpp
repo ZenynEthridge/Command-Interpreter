@@ -437,13 +437,19 @@ thruster_set Thruster_Commander::thrust_compute_fx_fy_fz_mx_my_mz(six_axis force
 }
 thruster_set Thruster_Commander::thrust_compute_general(float x_force, float y_force, float z_force, float x_torque, float y_torque, float z_torque)
 {
-	Eigen::VectorXd forces(6);
+	Eigen::VectorXf forces(6);
 	forces << x_force, y_force, z_force, x_torque, y_torque, z_torque;
-	Eigen::MatrixXd T = wrench_matrix.cast<float>().jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(forces);
-	//Eigen::VectorXf T = wrench_matrix.completeOrthogonalDecomposition().solve(forces);
-	thruster_set values;
-	values << T(0),T(1),T(2),T(3),T(4), T(5), T(6), T(7);
-	return values;
+	Eigen::Matrix<float, 8, 6> WInverse = wrench_matrix.completeOrthogonalDecomposition().pseudoInverse();
+	thruster_set thruster_forces;
+	thruster_forces = WInverse*forces;
+	return thruster_forces;
+	//Eigen::Matrix<float, 6, 8> W_Inverse= wrench_matrix.inverse();
+
+	// Eigen::MatrixXd T = wrench_matrix.cast<float>().jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(forces);
+	// //Eigen::VectorXf T = wrench_matrix.completeOrthogonalDecomposition().solve(forces);
+	// thruster_set values;
+	// values << T(0),T(1),T(2),T(3),T(4), T(5), T(6), T(7);
+	// return values;
 }
 thruster_set Thruster_Commander::thrust_compute(six_axis force_torque, bool simple)
 {
