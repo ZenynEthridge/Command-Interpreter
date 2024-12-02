@@ -62,6 +62,4 @@ FetchContent_MakeAvailable(yaml-cpp)
 target_link_libraries(Propulsion_2024 PUBLIC yaml-cpp::yaml-cpp) # The library or executable that require yaml-cpp library
 #YAML end
 
-target_include_directories(run_tests PUBLIC data/)
-target_include_directories(Propulsion_2024 PUBLIC data/)
-
+#configure_file(${PROJECT_SOURCE_DIR}/data/14V_Correlation.csv ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
