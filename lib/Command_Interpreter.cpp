@@ -13,7 +13,8 @@
 #define OUTPUT 0
 #define HIGH 1
 #define LOW 0
-//TODO: wrapper class for wiringPi GTest
+//TODO: wrapper class for wiringPi GTest?
+//TODO: Implement pin read?
 int wiringPiSetupGpio() {
     std::cout << "[Mock] wiringPi GPIO set up!" << std::endl;
     return 0;

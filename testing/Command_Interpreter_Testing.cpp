@@ -2,6 +2,8 @@
 #include "Parser.h"
 #include <gtest/gtest.h>
 
+//TODO: Test with direct pin read rather than capturing stdout?
+
 TEST(CommandInterpreterTest, CreateCommandInterpreter) {
     testing::internal::CaptureStdout();
 
