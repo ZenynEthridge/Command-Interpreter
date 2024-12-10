@@ -119,7 +119,7 @@ void PwmPin::setPowerAndDirection(int pwmValue, Direction direction) {
 }
 
 int PwmPin::read() {
-    return analogRead(gpioNumber);
+    return currentPwm;
 }
 
 
