@@ -34,6 +34,10 @@ public:
     /// @brief Whether a pin is currently powered (whether its power level is not zero)
     /// @return True if power is not zero, false otherwise
     virtual bool enabled() = 0;
+
+    /// @brief The pin's current state
+    /// @return The current pin status
+    virtual int read() = 0;
     explicit Pin(int gpioNumber) : gpioNumber(gpioNumber) {}
     virtual ~Pin() = default;
 };
@@ -48,6 +52,7 @@ public:
     void enable() override;
     void disable() override;
     bool enabled() override;
+    int read() override;
     DigitalPin(int gpioNumber, EnableType enableType);
 };
 
@@ -65,6 +70,7 @@ public:
     /// @param pwmValue a pwm value between 0 and 1023
     /// @param direction which direction the motor should spin (Forwards or Backwards)
     void setPowerAndDirection(int pwmValue, Direction direction);
+    int read() override;
     explicit PwmPin(int gpioNumber);
 };
 
@@ -95,6 +101,8 @@ public:
     /// @brief Executes a command by sending the specified pwm values to the Pi's GPIO for the specified duration
     /// @param command a command struct with a C-style array of pwm frequency integers and a duration float
     void execute(const Command& command);
+
+    std::vector<int> readPins();
 
     ~Command_Interpreter_RPi5(); //TODO this also deletes all its pins. Not sure if this is desirable or not?
 };

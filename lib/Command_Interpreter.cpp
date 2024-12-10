@@ -14,22 +14,37 @@
 #define HIGH 1
 #define LOW 0
 //TODO: wrapper class for wiringPi GTest?
-//TODO: Implement pin read?
+#include <map>
+std::map<int,int> pinStatus = {};
+
 int wiringPiSetupGpio() {
     std::cout << "[Mock] wiringPi GPIO set up!" << std::endl;
     return 0;
 }
 
 void pinMode(int pinNumber, int mode) {
+    if (pinStatus.find(pinNumber) == pinStatus.end()) {
+        pinStatus[pinNumber] = 0;
+    }
     std::cout << "[Mock] pinMode: pin " << pinNumber << " set to mode " << mode << std::endl;
 }
 
 void digitalWrite(int pinNumber, int voltage) {
+    pinStatus[pinNumber] = voltage;
     std::cout << "[Mock] digitalWrite: pin " << pinNumber << ", voltage " << voltage << std::endl;
 }
 
 void pwmWrite(int pinNumber, int pwm) {
+    pinStatus[pinNumber] = pwm;
     std::cout << "[Mock] pwmWrite: pin " << pinNumber << ", PWM " << pwm << std::endl;
+}
+
+int digitalRead(int pinNumber) {
+    return (pinStatus.find(pinNumber) != pinStatus.end() || pinStatus[pinNumber] > 1) ? pinStatus[pinNumber] : -1;
+}
+
+int analogRead(int pinNumber) {
+    return (pinStatus.find(pinNumber) != pinStatus.end()) ? pinStatus[pinNumber] : -1;
 }
 
 #endif
@@ -72,6 +87,10 @@ bool DigitalPin::enabled() {
     return pinStatus == Enabled;
 }
 
+int DigitalPin::read() {
+    return digitalRead(gpioNumber);
+}
+
 
 PwmPin::PwmPin(int gpioNumber): Pin(gpioNumber), currentPwm(0) {}
 
@@ -99,6 +118,9 @@ void PwmPin::setPowerAndDirection(int pwmValue, Direction direction) {
     currentPwm = pwmValue;
 }
 
+int PwmPin::read() {
+    return analogRead(gpioNumber);
+}
 
 
 Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins):
@@ -158,6 +180,14 @@ void Command_Interpreter_RPi5::execute(const Command& command) {
         i++;
     }
     //TODO: duration
+}
+
+std::vector<int> Command_Interpreter_RPi5::readPins() {
+    std::vector<int> pinValues;
+    for (auto pin : allPins()) {
+        pinValues.push_back(pin->read());
+    }
+    return pinValues;
 }
 
 Command_Interpreter_RPi5::~Command_Interpreter_RPi5() {
