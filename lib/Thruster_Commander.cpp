@@ -31,7 +31,7 @@ Thruster_Commander::Thruster_Commander()
 
 	thruster_positions = thruster_set_3D::Zero();
 	thruster_positions.row(0) <<   .2535, -.2035, .042 ;
-	thruster_positions.row(1) <<  .2535, .2035, -.042; 
+	thruster_positions.row(1) <<  .2535, .2035, .042; 
 	thruster_positions.row(2) <<  -.2545, -.2035, .042;
 	thruster_positions.row(3) <<  -.2545, .2035, .042;
 	thruster_positions.row(4) <<  .167, -.1375, -.049;
