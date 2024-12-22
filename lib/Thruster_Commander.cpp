@@ -190,11 +190,11 @@ double Thruster_Commander::get_pwm(int thruster_num, double force) {
 
     if (force < numericData[0][0]) {
         std::cerr << "Force too large of a negative number! No corresponding PWM found." << std::endl;
-        return 1100;//TODO: throw exception?
+        exit(42);
     }
     if (force > numericData[csvRows - 1][0]) {
         std::cerr << "Force too large of a positive number! No corresponding PWM found." << std::endl;
-        return 1896;//TODO: throw exception?
+        exit(42);
     }
 
     double smallestDifference = INT_MAX; //Arbitrarily large number to ensure it runs the first time

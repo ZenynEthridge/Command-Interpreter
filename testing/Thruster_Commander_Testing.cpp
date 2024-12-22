@@ -190,19 +190,18 @@ TEST(ThrusterCommanderTest, GetPwmWithInterpolation) {
 }
 
 TEST(ThrusterCommanderTest, GetPwmOutOfBounds) {
-    testing::internal::CaptureStderr();
     auto thrusterCommander = new Thruster_Commander();
-    double result = thrusterCommander->get_pwm(1, -3.521);
-    ASSERT_DOUBLE_EQ(result, 1100);
+    ASSERT_EXIT(thrusterCommander->get_pwm(1, -3.521), ::testing::ExitedWithCode(42),
+                "Force too large of a negative number! No corresponding PWM found.");
 
-    result = thrusterCommander->get_pwm(1, -500);
-    ASSERT_DOUBLE_EQ(result, 1100);
+    ASSERT_EXIT(thrusterCommander->get_pwm(1, -500), ::testing::ExitedWithCode(42),
+                "Force too large of a negative number! No corresponding PWM found.");
 
-    result = thrusterCommander->get_pwm(1, 4.531);
-    ASSERT_DOUBLE_EQ(result, 1896);
+    ASSERT_EXIT(thrusterCommander->get_pwm(1, 4.531), ::testing::ExitedWithCode(42),
+                "Force too large of a positive number! No corresponding PWM found.");
 
-    result = thrusterCommander->get_pwm(1, 500);
-    ASSERT_DOUBLE_EQ(result, 1896);
+    ASSERT_EXIT(thrusterCommander->get_pwm(1, 500), ::testing::ExitedWithCode(42),
+                "Force too large of a positive number! No corresponding PWM found.");
 
     delete thrusterCommander;
 }

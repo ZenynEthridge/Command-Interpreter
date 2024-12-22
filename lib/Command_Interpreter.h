@@ -46,7 +46,7 @@ public:
 class DigitalPin : public Pin {
 private:
     EnableType enableType;
-    PinStatus pinStatus;
+    PinStatus pinStatus; //TODO: can remove this and just rely on digitalReads from the pins directly
 public:
     void initialize() override;
     void enable() override;

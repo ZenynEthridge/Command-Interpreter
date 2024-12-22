@@ -43,10 +43,6 @@ int digitalRead(int pinNumber) {
     return (pinStatus.find(pinNumber) != pinStatus.end() || pinStatus[pinNumber] > 1) ? pinStatus[pinNumber] : -1;
 }
 
-int analogRead(int pinNumber) {
-    return (pinStatus.find(pinNumber) != pinStatus.end()) ? pinStatus[pinNumber] : -1;
-}
-
 #endif
 
 DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), pinStatus(Disabled), enableType(enableType) {}
@@ -64,7 +60,8 @@ void DigitalPin::enable() {
             digitalWrite(gpioNumber, LOW);
             break;
         default:
-            std::cerr << "Impossible pin mode!" << std::endl; //throw exception?
+            std::cerr << "Impossible pin mode!" << std::endl;
+            exit(42);
     }
     pinStatus = Enabled;
 }
@@ -78,7 +75,8 @@ void DigitalPin::disable() {
             digitalWrite(gpioNumber, HIGH);
             break;
         default:
-            std::cerr << "Impossible pin mode!" << std::endl; //TODO: throw exception?
+            std::cerr << "Impossible pin mode!" << std::endl;
+            exit(42);
     }
     pinStatus = Disabled;
 }
@@ -127,6 +125,7 @@ Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<PwmPin*> thruster
                                                 thrusterPins(std::move(thrusterPins)), digitalPins(std::move(digitalPins)) {
     if (this->thrusterPins.size() != 8) {
         std::cerr << "Incorrect number of thruster pwm pins given! Need 8, given " << this->thrusterPins.size() << std::endl;
+        exit(42);
     }
 }
 
@@ -139,7 +138,8 @@ std::vector<Pin*> Command_Interpreter_RPi5::allPins() {
 
 void Command_Interpreter_RPi5::initializePins() {
     if (wiringPiSetupGpio() == -1) {
-        std::cerr << "Failure to configure GPIO pins through wiringPi!" << std::endl; //throw exception?
+        std::cerr << "Failure to configure GPIO pins through wiringPi!" << std::endl;
+        exit(42);
     }
     for (Pin* pin : allPins()) {
         pin->initialize();
