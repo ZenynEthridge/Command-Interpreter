@@ -4,15 +4,15 @@
 TEST(CommandInterpreterTest, CreateCommandInterpreter) {
     testing::internal::CaptureStdout();
 
-    auto pin1 = new PwmPin(0);
-    auto pin2 = new PwmPin(1);
-    auto pin3 = new PwmPin(2);
-    auto pin4 = new PwmPin(3);
-    auto pin5 = new PwmPin(4);
-    auto pin6 = new PwmPin(5);
-    auto pin7 = new PwmPin(6);
-    auto pin8 = new PwmPin(7);
-    auto pins = std::vector<PwmPin *>{pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8};
+    auto pin1 = new HardwarePwmPin(0);
+    auto pin2 = new HardwarePwmPin(1);
+    auto pin3 = new HardwarePwmPin(2);
+    auto pin4 = new HardwarePwmPin(3);
+    auto pin5 = new HardwarePwmPin(4);
+    auto pin6 = new HardwarePwmPin(5);
+    auto pin7 = new HardwarePwmPin(6);
+    auto pin8 = new HardwarePwmPin(7);
+    auto pins = std::vector<HardwarePwmPin *>{pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8};
 
 
     auto interpreter = new Command_Interpreter_RPi5(pins, std::vector<DigitalPin *>{});
@@ -29,15 +29,15 @@ TEST(CommandInterpreterTest, CreateCommandInterpreter) {
 TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
     testing::internal::CaptureStdout();
 
-    auto pin1 = new PwmPin(0);
-    auto pin2 = new PwmPin(1);
-    auto pin3 = new PwmPin(2);
-    auto pin4 = new PwmPin(3);
-    auto pin5 = new PwmPin(4);
-    auto pin6 = new PwmPin(5);
-    auto pin7 = new PwmPin(6);
-    auto pin8 = new PwmPin(7);
-    auto pwmPins = std::vector<PwmPin *>{pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8};
+    auto pin1 = new HardwarePwmPin(0);
+    auto pin2 = new HardwarePwmPin(1);
+    auto pin3 = new HardwarePwmPin(2);
+    auto pin4 = new HardwarePwmPin(3);
+    auto pin5 = new HardwarePwmPin(4);
+    auto pin6 = new HardwarePwmPin(5);
+    auto pin7 = new HardwarePwmPin(6);
+    auto pin8 = new HardwarePwmPin(7);
+    auto pwmPins = std::vector<HardwarePwmPin *>{pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8};
 
     auto digital1 = new DigitalPin(8, ActiveLow);
     auto digital2 = new DigitalPin(9, ActiveHigh);
@@ -60,15 +60,15 @@ TEST(CommandInterpreterTest, ExecuteCommand) {
     struct Command command = {1500, 1900, 1100,
             1250, 1300, 1464, 1535,
             1536, 2};
-    auto pin1 = new PwmPin(0);
-    auto pin2 = new PwmPin(1);
-    auto pin3 = new PwmPin(2);
-    auto pin4 = new PwmPin(3);
-    auto pin5 = new PwmPin(4);
-    auto pin6 = new PwmPin(5);
-    auto pin7 = new PwmPin(6);
-    auto pin8 = new PwmPin(7);
-    auto pins = std::vector<PwmPin *>{pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8};
+    auto pin1 = new HardwarePwmPin(0);
+    auto pin2 = new HardwarePwmPin(1);
+    auto pin3 = new HardwarePwmPin(2);
+    auto pin4 = new HardwarePwmPin(3);
+    auto pin5 = new HardwarePwmPin(4);
+    auto pin6 = new HardwarePwmPin(5);
+    auto pin7 = new HardwarePwmPin(6);
+    auto pin8 = new HardwarePwmPin(7);
+    auto pins = std::vector<HardwarePwmPin *>{pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8};
 
     auto interpreter = new Command_Interpreter_RPi5(pins, std::vector<DigitalPin *>{});
     interpreter->initializePins();
