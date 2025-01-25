@@ -69,14 +69,18 @@ class PwmPin : public Pin {
 protected:
     int currentPwm;
     /// @brief Converts a pwm frequency between 1100 and 1900 into a Thruster Spec.
-    /// @param pwmFrequency a pwm frequency between 1100 and 1900
-    /// @return A Thruster Spec with a pwm magnitude between 0 and the max Pwm Value and a Direction
+    /// @param pwm a pwm frequency between 1100 and 1900
+    /// @return A Thruster Spec with a pwm magnitude between 0 and the max pwm value, and a Direction
     virtual ThrusterSpec convertPwmToThrusterSpec(int pwm) = 0;
+
     /// @brief Sets pin to the specified pwm value and direction
     /// @param thrusterSpec a spec dictating the power and direction for the thruster
     virtual void setPowerAndDirection(ThrusterSpec thrusterSpec) = 0;
 
 public:
+    /// @brief Sets pin to given pwm frequency
+    /// @param frequency the desired frequency, between 1100 and 1900
+    /// @param logFile a file stream to write activity to for post-match analysis
     virtual void setPwm(int frequency, std::ofstream& logFile);
     explicit PwmPin(int gpioNumber) : Pin(gpioNumber), currentPwm(0) {}
     virtual ~PwmPin() = default;
@@ -86,13 +90,12 @@ public:
 class HardwarePwmPin : public PwmPin {
 protected:
     /// @brief Converts a pwm frequency between 1100 and 1900 into a Thruster Spec.
-    /// @param pwmFrequency a pwm frequency between 1100 and 1900
+    /// @param pwm a pwm frequency between 1100 and 1900
     /// @return A Thruster Spec with a pwm magnitude between 0 and MAX_HARDWARE_PWM_VALUE and a Direction
     ThrusterSpec convertPwmToThrusterSpec(int pwm) override;
 
     /// @brief Sets pin to the specified pwm value and direction
-    /// @param pwmValue a pwm value between 0 and 1023
-    /// @param direction which direction the motor should spin (Forwards or Backwards)
+    /// @param thrusterSpec the pin specifications, with a pwm magnitude between 0 and MAX_HARDWARE_PWM_VALUE and a Direction
     void setPowerAndDirection(ThrusterSpec thrusterSpec) override;
 public:
     void initialize() override;
@@ -109,7 +112,7 @@ public:
 class SoftwarePwmPin : public PwmPin {
 protected:
     /// @brief Converts a pwm frequency between 1100 and 1900 into a Thruster Spec.
-    /// @param pwmFrequency a pwm frequency between 1100 and 1900
+    /// @param pwm a pwm frequency between 1100 and 1900
     /// @return A Thruster Spec with a pwm magnitude between 0 and MAX_HARDWARE_PWM_VALUE and a Direction
     ThrusterSpec convertPwmToThrusterSpec(int pwm) override;
 public:
@@ -119,8 +122,7 @@ public:
     bool enabled() override;
 
     /// @brief Sets pin to the specified pwm value and direction
-    /// @param pwmValue a software pwm value between //TODO: find range
-    /// @param direction which direction the motor should spin (Forwards or Backwards)
+    /// @param thrusterSpec the pin specifications, with a pwm magnitude between 0 and MAX_HARDWARE_PWM_VALUE and a Direction
     void setPowerAndDirection(ThrusterSpec thrusterSpec) override;
     int read() override;
     explicit SoftwarePwmPin(int gpioNumber);
@@ -143,13 +145,18 @@ public:
 
     /// @brief Executes a command by sending the specified pwm values to the Pi's GPIO for the specified duration
     /// @param command a command struct with a C-style array of pwm frequency integers and a duration float
+    /// @param logFile a file stream to write activity to for post-match analysis
     void execute(const CommandComponent& command, std::ofstream& logfile);
 
     /// @brief Executes a command without self-correction. Sets pwm values for the duration specified. Does not stop
     /// thrusters after execution.
     /// @param command a command struct with three sub-components: the acceleration, steady-state, and deceleration.
+    /// @param logFile a file stream to write activity to for post-match analysis
     void blind_execute(const CommandComponent& command, std::ofstream& logfile);
 
+    /// @brief Get the current pwm values of all the pins.
+    /// @return A vector containing the current value of all pins. PWM pins will return a value in their range, which
+    /// varies depending on the type.
     std::vector<int> readPins();
 
     ~Command_Interpreter_RPi5(); //TODO this also deletes all its pins. Not sure if this is desirable or not?
