@@ -17,7 +17,7 @@ struct ThrusterSpec {
 };
 
 const int MAX_HARDWARE_PWM_VALUE = 1023; //TODO: check pwm range (currently assuming 0-1023)
-const int MAX_SOFTWARE_PWM_VALUE = 256; //TODO: check pwm range for software
+const int MAX_SOFTWARE_PWM_VALUE = 100; //TODO: check pwm range for software
 
 /*
  * NOTE: We may not need DigitalPin, in which case both DigitalPin and abstract Pin classes are not useful, and can
