@@ -1,6 +1,7 @@
 // William Barber
 #include "Command_Interpreter.h"
-#include <iostream>
+#include <fstream>
+#include <ctime>
 #include <utility>
 
 // When compiling for non-RPI devices which cannot run wiringPi library,  
@@ -15,11 +16,17 @@
 #define LOW 0
 //TODO: wrapper class for wiringPi GTest?
 #include <map>
+#include <iostream>
 std::map<int,int> pinStatus = {};
 
 int wiringPiSetupGpio() {
     std::cout << "[Mock] wiringPi GPIO set up!" << std::endl;
     return 0;
+}
+
+void softPwmCreate(int pinNumber, int startValue, int max) {
+    std::cout << "Create software pwm pin number " << pinNumber << " in range [0," << max << "] and starting at "
+    << startValue << std::endl;
 }
 
 void pinMode(int pinNumber, int mode) {
@@ -37,6 +44,11 @@ void digitalWrite(int pinNumber, int voltage) {
 void pwmWrite(int pinNumber, int pwm) {
     pinStatus[pinNumber] = pwm;
     std::cout << "[Mock] pwmWrite: pin " << pinNumber << ", PWM " << pwm << std::endl;
+}
+
+void softPwmWrite(int pinNumber, int pwm) {
+    pinStatus[pinNumber] = pwm;
+    std::cout << "[Mock] softPwmWrite: pin" << pinNumber << ", PWM " << pwm << std::endl;
 }
 
 int digitalRead(int pinNumber) {
@@ -89,35 +101,122 @@ int DigitalPin::read() {
     return digitalRead(gpioNumber);
 }
 
+void PwmPin::setPwm(int frequency, std::ofstream &logFile) {
+    ThrusterSpec thrusterSpec = convertPwmToThrusterSpec(frequency);
+    setPowerAndDirection(thrusterSpec);
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    logFile << "Current time: " << std::ctime(&currentTime) << std::endl;
+    logFile << "Thruster at pin " << gpioNumber << ": " << thrusterSpec.pwm_value << std::endl;
+}
 
-PwmPin::PwmPin(int gpioNumber): Pin(gpioNumber), currentPwm(0) {}
+HardwarePwmPin::HardwarePwmPin(int gpioNumber): PwmPin(gpioNumber) {}
 
-void PwmPin::initialize() {
+void HardwarePwmPin::initialize() {
     pinMode(gpioNumber, PWM_OUTPUT);
 }
 
-void PwmPin::enable() {
-    setPowerAndDirection(MAX_PWM_VALUE, Forwards);
-    currentPwm = MAX_PWM_VALUE;
+void HardwarePwmPin::enable() {
+    setPowerAndDirection(ThrusterSpec{MAX_HARDWARE_PWM_VALUE, Forwards});
 }
 
-void PwmPin::disable() {
-    setPowerAndDirection(0, Forwards);
-    currentPwm = 0;
+void HardwarePwmPin::disable() {
+    setPowerAndDirection(ThrusterSpec{0, Forwards});
 }
 
-bool PwmPin::enabled() {
+bool HardwarePwmPin::enabled() {
     return currentPwm != 0;
 }
 
-void PwmPin::setPowerAndDirection(int pwmValue, Direction direction) {
+void HardwarePwmPin::setPowerAndDirection(ThrusterSpec thrusterSpec) {
     //TODO: set direction (not sure how to do this w/ pwm. High/low?)
-    pwmWrite(gpioNumber, pwmValue);
-    currentPwm = pwmValue;
+    pwmWrite(gpioNumber, thrusterSpec.pwm_value);
+    currentPwm = thrusterSpec.pwm_value;
 }
 
-int PwmPin::read() {
+int HardwarePwmPin::read() {
     return currentPwm;
+}
+
+ThrusterSpec HardwarePwmPin::convertPwmToThrusterSpec(int pwm) {
+    double pwmFrequency = pwm;
+    // 1100 - 1464 = negative
+    // 1536 - 1900 = positive
+    const int minPosPwmFrequency = 1535; // slightly less than 1536 so that 1536 is not zero
+    const int maxPosPwmFrequency = 1900;
+    const int minNegPwmFrequency = 1100;
+    const int maxNegPwmFrequency = 1465; // slightly greater than 1464 so that 1464 is not zero
+    int pwmMagnitude;
+    double multiplier;
+
+    if (pwmFrequency >= 1465 && pwmFrequency <= 1535) {
+        return ThrusterSpec{0, Forwards};
+    }
+    if (pwmFrequency <= 1464) {
+        multiplier = ((double)(MAX_HARDWARE_PWM_VALUE) / (double)(maxNegPwmFrequency - minNegPwmFrequency));
+        pwmMagnitude = MAX_HARDWARE_PWM_VALUE - (int)((double)(pwmFrequency - minNegPwmFrequency) * multiplier);
+        return ThrusterSpec{pwmMagnitude, Backwards};
+    }
+    else {
+        multiplier = ((double)(MAX_HARDWARE_PWM_VALUE) / (double)(maxPosPwmFrequency - minPosPwmFrequency));
+        pwmMagnitude = (int)((double)(pwmFrequency - minPosPwmFrequency) * multiplier);
+        return ThrusterSpec{pwmMagnitude, Forwards};
+    }
+}
+
+
+SoftwarePwmPin::SoftwarePwmPin(int gpioNumber): PwmPin(gpioNumber) {}
+
+void SoftwarePwmPin::initialize() {
+    pinMode(gpioNumber, OUTPUT);
+    softPwmCreate(gpioNumber, 0, 100); //TODO: Verify that this is correct
+}
+
+void SoftwarePwmPin::enable() {
+    setPowerAndDirection(ThrusterSpec{MAX_SOFTWARE_PWM_VALUE, Forwards});
+}
+
+void SoftwarePwmPin::disable() {
+    setPowerAndDirection(ThrusterSpec{0, Forwards});
+}
+
+bool SoftwarePwmPin::enabled() {
+    return currentPwm != 0;
+}
+
+void SoftwarePwmPin::setPowerAndDirection(ThrusterSpec thrusterSpec) {
+    softPwmWrite(gpioNumber, thrusterSpec.pwm_value);
+    currentPwm = thrusterSpec.pwm_value;
+    //TODO: work out how to do direction
+}
+
+int SoftwarePwmPin::read() {
+    return currentPwm;
+}
+
+ThrusterSpec SoftwarePwmPin::convertPwmToThrusterSpec(int pwm) {
+    double pwmFrequency = pwm;
+    // 1100 - 1464 = negative
+    // 1536 - 1900 = positive
+    const int minPosPwmFrequency = 1535; // slightly less than 1536 so that 1536 is not zero
+    const int maxPosPwmFrequency = 1900;
+    const int minNegPwmFrequency = 1100;
+    const int maxNegPwmFrequency = 1465; // slightly greater than 1464 so that 1464 is not zero
+    int pwmMagnitude;
+    double multiplier;
+
+    if (pwmFrequency >= 1465 && pwmFrequency <= 1535) {
+        return ThrusterSpec{0, Forwards};
+    }
+    if (pwmFrequency <= 1464) {
+        multiplier = ((double)(MAX_SOFTWARE_PWM_VALUE) / (double)(maxNegPwmFrequency - minNegPwmFrequency));
+        pwmMagnitude = MAX_SOFTWARE_PWM_VALUE - (int)((double)(pwmFrequency - minNegPwmFrequency) * multiplier);
+        return ThrusterSpec{pwmMagnitude, Backwards};
+    }
+    else {
+        multiplier = ((double)(MAX_SOFTWARE_PWM_VALUE) / (double)(maxPosPwmFrequency - minPosPwmFrequency));
+        pwmMagnitude = (int)((double)(pwmFrequency - minPosPwmFrequency) * multiplier);
+        return ThrusterSpec{pwmMagnitude, Forwards};
+    }
 }
 
 
@@ -146,40 +245,12 @@ void Command_Interpreter_RPi5::initializePins() {
     }
 }
 
-Command_Interpreter_RPi5::ThrusterSpec Command_Interpreter_RPi5::convertPwmValue(double pwmFrequency) {
-
-    // 1100 - 1464 = negative
-    // 1536 - 1900 = positive
-    const int minPosPwmFrequency = 1535; // slightly less than 1536 so that 1536 is not zero
-    const int maxPosPwmFrequency = 1900;
-    const int minNegPwmFrequency = 1100;
-    const int maxNegPwmFrequency = 1465; // slightly greater than 1464 so that 1464 is not zero
-    int pwmMagnitude;
-    double multiplier;
-
-    if (pwmFrequency >= 1465 && pwmFrequency <= 1535) {
-        return ThrusterSpec{0, Forwards};
-    }
-    if (pwmFrequency <= 1464) {
-        multiplier = ((double)(MAX_PWM_VALUE)/(double)(maxNegPwmFrequency - minNegPwmFrequency));
-        pwmMagnitude = MAX_PWM_VALUE - (int)((double)(pwmFrequency - minNegPwmFrequency) * multiplier);
-        return ThrusterSpec{pwmMagnitude, Backwards};
-    }
-    else {
-        multiplier = ((double)(MAX_PWM_VALUE)/(double)(maxPosPwmFrequency - minPosPwmFrequency));
-        pwmMagnitude = (int)((double)(pwmFrequency - minPosPwmFrequency) * multiplier);
-        return ThrusterSpec{pwmMagnitude, Forwards};
-    }
-}
-
-void Command_Interpreter_RPi5::execute(const Command& command) {
+void Command_Interpreter_RPi5::execute(const CommandComponent& commandComponent, std::ofstream& logFile) {
     int i = 0;
-    for (int frequency : command.thruster_pwms.pwm_signals) {
-        ThrusterSpec thrusterSpec = convertPwmValue(frequency);
-        thrusterPins.at(i)->setPowerAndDirection(thrusterSpec.pwm_value, thrusterSpec.direction);
+    for (int frequency : commandComponent.thruster_pwms.pwm_signals) {
+        thrusterPins.at(i)->setPwm(frequency, logFile);
         i++;
     }
-    //TODO: duration
 }
 
 std::vector<int> Command_Interpreter_RPi5::readPins() {
@@ -203,14 +274,17 @@ Command_Interpreter_RPi5::~Command_Interpreter_RPi5() {
 //    blind_execute(command.dec_command, logfile); //decel
 //    // At this point, a new thread/command sends new commands. This can be stop, or it can be a new direction, etc.
 //}
-//
-//void blind_execute(command_component command, std::ofstream logfile) {
-//    execute(command);
-//    while (!(time_is_up() || interrupt())) {
-//    }
-//}
-//
-//void corrective_execute(command_component command, std::ofstream logfile) {
+
+void Command_Interpreter_RPi5::blind_execute(const CommandComponent& commandComponent, std::ofstream& logfile) {
+    auto endTime = std::chrono::system_clock::now() + commandComponent.duration;
+    auto currentTime = std::chrono::system_clock::now();
+    execute(commandComponent, logfile);
+    while (currentTime < endTime) {
+        currentTime = std::chrono::system_clock::now();
+    }
+}
+
+//void Command_Interpreter_RPi5::corrective_execute(command_component command, std::ofstream logfile) {
 //    adjusted_command = copy(command)
 //    while (!time_is_up()) {
 //        adjusted_command = correct_command();
