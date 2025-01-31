@@ -245,9 +245,9 @@ void Command_Interpreter_RPi5::initializePins() {
     }
 }
 
-void Command_Interpreter_RPi5::execute(const CommandComponent& commandComponent, std::ofstream& logFile) {
+void Command_Interpreter_RPi5::execute(pwm_array thrusterPwms, std::ofstream& logFile) {
     int i = 0;
-    for (int frequency : commandComponent.thruster_pwms.pwm_signals) {
+    for (int frequency : thrusterPwms.pwm_signals) {
         thrusterPins.at(i)->setPwm(frequency, logFile);
         i++;
     }
@@ -278,7 +278,7 @@ Command_Interpreter_RPi5::~Command_Interpreter_RPi5() {
 void Command_Interpreter_RPi5::blind_execute(const CommandComponent& commandComponent, std::ofstream& logfile) {
     auto endTime = std::chrono::system_clock::now() + commandComponent.duration;
     auto currentTime = std::chrono::system_clock::now();
-    execute(commandComponent, logfile);
+    execute(commandComponent.thruster_pwms, logfile);
     while (currentTime < endTime) {
         currentTime = std::chrono::system_clock::now();
     }

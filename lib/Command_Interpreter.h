@@ -146,7 +146,7 @@ public:
     /// @brief Executes a command by sending the specified pwm values to the Pi's GPIO for the specified duration
     /// @param command a command struct with a C-style array of pwm frequency integers and a duration float
     /// @param logFile a file stream to write activity to for post-match analysis
-    void execute(const CommandComponent& command, std::ofstream& logfile);
+    void execute(pwm_array thrusterPwms, std::ofstream& logfile);
 
     /// @brief Executes a command without self-correction. Sets pwm values for the duration specified. Does not stop
     /// thrusters after execution.
