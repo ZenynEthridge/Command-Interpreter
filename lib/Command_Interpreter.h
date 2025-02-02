@@ -1,23 +1,12 @@
 // William Barber
 #pragma once
 #include "Command.h"
+#include "Wiring.h"
 #include <vector>
 #include <fstream>
 
-/// @brief Whether a pin is currently in an enabled (powered) or disabled (unpowered) state
-enum PinStatus {Enabled, Disabled};
-
 ///@brief Whether a digital pin is active high or active low
 enum EnableType {ActiveHigh, ActiveLow};
-
-/// @brief The spec for a thruster command to be sent to GPIO
-struct ThrusterSpec {
-    int pwm_value;
-    Direction direction;
-};
-
-const int MAX_HARDWARE_PWM_VALUE = 1023; //TODO: check pwm range (currently assuming 0-1023)
-const int MAX_SOFTWARE_PWM_VALUE = 100; //TODO: check pwm range for software
 
 /*
  * NOTE: We may not need DigitalPin, in which case both DigitalPin and abstract Pin classes are not useful, and can
@@ -30,22 +19,22 @@ class Pin {
 protected:
     int gpioNumber{};
 public:
-    /// @brief Initializes pin through WiringPi (i.e. to output, PWM, etc.)
-    virtual void initialize()= 0;
+    /// @brief Initializes pin through Wiring Control class (i.e. to output, PWM, etc.)
+    virtual void initialize(WiringControl& wiringControl) = 0;
 
     /// @brief Sets pin to maximum (positive) power
-    virtual void enable() = 0;
+    virtual void enable(WiringControl& wiringControl) = 0;
 
     /// @brief Sets pin to be unpowered (stopped)
-    virtual void disable() = 0;
+    virtual void disable(WiringControl& wiringControl) = 0;
 
     /// @brief Whether a pin is currently powered (whether its power level is not zero)
     /// @return True if power is not zero, false otherwise
-    virtual bool enabled() = 0;
+    virtual bool enabled(WiringControl& wiringControl) = 0;
 
     /// @brief The pin's current state
     /// @return The current pin status
-    virtual int read() = 0;
+    virtual int read(WiringControl& wiringControl) = 0;
     explicit Pin(int gpioNumber) : gpioNumber(gpioNumber) {}
     virtual ~Pin() = default;
 };
@@ -54,77 +43,60 @@ public:
 class DigitalPin : public Pin {
 private:
     EnableType enableType;
-    PinStatus pinStatus; //TODO: can remove this and just rely on digitalReads from the pins directly
 public:
-    void initialize() override;
-    void enable() override;
-    void disable() override;
-    bool enabled() override;
-    int read() override;
+    void initialize(WiringControl& wiringControl) override;
+    void enable(WiringControl& wiringControl) override;
+    void disable(WiringControl& wiringControl) override;
+    bool enabled(WiringControl& wiringControl) override;
+    int read(WiringControl& wiringControl) override;
     DigitalPin(int gpioNumber, EnableType enableType);
 };
 
 /// @brief A PWM pin which may or may not be hardware-supported
 class PwmPin : public Pin {
 protected:
-    int currentPwm;
-    /// @brief Converts a pwm frequency between 1100 and 1900 into a Thruster Spec.
-    /// @param pwm a pwm frequency between 1100 and 1900
-    /// @return A Thruster Spec with a pwm magnitude between 0 and the max pwm value, and a Direction
-    virtual ThrusterSpec convertPwmToThrusterSpec(int pwm) = 0;
-
     /// @brief Sets pin to the specified pwm value and direction
-    /// @param thrusterSpec a spec dictating the power and direction for the thruster
-    virtual void setPowerAndDirection(ThrusterSpec thrusterSpec) = 0;
+    /// @param pwmValue a pwm value dictating the power and direction for the thruster
+    virtual void setPowerAndDirection(int pwmValue, WiringControl& wiringControl) = 0;
 
 public:
     /// @brief Sets pin to given pwm frequency
     /// @param frequency the desired frequency, between 1100 and 1900
     /// @param logFile a file stream to write activity to for post-match analysis
-    virtual void setPwm(int frequency, std::ofstream& logFile);
-    explicit PwmPin(int gpioNumber) : Pin(gpioNumber), currentPwm(0) {}
+    virtual void setPwm(int frequency, WiringControl& wiringControl, std::ofstream& logFile);
+    explicit PwmPin(int gpioNumber) : Pin(gpioNumber) {}
     virtual ~PwmPin() = default;
 };
 
 /// @brief a pwm-capable Raspberry Pi 5 GPIO pin (supports analogue output)
 class HardwarePwmPin : public PwmPin {
 protected:
-    /// @brief Converts a pwm frequency between 1100 and 1900 into a Thruster Spec.
-    /// @param pwm a pwm frequency between 1100 and 1900
-    /// @return A Thruster Spec with a pwm magnitude between 0 and MAX_HARDWARE_PWM_VALUE and a Direction
-    ThrusterSpec convertPwmToThrusterSpec(int pwm) override;
-
     /// @brief Sets pin to the specified pwm value and direction
-    /// @param thrusterSpec the pin specifications, with a pwm magnitude between 0 and MAX_HARDWARE_PWM_VALUE and a Direction
-    void setPowerAndDirection(ThrusterSpec thrusterSpec) override;
+    /// @param pwmValue a pwm value dictating the power and direction for the thruster
+    void setPowerAndDirection(int pwmValue, WiringControl& wiringControl) override;
 public:
-    void initialize() override;
-    void enable() override;
-    void disable() override;
-    bool enabled() override;
+    void initialize(WiringControl& wiringControl) override;
+    void enable(WiringControl& wiringControl) override;
+    void disable(WiringControl& wiringControl) override;
+    bool enabled(WiringControl& wiringControl) override;
 
-    int read() override;
+    int read(WiringControl& wiringControl) override;
     explicit HardwarePwmPin(int gpioNumber);
 };
 
 /// @brief a Raspberry Pi 5 GPIO pin that doesn't natively support PWM, but that will simulate analogue output
 /// through software pwm control.
 class SoftwarePwmPin : public PwmPin {
-protected:
-    /// @brief Converts a pwm frequency between 1100 and 1900 into a Thruster Spec.
-    /// @param pwm a pwm frequency between 1100 and 1900
-    /// @return A Thruster Spec with a pwm magnitude between 0 and MAX_HARDWARE_PWM_VALUE and a Direction
-    ThrusterSpec convertPwmToThrusterSpec(int pwm) override;
 public:
-    void initialize() override;
-    void enable() override;
-    void disable() override;
-    bool enabled() override;
+    void initialize(WiringControl& wiringControl) override;
+    void enable(WiringControl& wiringControl) override;
+    void disable(WiringControl& wiringControl) override;
+    bool enabled(WiringControl& wiringControl) override;
 
     /// @brief Sets pin to the specified pwm value and direction
-    /// @param thrusterSpec the pin specifications, with a pwm magnitude between 0 and MAX_HARDWARE_PWM_VALUE and a Direction
-    void setPowerAndDirection(ThrusterSpec thrusterSpec) override;
-    int read() override;
+    /// @param pwmValue a pwm value dictating the power and direction for the thruster
+    void setPowerAndDirection(int pwmValue, WiringControl& wiringControl) override;
+    int read(WiringControl& wiringControl) override;
     explicit SoftwarePwmPin(int gpioNumber);
 };
 
@@ -135,6 +107,7 @@ private:
     std::vector<Pin*> allPins();
     std::vector<PwmPin*> thrusterPins;
     std::vector<DigitalPin*> digitalPins;
+    WiringControl wiringControl;
 
 public:
     explicit Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins);

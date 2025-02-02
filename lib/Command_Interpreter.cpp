@@ -1,224 +1,121 @@
 // William Barber
 #include "Command_Interpreter.h"
+#include "Wiring.h"
+#include <iostream>
 #include <fstream>
 #include <ctime>
 #include <utility>
 
-// When compiling for non-RPI devices which cannot run wiringPi library,  
-// use -MOCK_RPI flag to enable mock functions
-#ifndef MOCK_RPI
-#include <wiringPi.h>  // Include wiringPi library by default
+DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), enableType(enableType) {}
 
-#else
-#define PWM_OUTPUT 1
-#define OUTPUT 0
-#define HIGH 1
-#define LOW 0
-//TODO: wrapper class for wiringPi GTest?
-#include <map>
-#include <iostream>
-std::map<int,int> pinStatus = {};
-
-int wiringPiSetupGpio() {
-    std::cout << "[Mock] wiringPi GPIO set up!" << std::endl;
-    return 0;
+void DigitalPin::initialize(WiringControl& wiringControl) {
+    wiringControl.setPinType(gpioNumber, Digital);
 }
 
-void softPwmCreate(int pinNumber, int startValue, int max) {
-    std::cout << "Create software pwm pin number " << pinNumber << " in range [0," << max << "] and starting at "
-    << startValue << std::endl;
-}
-
-void pinMode(int pinNumber, int mode) {
-    if (pinStatus.find(pinNumber) == pinStatus.end()) {
-        pinStatus[pinNumber] = 0;
-    }
-    std::cout << "[Mock] pinMode: pin " << pinNumber << " set to mode " << mode << std::endl;
-}
-
-void digitalWrite(int pinNumber, int voltage) {
-    pinStatus[pinNumber] = voltage;
-    std::cout << "[Mock] digitalWrite: pin " << pinNumber << ", voltage " << voltage << std::endl;
-}
-
-void pwmWrite(int pinNumber, int pwm) {
-    pinStatus[pinNumber] = pwm;
-    std::cout << "[Mock] pwmWrite: pin " << pinNumber << ", PWM " << pwm << std::endl;
-}
-
-void softPwmWrite(int pinNumber, int pwm) {
-    pinStatus[pinNumber] = pwm;
-    std::cout << "[Mock] softPwmWrite: pin" << pinNumber << ", PWM " << pwm << std::endl;
-}
-
-int digitalRead(int pinNumber) {
-    return (pinStatus.find(pinNumber) != pinStatus.end() || pinStatus[pinNumber] > 1) ? pinStatus[pinNumber] : -1;
-}
-
-#endif
-
-DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), pinStatus(Disabled), enableType(enableType) {}
-
-void DigitalPin::initialize() {
-    pinMode(gpioNumber, OUTPUT);
-}
-
-void DigitalPin::enable() {
+void DigitalPin::enable(WiringControl& wiringControl) {
     switch (enableType) {
         case ActiveHigh:
-            digitalWrite(gpioNumber, HIGH);
+            wiringControl.digitalWrite(gpioNumber, High);
             break;
         case ActiveLow:
-            digitalWrite(gpioNumber, LOW);
+            wiringControl.digitalWrite(gpioNumber, Low);
             break;
         default:
             std::cerr << "Impossible pin mode!" << std::endl;
             exit(42);
     }
-    pinStatus = Enabled;
 }
 
-void DigitalPin::disable() {
+void DigitalPin::disable(WiringControl& wiringControl) {
     switch (enableType) {
         case ActiveHigh:
-            digitalWrite(gpioNumber, LOW);
+            wiringControl.digitalWrite(gpioNumber, Low);
             break;
         case ActiveLow:
-            digitalWrite(gpioNumber, HIGH);
+            wiringControl.digitalWrite(gpioNumber, High);
             break;
         default:
             std::cerr << "Impossible pin mode!" << std::endl;
             exit(42);
     }
-    pinStatus = Disabled;
 }
 
-bool DigitalPin::enabled() {
-    return pinStatus == Enabled;
+bool DigitalPin::enabled(WiringControl& wiringControl) {
+    switch (enableType) {
+        case ActiveHigh:
+            return wiringControl.digitalRead(gpioNumber) == High;
+            break;
+        case ActiveLow:
+            return wiringControl.digitalRead(gpioNumber) == Low;
+            break;
+        default:
+            std::cerr << "Impossible pin enable type! Exiting." << std::endl;
+            exit(42);
+    }
 }
 
-int DigitalPin::read() {
-    return digitalRead(gpioNumber);
+int DigitalPin::read(WiringControl& wiringControl) {
+    return wiringControl.digitalRead(gpioNumber);
 }
 
-void PwmPin::setPwm(int frequency, std::ofstream &logFile) {
-    ThrusterSpec thrusterSpec = convertPwmToThrusterSpec(frequency);
-    setPowerAndDirection(thrusterSpec);
+void PwmPin::setPwm(int frequency, WiringControl& wiringControl, std::ofstream &logFile) {
+    setPowerAndDirection(frequency, wiringControl);
     std::time_t currentTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     logFile << "Current time: " << std::ctime(&currentTime) << std::endl;
-    logFile << "Thruster at pin " << gpioNumber << ": " << thrusterSpec.pwm_value << std::endl;
+    logFile << "Thruster at pin " << gpioNumber << ": " << frequency << std::endl;
 }
 
 HardwarePwmPin::HardwarePwmPin(int gpioNumber): PwmPin(gpioNumber) {}
 
-void HardwarePwmPin::initialize() {
-    pinMode(gpioNumber, PWM_OUTPUT);
+void HardwarePwmPin::initialize(WiringControl& wiringControl) {
+    wiringControl.setPinType(gpioNumber, HardwarePWM);
 }
 
-void HardwarePwmPin::enable() {
-    setPowerAndDirection(ThrusterSpec{MAX_HARDWARE_PWM_VALUE, Forwards});
+void HardwarePwmPin::enable(WiringControl& wiringControl) {
+    wiringControl.pwmWriteMaximum(gpioNumber);
 }
 
-void HardwarePwmPin::disable() {
-    setPowerAndDirection(ThrusterSpec{0, Forwards});
+void HardwarePwmPin::disable(WiringControl& wiringControl) {
+    wiringControl.pwmWriteOff(gpioNumber);
 }
 
-bool HardwarePwmPin::enabled() {
-    return currentPwm != 0;
+bool HardwarePwmPin::enabled(WiringControl& wiringControl) {
+    return wiringControl.pwmRead(gpioNumber).frequency != 1500;
 }
 
-void HardwarePwmPin::setPowerAndDirection(ThrusterSpec thrusterSpec) {
-    //TODO: set direction (not sure how to do this w/ pwm. High/low?)
-    pwmWrite(gpioNumber, thrusterSpec.pwm_value);
-    currentPwm = thrusterSpec.pwm_value;
+void HardwarePwmPin::setPowerAndDirection(int pwmValue, WiringControl& wiringControl) {
+    wiringControl.pwmWrite(gpioNumber, pwmValue);
 }
 
-int HardwarePwmPin::read() {
-    return currentPwm;
+int HardwarePwmPin::read(WiringControl& wiringControl) {
+    return wiringControl.pwmRead(gpioNumber).frequency;
 }
-
-ThrusterSpec HardwarePwmPin::convertPwmToThrusterSpec(int pwm) {
-    double pwmFrequency = pwm;
-    // 1100 - 1464 = negative
-    // 1536 - 1900 = positive
-    const int minPosPwmFrequency = 1535; // slightly less than 1536 so that 1536 is not zero
-    const int maxPosPwmFrequency = 1900;
-    const int minNegPwmFrequency = 1100;
-    const int maxNegPwmFrequency = 1465; // slightly greater than 1464 so that 1464 is not zero
-    int pwmMagnitude;
-    double multiplier;
-
-    if (pwmFrequency >= 1465 && pwmFrequency <= 1535) {
-        return ThrusterSpec{0, Forwards};
-    }
-    if (pwmFrequency <= 1464) {
-        multiplier = ((double)(MAX_HARDWARE_PWM_VALUE) / (double)(maxNegPwmFrequency - minNegPwmFrequency));
-        pwmMagnitude = MAX_HARDWARE_PWM_VALUE - (int)((double)(pwmFrequency - minNegPwmFrequency) * multiplier);
-        return ThrusterSpec{pwmMagnitude, Backwards};
-    }
-    else {
-        multiplier = ((double)(MAX_HARDWARE_PWM_VALUE) / (double)(maxPosPwmFrequency - minPosPwmFrequency));
-        pwmMagnitude = (int)((double)(pwmFrequency - minPosPwmFrequency) * multiplier);
-        return ThrusterSpec{pwmMagnitude, Forwards};
-    }
-}
-
 
 SoftwarePwmPin::SoftwarePwmPin(int gpioNumber): PwmPin(gpioNumber) {}
 
-void SoftwarePwmPin::initialize() {
-    pinMode(gpioNumber, OUTPUT);
-    softPwmCreate(gpioNumber, 0, 100); //TODO: Verify that this is correct
+void SoftwarePwmPin::initialize(WiringControl& wiringControl) {
+    wiringControl.setPinType(gpioNumber, SoftwarePWM);
 }
 
-void SoftwarePwmPin::enable() {
-    setPowerAndDirection(ThrusterSpec{MAX_SOFTWARE_PWM_VALUE, Forwards});
+void SoftwarePwmPin::enable(WiringControl& wiringControl) {
+    wiringControl.pwmWriteMaximum(gpioNumber);
 }
 
-void SoftwarePwmPin::disable() {
-    setPowerAndDirection(ThrusterSpec{0, Forwards});
+void SoftwarePwmPin::disable(WiringControl& wiringControl) {
+    wiringControl.pwmWriteOff(gpioNumber);
 }
 
-bool SoftwarePwmPin::enabled() {
-    return currentPwm != 0;
+bool SoftwarePwmPin::enabled(WiringControl& wiringControl) {
+    return wiringControl.pwmRead(gpioNumber).frequency != 1500;
 }
 
-void SoftwarePwmPin::setPowerAndDirection(ThrusterSpec thrusterSpec) {
-    softPwmWrite(gpioNumber, thrusterSpec.pwm_value);
-    currentPwm = thrusterSpec.pwm_value;
-    //TODO: work out how to do direction
+void SoftwarePwmPin::setPowerAndDirection(int pwmValue, WiringControl& wiringControl) {
+    wiringControl.pwmWrite(gpioNumber, pwmValue);
 }
 
-int SoftwarePwmPin::read() {
-    return currentPwm;
+int SoftwarePwmPin::read(WiringControl& wiringControl) {
+    return wiringControl.pwmRead(gpioNumber).frequency;
 }
-
-ThrusterSpec SoftwarePwmPin::convertPwmToThrusterSpec(int pwm) {
-    double pwmFrequency = pwm;
-    // 1100 - 1464 = negative
-    // 1536 - 1900 = positive
-    const int minPosPwmFrequency = 1535; // slightly less than 1536 so that 1536 is not zero
-    const int maxPosPwmFrequency = 1900;
-    const int minNegPwmFrequency = 1100;
-    const int maxNegPwmFrequency = 1465; // slightly greater than 1464 so that 1464 is not zero
-    int pwmMagnitude;
-    double multiplier;
-
-    if (pwmFrequency >= 1465 && pwmFrequency <= 1535) {
-        return ThrusterSpec{0, Forwards};
-    }
-    if (pwmFrequency <= 1464) {
-        multiplier = ((double)(MAX_SOFTWARE_PWM_VALUE) / (double)(maxNegPwmFrequency - minNegPwmFrequency));
-        pwmMagnitude = MAX_SOFTWARE_PWM_VALUE - (int)((double)(pwmFrequency - minNegPwmFrequency) * multiplier);
-        return ThrusterSpec{pwmMagnitude, Backwards};
-    }
-    else {
-        multiplier = ((double)(MAX_SOFTWARE_PWM_VALUE) / (double)(maxPosPwmFrequency - minPosPwmFrequency));
-        pwmMagnitude = (int)((double)(pwmFrequency - minPosPwmFrequency) * multiplier);
-        return ThrusterSpec{pwmMagnitude, Forwards};
-    }
-}
-
 
 Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins):
                                                 thrusterPins(std::move(thrusterPins)), digitalPins(std::move(digitalPins)) {
@@ -236,19 +133,19 @@ std::vector<Pin*> Command_Interpreter_RPi5::allPins() {
 }
 
 void Command_Interpreter_RPi5::initializePins() {
-    if (wiringPiSetupGpio() == -1) {
+    if (!wiringControl.initializeGPIO()) {
         std::cerr << "Failure to configure GPIO pins through wiringPi!" << std::endl;
         exit(42);
     }
     for (Pin* pin : allPins()) {
-        pin->initialize();
+        pin->initialize(wiringControl);
     }
 }
 
 void Command_Interpreter_RPi5::execute(pwm_array thrusterPwms, std::ofstream& logFile) {
     int i = 0;
     for (int frequency : thrusterPwms.pwm_signals) {
-        thrusterPins.at(i)->setPwm(frequency, logFile);
+        thrusterPins.at(i)->setPwm(frequency, wiringControl, logFile);
         i++;
     }
 }
@@ -256,7 +153,7 @@ void Command_Interpreter_RPi5::execute(pwm_array thrusterPwms, std::ofstream& lo
 std::vector<int> Command_Interpreter_RPi5::readPins() {
     std::vector<int> pinValues;
     for (auto pin : allPins()) {
-        pinValues.push_back(pin->read());
+        pinValues.push_back(pin->read(wiringControl));
     }
     return pinValues;
 }
