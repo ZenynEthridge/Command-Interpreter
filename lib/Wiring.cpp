@@ -5,7 +5,9 @@
 // When compiling for non-RPI devices which cannot run wiringPi library,
 // use -MOCK_RPI flag to enable mock functions
 #ifndef MOCK_RPI
-#include <wiringPi.h>  // Include wiringPi library by default
+namespace wiringPi {
+    #include <wiringPi.h>  // Include wiringPi library by default
+}
 #include <iostream>
 
 const int MAX_HARDWARE_PWM_VALUE = 1023;
@@ -38,7 +40,7 @@ int scalePwm(int pwm, int maxPwmValue) {
 
 
 bool WiringControl::initializeGPIO() {
-    if (wiringPiSetupGpio() == 0) {
+    if (wiringPi::wiringPiSetupGpio() == 0) {
         return true;
     }
     else {
@@ -49,16 +51,16 @@ bool WiringControl::initializeGPIO() {
 void WiringControl::setPinType(int pinNumber, PinType pinType) {
     switch (pinType) {
         case Digital:
-            pinMode(pinNumber, OUTPUT);
+            wiringPi::pinMode(pinNumber, wiringPi::OUTPUT);
             digitalPinStatuses[pinNumber] = Low;
             break;
         case HardwarePWM:
             pwmPinStatuses[pinNumber] = PwmPinStatus {1500, 0};
-            pinMode(pinNumber, PWM_OUTPUT);
+            wiringPi::pinMode(pinNumber, wiringPi::PWM_OUTPUT);
             break;
         case SoftwarePWM:
             pwmPinStatuses[pinNumber] = PwmPinStatus {1500, 0};
-            pinMode(pinNumber, OUTPUT);
+            wiringPi::pinMode(pinNumber, wiringPi::OUTPUT);
             break;
         default:
             std::cerr << "Impossible pin type " << pinType << "! Exiting." << std::endl;
@@ -70,10 +72,10 @@ void WiringControl::setPinType(int pinNumber, PinType pinType) {
 void WiringControl::digitalWrite(int pinNumber, DigitalPinStatus digitalPinStatus) {
     switch (digitalPinStatus) {
         case Low:
-            digitalWrite(pinNumber, LOW);
+            wiringPi::digitalWrite(pinNumber, wiringPi::LOW);
             break;
         case High:
-            digitalWrite(pinNumber, HIGH);
+            wiringPi::digitalWrite(pinNumber, wiringPi::HIGH);
             break;
         default:
             std::cerr << "Impossible digital pin status " << digitalPinStatus << "! Exiting." << std::endl;
@@ -89,9 +91,9 @@ DigitalPinStatus WiringControl::digitalRead(int pinNumber) {
 void WiringControl::pwmWrite(int pinNumber, int pwmFequency) {
     switch (pinTypes[pinNumber]) {
         case HardwarePWM:
-            pwmWrite(pinNumber, scalePwm(pwmFequency, MAX_HARDWARE_PWM_VALUE));
+            wiringPi::pwmWrite(pinNumber, scalePwm(pwmFequency, MAX_HARDWARE_PWM_VALUE));
         case SoftwarePWM:
-            pwmWrite(pinNumber, scalePwm(pwmFequency, MAX_SOFTWARE_PWM_VALUE));
+            wiringPi::softPwmWrite(pinNumber, scalePwm(pwmFequency, MAX_SOFTWARE_PWM_VALUE));
             break;
         case Digital:
             std::cerr << "Invalid pin type \"Digital\". Digital pin type cannot be used for PWM. Exiting." << std::endl;
