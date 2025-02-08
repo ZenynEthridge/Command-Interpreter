@@ -51,16 +51,16 @@ bool WiringControl::initializeGPIO() {
 void WiringControl::setPinType(int pinNumber, PinType pinType) {
     switch (pinType) {
         case Digital:
-            wiringPi::pinMode(pinNumber, wiringPi::OUTPUT);
+            wiringPi::pinMode(pinNumber, OUTPUT);
             digitalPinStatuses[pinNumber] = Low;
             break;
         case HardwarePWM:
             pwmPinStatuses[pinNumber] = PwmPinStatus {1500, 0};
-            wiringPi::pinMode(pinNumber, wiringPi::PWM_OUTPUT);
+            wiringPi::pinMode(pinNumber, PWM_OUTPUT);
             break;
         case SoftwarePWM:
             pwmPinStatuses[pinNumber] = PwmPinStatus {1500, 0};
-            wiringPi::pinMode(pinNumber, wiringPi::OUTPUT);
+            wiringPi::pinMode(pinNumber, OUTPUT);
             break;
         default:
             std::cerr << "Impossible pin type " << pinType << "! Exiting." << std::endl;
@@ -72,10 +72,10 @@ void WiringControl::setPinType(int pinNumber, PinType pinType) {
 void WiringControl::digitalWrite(int pinNumber, DigitalPinStatus digitalPinStatus) {
     switch (digitalPinStatus) {
         case Low:
-            wiringPi::digitalWrite(pinNumber, wiringPi::LOW);
+            wiringPi::digitalWrite(pinNumber, LOW);
             break;
         case High:
-            wiringPi::digitalWrite(pinNumber, wiringPi::HIGH);
+            wiringPi::digitalWrite(pinNumber, HIGH);
             break;
         default:
             std::cerr << "Impossible digital pin status " << digitalPinStatus << "! Exiting." << std::endl;
@@ -93,7 +93,7 @@ void WiringControl::pwmWrite(int pinNumber, int pwmFequency) {
         case HardwarePWM:
             wiringPi::pwmWrite(pinNumber, scalePwm(pwmFequency, MAX_HARDWARE_PWM_VALUE));
         case SoftwarePWM:
-            wiringPi::softPwmWrite(pinNumber, scalePwm(pwmFequency, MAX_SOFTWARE_PWM_VALUE));
+            wiringPi::pwmWrite(pinNumber, scalePwm(pwmFequency, MAX_SOFTWARE_PWM_VALUE));
             break;
         case Digital:
             std::cerr << "Invalid pin type \"Digital\". Digital pin type cannot be used for PWM. Exiting." << std::endl;
@@ -106,6 +106,14 @@ void WiringControl::pwmWrite(int pinNumber, int pwmFequency) {
 
 PwmPinStatus WiringControl::pwmRead(int pinNumber) {
     return pwmPinStatuses[pinNumber];
+}
+
+void WiringControl::pwmWriteMaximum(int pinNumber) {
+    pwmWrite(pinNumber, 1900);
+}
+
+void WiringControl::pwmWriteOff(int pinNumber) {
+    pwmWrite(pinNumber, 1500);
 }
 
 #else
