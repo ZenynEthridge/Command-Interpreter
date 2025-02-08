@@ -7,6 +7,7 @@
 #ifndef MOCK_RPI
 namespace wiringPi {
     #include <wiringPi.h>  // Include wiringPi library by default
+	#include <softPwm.h>
 }
 #include <iostream>
 
@@ -55,11 +56,11 @@ void WiringControl::setPinType(int pinNumber, PinType pinType) {
             digitalPinStatuses[pinNumber] = Low;
             break;
         case HardwarePWM:
-            pwmPinStatuses[pinNumber] = PwmPinStatus {1500, 0};
+            pwmPinStatuses[pinNumber] = PwmPinStatus {scalePwm(1500, MAX_HARDWARE_PWM_VALUE), 0};
             wiringPi::pinMode(pinNumber, PWM_OUTPUT);
             break;
         case SoftwarePWM:
-            pwmPinStatuses[pinNumber] = PwmPinStatus {1500, 0};
+            pwmPinStatuses[pinNumber] = PwmPinStatus {scalePwm(1500, MAX_SOFTWARE_PWM_VALUE), 0};
             wiringPi::pinMode(pinNumber, OUTPUT);
             break;
         default:
@@ -88,12 +89,15 @@ DigitalPinStatus WiringControl::digitalRead(int pinNumber) {
     return digitalPinStatuses[pinNumber];
 }
 
-void WiringControl::pwmWrite(int pinNumber, int pwmFequency) {
+void WiringControl::pwmWrite(int pinNumber, int pwmFrequency) {
     switch (pinTypes[pinNumber]) {
         case HardwarePWM:
-            wiringPi::pwmWrite(pinNumber, scalePwm(pwmFequency, MAX_HARDWARE_PWM_VALUE));
+            wiringPi::pwmWrite(pinNumber, scalePwm(pwmFrequency, MAX_HARDWARE_PWM_VALUE));
+			pwmPinStatuses[pinNumber].frequency = scalePwm(pwmFrequency, MAX_HARDWARE_PWM_VALUE);
+			break;
         case SoftwarePWM:
-            wiringPi::pwmWrite(pinNumber, scalePwm(pwmFequency, MAX_SOFTWARE_PWM_VALUE));
+            wiringPi::softPwmWrite(pinNumber, scalePwm(pwmFrequency, MAX_SOFTWARE_PWM_VALUE));
+			pwmPinStatuses[pinNumber].frequency = scalePwm(pwmFrequency, MAX_SOFTWARE_PWM_VALUE);
             break;
         case Digital:
             std::cerr << "Invalid pin type \"Digital\". Digital pin type cannot be used for PWM. Exiting." << std::endl;
