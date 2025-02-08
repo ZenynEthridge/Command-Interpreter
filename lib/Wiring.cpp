@@ -6,6 +6,7 @@
 // use -MOCK_RPI flag to enable mock functions
 #ifndef MOCK_RPI
 #include <wiringPi.h>  // Include wiringPi library by default
+#include <iostream>
 
 const int MAX_HARDWARE_PWM_VALUE = 1023;
 const int MAX_SOFTWARE_PWM_VALUE = 100;
