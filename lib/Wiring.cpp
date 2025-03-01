@@ -55,11 +55,10 @@ void WiringControl::setPinType(int pinNumber, PinType pinType) {
         case HardwarePWM:
             pwmPinStatuses[pinNumber] = PwmPinStatus {scalePwm(1500, MAX_HARDWARE_PWM_VALUE), 0};
             mockPinMode(pinNumber, PWM_OUTPUT);
-            mockSoftPwmCreate(pinNumber, 0, 100);
             break;
         case SoftwarePWM:
             pwmPinStatuses[pinNumber] = PwmPinStatus {scalePwm(1500, MAX_SOFTWARE_PWM_VALUE), 0};
-            mockPinMode(pinNumber, OUTPUT);
+            mockSoftPwmCreate(pinNumber, 0, 100);
             break;
         default:
             std::cerr << "Impossible pin type " << pinType << "! Exiting." << std::endl;
@@ -120,8 +119,6 @@ PwmPinStatus WiringControl::pwmRead(int pinNumber) {
 }
 
 #else
-
-#ifdef WIRINGPI // If we're compiling to use the WiringPi library
 
 namespace wiringPi {
 #include <wiringPi.h>
@@ -238,78 +235,4 @@ void WiringControl::pwmWriteOff(int pinNumber) {
     pwmWrite(pinNumber, 1500);
 }
 
-#else // Use Pi Pico library by default
-#include "pico/stdlib.h"
-#include "hardware/pwm.h"
-
-bool WiringControl::initializeGPIO() {
-    return true;
-}
-
-void WiringControl::setPinType(int pinNumber, PinType pinType) {
-    switch (pinType) {
-        case HardwarePWM:
-            pwmPinStatuses[pinNumber] = PwmPinStatus {scalePwm(1500, MAX_HARDWARE_PWM_VALUE), 0};
-            mockPinMode(pinNumber, PWM_OUTPUT);
-            mockSoftPwmCreate(pinNumber, 0, 100);
-            break;
-        default:
-            std::cerr << "Impossible pin type " << pinType << ". Only hardware PWM is supported on Pi Pico. Exiting." << std::endl;
-            exit(42);
-    }
-    pinTypes[pinNumber] = pinType;
-}
-
-void WiringControl::digitalWrite(int pinNumber, DigitalPinStatus digitalPinStatus) {
-    switch (digitalPinStatus) {
-        case Low:
-            mockDigitalWrite(pinNumber, LOW);
-            break;
-        case High:
-            mockDigitalWrite(pinNumber, HIGH);
-            break;
-        default:
-            std::cerr << "Impossible digital pin status " << digitalPinStatus << "! Exiting." << std::endl;
-            exit(42);
-    }
-    digitalPinStatuses[pinNumber] = digitalPinStatus;
-}
-
-DigitalPinStatus WiringControl::digitalRead(int pinNumber) {
-    return digitalPinStatuses[pinNumber];
-}
-
-void WiringControl::pwmWrite(int pinNumber, int pwmFrequency) {
-    switch (pinTypes[pinNumber]) {
-        case HardwarePWM:
-            mockPwmWrite(pinNumber, scalePwm(pwmFrequency, MAX_HARDWARE_PWM_VALUE));
-            pwmPinStatuses[pinNumber].frequency = scalePwm(pwmFrequency, MAX_HARDWARE_PWM_VALUE);
-            break;
-        case SoftwarePWM:
-            mockSoftPwmWrite(pinNumber, scalePwm(pwmFrequency, MAX_SOFTWARE_PWM_VALUE));
-            pwmPinStatuses[pinNumber].frequency = scalePwm(pwmFrequency, MAX_SOFTWARE_PWM_VALUE);
-            break;
-        case Digital:
-            std::cerr << "Invalid pin type \"Digital\". Digital pin type cannot be used for PWM. Exiting." << std::endl;
-            exit(42);
-            break;
-        default:
-            std::cerr << "Impossible pin type " << pinTypes[pinNumber] << "! Exiting." << std::endl;
-            exit(42);
-    }
-}
-
-void WiringControl::pwmWriteMaximum(int pinNumber) {
-    pwmWrite(pinNumber, 1900);
-}
-
-void WiringControl::pwmWriteOff(int pinNumber) {
-    pwmWrite(pinNumber, 1500);
-}
-
-PwmPinStatus WiringControl::pwmRead(int pinNumber) {
-    return pwmPinStatuses[pinNumber];
-}
-
-#endif
 #endif

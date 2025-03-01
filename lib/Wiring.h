@@ -8,8 +8,9 @@ enum PinType {Digital, HardwarePWM, SoftwarePWM};
 enum DigitalPinStatus {Low, High};
 
 struct PwmPinStatus {
+    int pulseWidth;
     int frequency;
-    float dutyCycle;
+    int dutyCycle;
 };
 
 class WiringControl {
