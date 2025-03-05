@@ -34,6 +34,7 @@ bool WiringControl::initializeGPIO() {
     if (wiringPiSetupGpio() < 0 || (serial = serialOpen("/dev/ttyAMA0", 115200) < 0)) {
         return false;
     }
+    return true;
 }
 
 void printToSerial(std::string message, int serial) {
