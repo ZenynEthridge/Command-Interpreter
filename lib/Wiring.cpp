@@ -15,7 +15,7 @@
 #include <wiringSerial.h>
 
 bool WiringControl::initializeGPIO() {
-    if (wiringPi::wiringPiSetupGpio() < 0 || (serial = serialOpen("/dev/ttyAMA0", 115200) < 0)) {
+    if (wiringPiSetupGpio() < 0 || (serial = serialOpen("/dev/ttyAMA0", 115200) < 0)) {
         return false;
     }
 }
@@ -26,7 +26,7 @@ void printToSerial(std::string message, int serial) {
     }
     else {
         for (int i = 0; i < message.length(); i++) {
-            serialPutChar(serial, message[i]);
+            serialPutchar(serial, message[i]);
         }
     }
 }
