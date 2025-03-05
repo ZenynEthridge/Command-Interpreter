@@ -9,6 +9,22 @@
 // use -MOCK_RPI flag to enable mock functions
 #ifdef MOCK_RPI
 
+bool WiringControl::initializeGPIO() {
+    return true;
+}
+
+
+void printToSerial(std::string message, int serial) {
+    if (serial == -1) {
+        std::cout << message;
+    }
+    else {
+        for (int i = 0; i < message.length(); i++) {
+            putchar(message[i]);
+        }
+    }
+}
+
 #else
 
 #include <wiringPi.h>
@@ -32,22 +48,6 @@ void printToSerial(std::string message, int serial) {
 }
 
 #endif
-
-bool WiringControl::initializeGPIO() {
-    return true;
-}
-
-
-void printToSerial(std::string message, int serial) {
-    if (serial == -1) {
-        std::cout << message;
-    }
-    else {
-        for (int i = 0; i < message.length(); i++) {
-            putchar(message[i]);
-        }
-    }
-}
 
 void WiringControl::setPinType(int pinNumber, PinType pinType) {
     std::string message = "Set pin ";
