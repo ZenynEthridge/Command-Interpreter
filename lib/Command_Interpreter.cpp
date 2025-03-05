@@ -58,11 +58,11 @@ int DigitalPin::read(WiringControl& wiringControl) {
     return wiringControl.digitalRead(gpioNumber);
 }
 
-void PwmPin::setPwm(int frequency, WiringControl& wiringControl, std::ofstream &logFile) {
-    setPowerAndDirection(frequency, wiringControl);
+void PwmPin::setPwm(int pulseWidth, WiringControl& wiringControl, std::ofstream &logFile) {
+    setPowerAndDirection(pulseWidth, wiringControl);
     std::time_t currentTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     logFile << "Current time: " << std::ctime(&currentTime) << std::endl;
-    logFile << "Thruster at pin " << gpioNumber << ": " << frequency << std::endl;
+    logFile << "Thruster at pin " << gpioNumber << ": " << pulseWidth << std::endl;
 }
 
 HardwarePwmPin::HardwarePwmPin(int gpioNumber): PwmPin(gpioNumber) {}
@@ -80,7 +80,7 @@ void HardwarePwmPin::disable(WiringControl& wiringControl) {
 }
 
 bool HardwarePwmPin::enabled(WiringControl& wiringControl) {
-    return wiringControl.pwmRead(gpioNumber).frequency != 1500;
+    return wiringControl.pwmRead(gpioNumber).pulseWidth != 1500;
 }
 
 void HardwarePwmPin::setPowerAndDirection(int pwmValue, WiringControl& wiringControl) {
@@ -88,7 +88,7 @@ void HardwarePwmPin::setPowerAndDirection(int pwmValue, WiringControl& wiringCon
 }
 
 int HardwarePwmPin::read(WiringControl& wiringControl) {
-    return wiringControl.pwmRead(gpioNumber).frequency;
+    return wiringControl.pwmRead(gpioNumber).pulseWidth;
 }
 
 SoftwarePwmPin::SoftwarePwmPin(int gpioNumber): PwmPin(gpioNumber) {}
@@ -106,7 +106,7 @@ void SoftwarePwmPin::disable(WiringControl& wiringControl) {
 }
 
 bool SoftwarePwmPin::enabled(WiringControl& wiringControl) {
-    return wiringControl.pwmRead(gpioNumber).frequency != 1500;
+    return wiringControl.pwmRead(gpioNumber).pulseWidth != 1500;
 }
 
 void SoftwarePwmPin::setPowerAndDirection(int pwmValue, WiringControl& wiringControl) {
@@ -114,7 +114,7 @@ void SoftwarePwmPin::setPowerAndDirection(int pwmValue, WiringControl& wiringCon
 }
 
 int SoftwarePwmPin::read(WiringControl& wiringControl) {
-    return wiringControl.pwmRead(gpioNumber).frequency;
+    return wiringControl.pwmRead(gpioNumber).pulseWidth;
 }
 
 Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins):
@@ -144,8 +144,8 @@ void Command_Interpreter_RPi5::initializePins() {
 
 void Command_Interpreter_RPi5::execute(pwm_array thrusterPwms, std::ofstream& logFile) {
     int i = 0;
-    for (int frequency : thrusterPwms.pwm_signals) {
-        thrusterPins.at(i)->setPwm(frequency, wiringControl, logFile);
+    for (int pulseWidth : thrusterPwms.pwm_signals) {
+        thrusterPins.at(i)->setPwm(pulseWidth, wiringControl, logFile);
         i++;
     }
 }
