@@ -23,7 +23,7 @@ TEST(CommandInterpreterTest, CreateCommandInterpreter) {
     delete interpreter;
 
     ASSERT_EQ(pinStatus.size(), 8);
-    ASSERT_EQ(pinStatus, (std::vector<int>{0, 0, 0, 0, 0, 0, 0, 0}));
+    ASSERT_EQ(pinStatus, (std::vector<int>{1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500}));
 }
 
 TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
@@ -51,7 +51,7 @@ TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
     delete interpreter;
 
     ASSERT_EQ(pinStatus.size(), 10);
-    ASSERT_EQ(pinStatus, (std::vector<int>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+    ASSERT_EQ(pinStatus, (std::vector<int>{1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 0, 0}));
 }
 
 TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
@@ -85,7 +85,7 @@ TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
 
     ASSERT_NEAR((endTime - startTime) / std::chrono::milliseconds(1), std::chrono::milliseconds(2000) /
         std::chrono::milliseconds(1), std::chrono::milliseconds(10) / std::chrono::milliseconds(1));
-    ASSERT_EQ(pinStatus, (std::vector<int>{0, 1023, 1023, 603, 463, 3, 0, 2}));
+    ASSERT_EQ(pinStatus, (std::vector<int>{1500, 1900, 1100, 1250, 1300, 1464, 1535, 1536}));
 }
 
 TEST(CommandInterpreterTest, BlindExecuteSoftwarePwm) {
@@ -120,6 +120,6 @@ TEST(CommandInterpreterTest, BlindExecuteSoftwarePwm) {
     ASSERT_NEAR((endTime - startTime) / std::chrono::milliseconds(1), std::chrono::milliseconds(2000) /
         std::chrono::milliseconds(1), std::chrono::milliseconds(10) / std::chrono::milliseconds(1));
 
-    ASSERT_EQ(pinStatus, (std::vector<int>{0, 100, 100, 59, 46, 1, 0, 0}));
+    ASSERT_EQ(pinStatus, (std::vector<int>{1500, 1900, 1100, 1250, 1300, 1464, 1535, 1536}));
 }
 

@@ -15,7 +15,7 @@ struct PwmPinStatus {
 
 class WiringControl {
 private:
-    static int serial = -1;
+    int serial = -1;
     std::unordered_map<int, PinType> pinTypes;
     std::unordered_map<int, PwmPinStatus> pwmPinStatuses;
     std::unordered_map<int, DigitalPinStatus> digitalPinStatuses;
