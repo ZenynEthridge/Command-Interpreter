@@ -51,7 +51,7 @@ void printToSerial(std::string message, int serial) {
 #endif
 
 void WiringControl::setPinType(int pinNumber, PinType pinType) {
-    std::string message = "Set pin ";
+    std::string message = "Configure ";
     message.append(std::to_string(pinNumber));
     switch (pinType) {
         case Digital:
@@ -62,14 +62,14 @@ void WiringControl::setPinType(int pinNumber, PinType pinType) {
             digitalPinStatuses[pinNumber] = Low;
             break;
         case HardwarePWM:
-            message.append(" to mode HardPwm\n");
+            message.append(" HardPwm\n");
             printToSerial(message, serial);
             pinTypes[pinNumber] = HardwarePWM;
             pwmWrite(pinNumber, 1500);
             pwmPinStatuses[pinNumber] = PwmPinStatus {1500, 0};
             break;
         case SoftwarePWM:
-            message.append(" to mode SoftPwm\n");
+            message.append(" SoftPwm\n");
             printToSerial(message, serial);
             pinTypes[pinNumber] = SoftwarePWM;
             pwmWrite(pinNumber, 1500);
@@ -83,16 +83,16 @@ void WiringControl::setPinType(int pinNumber, PinType pinType) {
 }
 
 void WiringControl::digitalWrite(int pinNumber, DigitalPinStatus digitalPinStatus) {
-    std::string message = "Set pin ";
+    std::string message = "Set ";
     message.append(std::to_string(pinNumber));
     switch (digitalPinStatus) {
         case Low:
-            message.append(" to digital Low\n");
+            message.append(" Digital Low\n");
             printToSerial(message, serial);
             digitalPinStatuses[pinNumber] = Low;
             break;
         case High:
-            message.append(" to digital High\n");
+            message.append(" Digital High\n");
             printToSerial(message, serial);
             digitalPinStatuses[pinNumber] = High;
             break;
@@ -108,12 +108,12 @@ DigitalPinStatus WiringControl::digitalRead(int pinNumber) {
 }
 
 void WiringControl::pwmWrite(int pinNumber, int pulseWidth) {
-    std::string message = "Set pin ";
+    std::string message = "Set ";
     message.append(std::to_string(pinNumber));
     switch (pinTypes[pinNumber]) {
         case HardwarePWM:
         case SoftwarePWM:
-            message.append(" to PWM pulse width ");
+            message.append(" PWM ");
             message.append(std::to_string(pulseWidth));
             message.append("\n");
             printToSerial(message, serial);

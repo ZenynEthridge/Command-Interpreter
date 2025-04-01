@@ -55,7 +55,7 @@ TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
 }
 
 TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
-    testing::internal::CaptureStdout();
+//    testing::internal::CaptureStdout();
 
     const CommandComponent acceleration = {1500, 1900, 1100,
                                      1250, 1300, 1464, 1535,
@@ -78,7 +78,7 @@ TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
     auto startTime = std::chrono::system_clock::now();
     interpreter->blind_execute(acceleration, logFile);
     auto endTime = std::chrono::system_clock::now();
-    std::string output = testing::internal::GetCapturedStdout();
+//    std::string output = testing::internal::GetCapturedStdout();
     auto pinStatus = interpreter->readPins();
 
     delete interpreter;
