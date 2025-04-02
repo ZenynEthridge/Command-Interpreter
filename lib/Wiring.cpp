@@ -54,12 +54,19 @@ void WiringControl::setPinType(int pinNumber, PinType pinType) {
     std::string message = "Configure ";
     message.append(std::to_string(pinNumber));
     switch (pinType) {
-        case Digital:
-            message.append(" to mode Digital\n");
+        case DigitalActiveHigh:
+            message.append(" Digital\n");
             printToSerial(message, serial);
-            pinTypes[pinNumber] = Digital;
+            pinTypes[pinNumber] = DigitalActiveHigh;
             digitalWrite(pinNumber, Low);
             digitalPinStatuses[pinNumber] = Low;
+            break;
+        case DigitalActiveLow:
+            message.append(" Digital\n");
+            printToSerial(message, serial);
+            pinTypes[pinNumber] = DigitalActiveLow;
+            digitalWrite(pinNumber, High);
+            digitalPinStatuses[pinNumber] = High;
             break;
         case HardwarePWM:
             message.append(" HardPwm\n");
@@ -119,7 +126,8 @@ void WiringControl::pwmWrite(int pinNumber, int pulseWidth) {
             printToSerial(message, serial);
             pwmPinStatuses[pinNumber].pulseWidth = pulseWidth;
             break;
-        case Digital:
+        case DigitalActiveHigh:
+        case DigitalActiveLow:
             std::cerr << "Invalid pin type \"Digital\". Digital pin type cannot be used for PWM. Exiting." << std::endl;
             exit(42);
         default:

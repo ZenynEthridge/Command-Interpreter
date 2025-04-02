@@ -9,7 +9,17 @@
 DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), enableType(enableType) {}
 
 void DigitalPin::initialize(WiringControl& wiringControl) {
-    wiringControl.setPinType(gpioNumber, Digital);
+    switch (enableType) {
+        case ActiveLow:
+            wiringControl.setPinType(gpioNumber, DigitalActiveLow);
+            break;
+        case ActiveHigh:
+            wiringControl.setPinType(gpioNumber, DigitalActiveHigh);
+            break;
+        default:
+            std::cerr << "Impossible digital pin type " << enableType << "! Exiting." << std::endl;
+            exit(42);
+    }
 }
 
 void DigitalPin::enable(WiringControl& wiringControl) {
@@ -44,10 +54,8 @@ bool DigitalPin::enabled(WiringControl& wiringControl) {
     switch (enableType) {
         case ActiveHigh:
             return wiringControl.digitalRead(gpioNumber) == High;
-            break;
         case ActiveLow:
             return wiringControl.digitalRead(gpioNumber) == Low;
-            break;
         default:
             std::cerr << "Impossible pin enable type! Exiting." << std::endl;
             exit(42);

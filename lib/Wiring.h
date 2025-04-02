@@ -4,7 +4,7 @@
 
 #include <unordered_map>
 
-enum PinType {Digital, HardwarePWM, SoftwarePWM};
+enum PinType {DigitalActiveLow, DigitalActiveHigh, HardwarePWM, SoftwarePWM};
 enum DigitalPinStatus {Low, High};
 
 struct PwmPinStatus {
