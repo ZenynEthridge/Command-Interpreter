@@ -113,19 +113,20 @@ TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
         expectedOutput.append(std::to_string(i));
         expectedOutput.append(" PWM 1500\n");
     }
-    expectedOutput.append(" HardPwm\nSet 0 PWM 1500\n");
-    expectedOutput.append(" HardPwm\nSet 1 PWM 1900\n");
-    expectedOutput.append(" HardPwm\nSet 2 PWM 1100\n");
-    expectedOutput.append(" HardPwm\nSet 3 PWM 1250\n");
-    expectedOutput.append(" HardPwm\nSet 4 PWM 1300\n");
-    expectedOutput.append(" HardPwm\nSet 5 PWM 1464\n");
-    expectedOutput.append(" HardPwm\nSet 6 PWM 1535\n");
-    expectedOutput.append(" HardPwm\nSet 7 PWM 1536\n");
+    expectedOutput.append("Set 0 PWM 1500\n");
+    expectedOutput.append("Set 1 PWM 1900\n");
+    expectedOutput.append("Set 2 PWM 1100\n");
+    expectedOutput.append("Set 3 PWM 1250\n");
+    expectedOutput.append("Set 4 PWM 1300\n");
+    expectedOutput.append("Set 5 PWM 1464\n");
+    expectedOutput.append("Set 6 PWM 1535\n");
+    expectedOutput.append("Set 7 PWM 1536\n");
 
 
     ASSERT_NEAR((endTime - startTime) / std::chrono::milliseconds(1), std::chrono::milliseconds(2000) /
         std::chrono::milliseconds(1), std::chrono::milliseconds(10) / std::chrono::milliseconds(1));
     ASSERT_EQ(pinStatus, (std::vector<int>{1500, 1900, 1100, 1250, 1300, 1464, 1535, 1536}));
+    ASSERT_EQ(output, expectedOutput);
 }
 
 TEST(CommandInterpreterTest, BlindExecuteSoftwarePwm) {
@@ -165,18 +166,19 @@ TEST(CommandInterpreterTest, BlindExecuteSoftwarePwm) {
         expectedOutput.append(std::to_string(i));
         expectedOutput.append(" PWM 1500\n");
     }
-    expectedOutput.append(" SoftPwm\nSet 0 PWM 1500\n");
-    expectedOutput.append(" SoftPwm\nSet 1 PWM 1900\n");
-    expectedOutput.append(" SoftPwm\nSet 2 PWM 1100\n");
-    expectedOutput.append(" SoftPwm\nSet 3 PWM 1250\n");
-    expectedOutput.append(" SoftPwm\nSet 4 PWM 1300\n");
-    expectedOutput.append(" SoftPwm\nSet 5 PWM 1464\n");
-    expectedOutput.append(" SoftPwm\nSet 6 PWM 1535\n");
-    expectedOutput.append(" SoftPwm\nSet 7 PWM 1536\n");
+    expectedOutput.append("Set 0 PWM 1500\n");
+    expectedOutput.append("Set 1 PWM 1900\n");
+    expectedOutput.append("Set 2 PWM 1100\n");
+    expectedOutput.append("Set 3 PWM 1250\n");
+    expectedOutput.append("Set 4 PWM 1300\n");
+    expectedOutput.append("Set 5 PWM 1464\n");
+    expectedOutput.append("Set 6 PWM 1535\n");
+    expectedOutput.append("Set 7 PWM 1536\n");
 
     ASSERT_NEAR((endTime - startTime) / std::chrono::milliseconds(1), std::chrono::milliseconds(2000) /
         std::chrono::milliseconds(1), std::chrono::milliseconds(10) / std::chrono::milliseconds(1));
 
     ASSERT_EQ(pinStatus, (std::vector<int>{1500, 1900, 1100, 1250, 1300, 1464, 1535, 1536}));
+    ASSERT_EQ(output, expectedOutput);
 }
 
