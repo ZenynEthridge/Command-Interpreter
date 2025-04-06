@@ -4,16 +4,13 @@
 TEST(CommandInterpreterTest, CreateCommandInterpreter) {
     testing::internal::CaptureStdout();
 
-    auto pin1 = new HardwarePwmPin(0);
-    auto pin2 = new HardwarePwmPin(1);
-    auto pin3 = new HardwarePwmPin(2);
-    auto pin4 = new HardwarePwmPin(3);
-    auto pin5 = new HardwarePwmPin(4);
-    auto pin6 = new HardwarePwmPin(5);
-    auto pin7 = new HardwarePwmPin(6);
-    auto pin8 = new HardwarePwmPin(7);
-    auto pins = std::vector<PwmPin *>{pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8};
+    auto pinNumbers = std::vector<int>{4, 5, 2, 3, 9, 7, 8, 6};
 
+    auto pins = std::vector<PwmPin *>{};
+
+    for (int pinNumber : pinNumbers) {
+        pins.push_back(new HardwarePwmPin(pinNumber));
+    }
 
     auto interpreter = new Command_Interpreter_RPi5(pins, std::vector<DigitalPin *>{});
     interpreter->initializePins();
@@ -23,11 +20,11 @@ TEST(CommandInterpreterTest, CreateCommandInterpreter) {
     delete interpreter;
 
     std::string expectedOutput;
-    for (int i = 0; i < 8; i++) {
+    for (int pinNumber : pinNumbers) {
         expectedOutput.append("Configure ");
-        expectedOutput.append(std::to_string(i));
+        expectedOutput.append(std::to_string(pinNumber));
         expectedOutput.append(" HardPwm\nSet ");
-        expectedOutput.append(std::to_string(i));
+        expectedOutput.append(std::to_string(pinNumber));
         expectedOutput.append(" PWM 1500\n");
     }
 
@@ -39,15 +36,13 @@ TEST(CommandInterpreterTest, CreateCommandInterpreter) {
 TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
     testing::internal::CaptureStdout();
 
-    auto pin1 = new HardwarePwmPin(0);
-    auto pin2 = new HardwarePwmPin(1);
-    auto pin3 = new HardwarePwmPin(2);
-    auto pin4 = new HardwarePwmPin(3);
-    auto pin5 = new HardwarePwmPin(4);
-    auto pin6 = new HardwarePwmPin(5);
-    auto pin7 = new HardwarePwmPin(6);
-    auto pin8 = new HardwarePwmPin(7);
-    auto pwmPins = std::vector<PwmPin *>{pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8};
+    auto pinNumbers = std::vector<int>{4, 5, 2, 3, 9, 7, 8, 6};
+
+    auto pwmPins = std::vector<PwmPin *>{};
+
+    for (int pinNumber : pinNumbers) {
+        pwmPins.push_back(new HardwarePwmPin(pinNumber));
+    }
 
     auto digital1 = new DigitalPin(8, ActiveLow);
     auto digital2 = new DigitalPin(9, ActiveHigh);
@@ -61,11 +56,11 @@ TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
     delete interpreter;
 
     std::string expectedOutput;
-    for (int i = 0; i < 8; i++) {
+    for (int pinNumber : pinNumbers) {
         expectedOutput.append("Configure ");
-        expectedOutput.append(std::to_string(i));
+        expectedOutput.append(std::to_string(pinNumber));
         expectedOutput.append(" HardPwm\nSet ");
-        expectedOutput.append(std::to_string(i));
+        expectedOutput.append(std::to_string(pinNumber));
         expectedOutput.append(" PWM 1500\n");
     }
     expectedOutput.append("Configure 8 Digital\nSet 8 Digital High\n");
@@ -83,15 +78,13 @@ TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
                                      1250, 1300, 1464, 1535,
                                      1536, std::chrono::milliseconds(2000)};
 
-    auto pin1 = new HardwarePwmPin(0);
-    auto pin2 = new HardwarePwmPin(1);
-    auto pin3 = new HardwarePwmPin(2);
-    auto pin4 = new HardwarePwmPin(3);
-    auto pin5 = new HardwarePwmPin(4);
-    auto pin6 = new HardwarePwmPin(5);
-    auto pin7 = new HardwarePwmPin(6);
-    auto pin8 = new HardwarePwmPin(7);
-    auto pins = std::vector<PwmPin*>{pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8};
+    auto pinNumbers = std::vector<int>{4, 5, 2, 3, 9, 7, 8, 6};
+
+    auto pins = std::vector<PwmPin *>{};
+
+    for (int pinNumber : pinNumbers) {
+        pins.push_back(new HardwarePwmPin(pinNumber));
+    }
 
     std::ofstream logFile = std::ofstream("/dev/null");
 
@@ -106,22 +99,21 @@ TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
     delete interpreter;
 
     std::string expectedOutput;
-    for (int i = 0; i < 8; i++) {
+    for (int pinNumber : pinNumbers) {
         expectedOutput.append("Configure ");
-        expectedOutput.append(std::to_string(i));
+        expectedOutput.append(std::to_string(pinNumber));
         expectedOutput.append(" HardPwm\nSet ");
-        expectedOutput.append(std::to_string(i));
+        expectedOutput.append(std::to_string(pinNumber));
         expectedOutput.append(" PWM 1500\n");
     }
-    expectedOutput.append("Set 0 PWM 1500\n");
-    expectedOutput.append("Set 1 PWM 1900\n");
+    expectedOutput.append("Set 4 PWM 1500\n");
+    expectedOutput.append("Set 5 PWM 1900\n");
     expectedOutput.append("Set 2 PWM 1100\n");
     expectedOutput.append("Set 3 PWM 1250\n");
-    expectedOutput.append("Set 4 PWM 1300\n");
-    expectedOutput.append("Set 5 PWM 1464\n");
-    expectedOutput.append("Set 6 PWM 1535\n");
-    expectedOutput.append("Set 7 PWM 1536\n");
-
+    expectedOutput.append("Set 9 PWM 1300\n");
+    expectedOutput.append("Set 7 PWM 1464\n");
+    expectedOutput.append("Set 8 PWM 1535\n");
+    expectedOutput.append("Set 6 PWM 1536\n");
 
     ASSERT_NEAR((endTime - startTime) / std::chrono::milliseconds(1), std::chrono::milliseconds(2000) /
         std::chrono::milliseconds(1), std::chrono::milliseconds(10) / std::chrono::milliseconds(1));
@@ -136,15 +128,13 @@ TEST(CommandInterpreterTest, BlindExecuteSoftwarePwm) {
                                            1250, 1300, 1464, 1535,
                                            1536, std::chrono::milliseconds(2000)};
 
-    auto pin1 = new SoftwarePwmPin(0);
-    auto pin2 = new SoftwarePwmPin(1);
-    auto pin3 = new SoftwarePwmPin(2);
-    auto pin4 = new SoftwarePwmPin(3);
-    auto pin5 = new SoftwarePwmPin(4);
-    auto pin6 = new SoftwarePwmPin(5);
-    auto pin7 = new SoftwarePwmPin(6);
-    auto pin8 = new SoftwarePwmPin(7);
-    auto pins = std::vector<PwmPin*>{pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8};
+    auto pinNumbers = std::vector<int>{4, 5, 2, 3, 9, 7, 8, 6};
+
+    auto pins = std::vector<PwmPin *>{};
+
+    for (int pinNumber : pinNumbers) {
+        pins.push_back(new SoftwarePwmPin(pinNumber));
+    }
 
     std::ofstream logFile = std::ofstream("/dev/null");
 
@@ -159,21 +149,21 @@ TEST(CommandInterpreterTest, BlindExecuteSoftwarePwm) {
     delete interpreter;
 
     std::string expectedOutput;
-    for (int i = 0; i < 8; i++) {
+    for (int pinNumber : pinNumbers) {
         expectedOutput.append("Configure ");
-        expectedOutput.append(std::to_string(i));
+        expectedOutput.append(std::to_string(pinNumber));
         expectedOutput.append(" SoftPwm\nSet ");
-        expectedOutput.append(std::to_string(i));
+        expectedOutput.append(std::to_string(pinNumber));
         expectedOutput.append(" PWM 1500\n");
     }
-    expectedOutput.append("Set 0 PWM 1500\n");
-    expectedOutput.append("Set 1 PWM 1900\n");
+    expectedOutput.append("Set 4 PWM 1500\n");
+    expectedOutput.append("Set 5 PWM 1900\n");
     expectedOutput.append("Set 2 PWM 1100\n");
     expectedOutput.append("Set 3 PWM 1250\n");
-    expectedOutput.append("Set 4 PWM 1300\n");
-    expectedOutput.append("Set 5 PWM 1464\n");
-    expectedOutput.append("Set 6 PWM 1535\n");
-    expectedOutput.append("Set 7 PWM 1536\n");
+    expectedOutput.append("Set 9 PWM 1300\n");
+    expectedOutput.append("Set 7 PWM 1464\n");
+    expectedOutput.append("Set 8 PWM 1535\n");
+    expectedOutput.append("Set 6 PWM 1536\n");
 
     ASSERT_NEAR((endTime - startTime) / std::chrono::milliseconds(1), std::chrono::milliseconds(2000) /
         std::chrono::milliseconds(1), std::chrono::milliseconds(10) / std::chrono::milliseconds(1));

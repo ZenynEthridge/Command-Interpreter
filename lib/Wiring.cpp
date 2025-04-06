@@ -42,9 +42,7 @@ void printToSerial(std::string message, int serial) {
         std::cout << message;
     }
     else {
-        for (int i = 0; i < message.length(); i++) {
-            serialPutchar(serial, message[i]);
-        }
+            serialPuts(serial, message);
     }
 }
 
