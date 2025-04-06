@@ -2,12 +2,13 @@ cmake_minimum_required(VERSION 3.28)
 project(Propulsion_2024)
 
 set(CMAKE_CXX_STANDARD 14)
-add_compile_options("-g")
+add_compile_options("-DMOCK_RPI")
 
-include_directories(..
+include_directories(.. 
         ../lib
 		../testing
-		../data)
+		../data
+                ../eigen-3.4.0)
 
 add_executable(Propulsion_2024
         ../lib/Command.h
@@ -23,7 +24,13 @@ add_executable(Propulsion_2024
         ../lib/LQR_Control.h
         ../lib/Physics.h "../lib/Physics.cpp")
   #"lib/LQR_Control.h" "lib/Physics.h" "testing/Physics_Testing.cpp")
-
+add_library(PropulsionFunctions 
+        ../lib/Command.h
+        ../lib/Command_Interpreter.cpp
+        ../lib/Command_Interpreter.h
+        ../lib/Wiring.cpp
+        ../lib/Wiring.h
+)       
 # GTest start
 include(FetchContent)
 FetchContent_Declare(
