@@ -29,4 +29,5 @@ public:
    void pwmWriteMaximum(int pinNumber);
    void pwmWriteOff(int pinNumber);
    WiringControl() = default;
+   ~WiringControl();
 };

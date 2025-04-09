@@ -29,17 +29,11 @@ void printToSerial(std::string message, int serial) {
 
 #include <wiringPi.h>
 #include <wiringSerial.h>
-#include <fcntl.h>
 
 bool WiringControl::initializeGPIO() {
-    int fd = serialOpen("/dev/null", 115200);
-    std::cout << "fd set to: " << fd << std::endl;
-	int fd1 = open("/dev/ttyS0", O_RDWR);
-	std::cout << "fd1 set to: " << fd1 << std::endl;
-    if (wiringPiSetupGpio() < 0 || (serial = serialOpen("/dev/AMA0", 115200) < 0)) {
+    if (wiringPiSetupGpio() < 0 || ((serial = serialOpen("/dev/ttyS0", 115200)) < 0)) {
         return false;
     }
-    std::cout << "Serial is set to: " << serial << std::endl;
     return true;
 }
 
@@ -48,10 +42,8 @@ void printToSerial(std::string message, int serial) {
         std::cout << message;
     }
     else {
-    	std::cout << "Serial during print is set to: " << serial << std::endl;
-	fflush(stdout);
-	serialPuts(serial, "serial hello\n"); 
-	serialFlush(serial);
+        std::cout << "Serial set to: " << serial << std::endl;
+        serialPuts(serial, message.c_str());
     }
 }
 
@@ -153,4 +145,8 @@ void WiringControl::pwmWriteMaximum(int pinNumber) {
 
 void WiringControl::pwmWriteOff(int pinNumber) {
     pwmWrite(pinNumber, 1500);
+}
+
+WiringControl::~WiringControl() {
+    serialClose(serial);
 }
