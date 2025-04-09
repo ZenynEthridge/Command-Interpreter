@@ -42,7 +42,6 @@ void printToSerial(std::string message, int serial) {
         std::cout << message;
     }
     else {
-        std::cout << "Serial set to: " << serial << std::endl;
         serialPuts(serial, message.c_str());
     }
 }
@@ -148,5 +147,7 @@ void WiringControl::pwmWriteOff(int pinNumber) {
 }
 
 WiringControl::~WiringControl() {
+    #ifndef MOCK_RPI
     serialClose(serial);
+    #endif
 }
