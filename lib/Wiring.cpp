@@ -31,7 +31,7 @@ void printToSerial(std::string message, int serial) {
 #include <wiringSerial.h>
 
 bool WiringControl::initializeGPIO() {
-    if (wiringPiSetupGpio() < 0 || ((serial = serialOpen("/dev/ttyS0", 115200)) < 0)) {
+    if (wiringPiSetupGpio() < 0 || ((serial = serialOpen("/dev/ttyACM0", 115200)) < 0)) {
         return false;
     }
     return true;
