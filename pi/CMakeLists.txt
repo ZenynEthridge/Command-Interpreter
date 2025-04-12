@@ -2,12 +2,13 @@ cmake_minimum_required(VERSION 3.28)
 project(Propulsion_2024)
 
 set(CMAKE_CXX_STANDARD 14)
-add_compile_options("-g")
+add_compile_options("-DMOCK_RPI")
 
 include_directories(
         .
         ../lib
         ../testing)
+
 
 # GTest start
 include(FetchContent)
@@ -34,7 +35,13 @@ target_link_libraries(
         GTest::gtest_main
         wiringPi
 )
-
+add_library(PropulsionFunctions 
+        ../lib/Command.h
+        ../lib/Command_Interpreter.cpp
+        ../lib/Command_Interpreter.h
+        ../lib/Wiring.cpp
+        ../lib/Wiring.h
+)       
 include(GoogleTest)
 gtest_discover_tests(run_tests)
 #Gtest end
