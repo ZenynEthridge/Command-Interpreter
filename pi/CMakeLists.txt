@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 14)
 add_compile_options("-g")
 
 include_directories(
-        .
         ../lib
         ../testing)
 
