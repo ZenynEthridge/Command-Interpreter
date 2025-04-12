@@ -31,7 +31,7 @@ void printToSerial(std::string message, int serial) {
 #include <wiringSerial.h>
 
 bool WiringControl::initializeGPIO() {
-    if (wiringPiSetupGpio() < 0 || (serial = serialOpen("/dev/ttyACM0", 115200) < 0)) {
+    if (wiringPiSetupGpio() < 0 || ((serial = serialOpen("/dev/ttyACM0", 115200)) < 0)) {
         return false;
     }
     return true;
@@ -43,7 +43,6 @@ void printToSerial(std::string message, int serial) {
     }
     else {
         serialPuts(serial, message.c_str());
-        serialFlush(serial);
     }
 }
 
@@ -145,4 +144,10 @@ void WiringControl::pwmWriteMaximum(int pinNumber) {
 
 void WiringControl::pwmWriteOff(int pinNumber) {
     pwmWrite(pinNumber, 1500);
+}
+
+WiringControl::~WiringControl() {
+    #ifndef MOCK_RPI
+    serialClose(serial);
+    #endif
 }
