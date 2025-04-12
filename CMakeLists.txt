@@ -25,8 +25,6 @@ add_executable(
         lib/Command.h
         lib/Command_Interpreter.cpp
         lib/Command_Interpreter.h
-        lib/Mock_GPIO.cpp
-        lib/Mock_GPIO.h
         lib/Wiring.cpp
         lib/Wiring.h)
 target_link_libraries(
