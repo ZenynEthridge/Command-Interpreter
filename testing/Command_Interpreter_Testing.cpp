@@ -43,8 +43,7 @@ int getSerialChar(int* serial) {
 TEST(CommandInterpreterTest, CreateCommandInterpreter) {
     testing::internal::CaptureStdout();
     int serial = -1;
-    initializeSerial
-(&serial);
+    initializeSerial(&serial);
 
     auto pinNumbers = std::vector<int>{4, 5, 2, 3, 9, 7, 8, 6};
 
@@ -90,8 +89,7 @@ TEST(CommandInterpreterTest, CreateCommandInterpreter) {
 TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
     testing::internal::CaptureStdout();
     int serial = -1;
-    initializeSerial
-(&serial);
+    initializeSerial(&serial);
 
     auto pinNumbers = std::vector<int>{4, 5, 2, 3, 9, 7, 8, 6};
 
@@ -142,8 +140,7 @@ TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
 TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
     testing::internal::CaptureStdout();
     int serial = -1;
-    initializeSerial
-(&serial);
+    initializeSerial(&serial);
 
     const CommandComponent acceleration = {1900, 1900, 1100,
                                      1250, 1300, 1464, 1535,
@@ -206,8 +203,7 @@ TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
 TEST(CommandInterpreterTest, BlindExecuteSoftwarePwm) {
     testing::internal::CaptureStdout();
     int serial = -1;
-    initializeSerial
-(&serial);
+    initializeSerial(&serial);
 
     const CommandComponent acceleration = {1100, 1900, 1100,
                                            1250, 1300, 1464, 1535,
