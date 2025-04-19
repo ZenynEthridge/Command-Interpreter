@@ -1,6 +1,31 @@
 #include "Command_Interpreter.h"
 #include <gtest/gtest.h>
 
+#ifndef MOCK_RPI
+
+#include <wiringSerial.h>
+
+serial;
+
+bool WiringControl::initializeGPIO() {
+    if ((serial = serialOpen("/dev/serial/by-id/usb-MicroPython_Board_in_FS_mode_e6614864d3798738-if00", 115200)) < 0) {
+        return false;
+    }
+    return true;
+}
+
+int getSerialChar() {
+    return serialGetchar(serial); // from wiringSerial
+}
+
+#else
+
+int getSerialChar() {
+    return EOF;
+}
+
+#endif
+
 TEST(CommandInterpreterTest, CreateCommandInterpreter) {
     testing::internal::CaptureStdout();
 
@@ -28,9 +53,17 @@ TEST(CommandInterpreterTest, CreateCommandInterpreter) {
         expectedOutput.append(" PWM 1500\n");
     }
 
+    std::string serialOutput;
+    while (getSerialChar() != EOF) {}
+
     ASSERT_EQ(pinStatus.size(), 8);
     ASSERT_EQ(pinStatus, (std::vector<int>{1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500}));
-    ASSERT_EQ(output, expectedOutput);
+    if (serialOutput.empty()) {
+        ASSERT_EQ(output, expectedOutput);
+    }
+    else {
+        ASSERT_EQ(serialOutput, expectedOutput);
+    }
 }
 
 TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
@@ -66,9 +99,16 @@ TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
     expectedOutput.append("Configure 8 Digital\nSet 8 Digital High\n");
     expectedOutput.append("Configure 9 Digital\nSet 9 Digital Low\n");
 
+    std::string serialOutput;
+    while (getSerialChar() != EOF) {}
     ASSERT_EQ(pinStatus.size(), 10);
     ASSERT_EQ(pinStatus, (std::vector<int>{1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1, 0}));
-    ASSERT_EQ(output, expectedOutput);
+    if (serialOutput.empty()) {
+        ASSERT_EQ(output, expectedOutput);
+    }
+    else {
+        ASSERT_EQ(serialOutput, expectedOutput);
+    }
 }
 
 TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
@@ -115,10 +155,17 @@ TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
     expectedOutput.append("Set 8 PWM 1535\n");
     expectedOutput.append("Set 6 PWM 1536\n");
 
+    std::string serialOutput;
+    while (getSerialChar() != EOF) {}
     ASSERT_NEAR((endTime - startTime) / std::chrono::milliseconds(1), std::chrono::milliseconds(2000) /
         std::chrono::milliseconds(1), std::chrono::milliseconds(10) / std::chrono::milliseconds(1));
     ASSERT_EQ(pinStatus, (std::vector<int>{1900, 1900, 1100, 1250, 1300, 1464, 1535, 1536}));
-    ASSERT_EQ(output, expectedOutput);
+    if (serialOutput.empty()) {
+        ASSERT_EQ(output, expectedOutput);
+    }
+    else {
+        ASSERT_EQ(serialOutput, expectedOutput);
+    }
 }
 
 TEST(CommandInterpreterTest, BlindExecuteSoftwarePwm) {
@@ -165,10 +212,17 @@ TEST(CommandInterpreterTest, BlindExecuteSoftwarePwm) {
     expectedOutput.append("Set 8 PWM 1535\n");
     expectedOutput.append("Set 6 PWM 1536\n");
 
+    std::string serialOutput;
+    while (getSerialChar() != EOF) {}
     ASSERT_NEAR((endTime - startTime) / std::chrono::milliseconds(1), std::chrono::milliseconds(2000) /
         std::chrono::milliseconds(1), std::chrono::milliseconds(10) / std::chrono::milliseconds(1));
 
     ASSERT_EQ(pinStatus, (std::vector<int>{1100, 1900, 1100, 1250, 1300, 1464, 1535, 1536}));
-    ASSERT_EQ(output, expectedOutput);
+    if (serialOutput.empty()) {
+        ASSERT_EQ(output, expectedOutput);
+    }
+    else {
+        ASSERT_EQ(serialOutput, expectedOutput);
+    }
 }
 
