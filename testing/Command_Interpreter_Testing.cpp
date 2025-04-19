@@ -5,16 +5,22 @@
 
 #include <wiringSerial.h>
 
-bool initializeGPIO(int* serial) {
+void echoOn(int serial) {
+    serialPuts(serial, "echo on\n");
+}
+
+bool initializeSerial(int* serial) {
     if ((*serial = serialOpen("/dev/serial/by-id/usb-MicroPython_Board_in_FS_mode_e6614864d3798738-if00", 115200)) < 0) {
         return false;
     }
+    echoOn(*serial);
     return true;
 }
 
 int getSerialChar(int* serial) {
     if (*serial == -1) {
-        if (!initializeGPIO(serial)) {
+        if (!initializeSerial
+        (serial)) {
             std::cerr << "Unable to open serial port! Exiting." << std::endl;
             exit(42);
         }
@@ -22,18 +28,10 @@ int getSerialChar(int* serial) {
     return serialGetchar(*serial); // from wiringSerial
 }
 
-void echoOn(int serial) {
-    serialPuts(serial, "echo on\n");
-}
-
 #else
 
-bool initializeGPIO(int* serial) {
+bool initializeSerial(int* serial) {
     return true;
-}
-
-void echoOn(int serial) {
-    return;
 }
 
 int getSerialChar(int* serial) {
@@ -45,7 +43,8 @@ int getSerialChar(int* serial) {
 TEST(CommandInterpreterTest, CreateCommandInterpreter) {
     testing::internal::CaptureStdout();
     int serial = -1;
-    initializeGPIO(&serial);
+    initializeSerial
+(&serial);
 
     auto pinNumbers = std::vector<int>{4, 5, 2, 3, 9, 7, 8, 6};
 
@@ -83,6 +82,7 @@ TEST(CommandInterpreterTest, CreateCommandInterpreter) {
         ASSERT_EQ(output, expectedOutput);
     }
     else {
+        expectedOutput.insert(0, "echo on\n");
         ASSERT_EQ(serialOutput, expectedOutput);
     }
 }
@@ -90,7 +90,8 @@ TEST(CommandInterpreterTest, CreateCommandInterpreter) {
 TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
     testing::internal::CaptureStdout();
     int serial = -1;
-    initializeGPIO(&serial);
+    initializeSerial
+(&serial);
 
     auto pinNumbers = std::vector<int>{4, 5, 2, 3, 9, 7, 8, 6};
 
@@ -133,6 +134,7 @@ TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
         ASSERT_EQ(output, expectedOutput);
     }
     else {
+        expectedOutput.insert(0, "echo on\n");
         ASSERT_EQ(serialOutput, expectedOutput);
     }
 }
@@ -140,7 +142,8 @@ TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
 TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
     testing::internal::CaptureStdout();
     int serial = -1;
-    initializeGPIO(&serial);
+    initializeSerial
+(&serial);
 
     const CommandComponent acceleration = {1900, 1900, 1100,
                                      1250, 1300, 1464, 1535,
@@ -195,6 +198,7 @@ TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
         ASSERT_EQ(output, expectedOutput);
     }
     else {
+        expectedOutput.insert(0, "echo on\n");
         ASSERT_EQ(serialOutput, expectedOutput);
     }
 }
@@ -202,7 +206,8 @@ TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
 TEST(CommandInterpreterTest, BlindExecuteSoftwarePwm) {
     testing::internal::CaptureStdout();
     int serial = -1;
-    initializeGPIO(&serial);
+    initializeSerial
+(&serial);
 
     const CommandComponent acceleration = {1100, 1900, 1100,
                                            1250, 1300, 1464, 1535,
@@ -258,6 +263,7 @@ TEST(CommandInterpreterTest, BlindExecuteSoftwarePwm) {
         ASSERT_EQ(output, expectedOutput);
     }
     else {
+        expectedOutput.insert(0, "echo on\n");
         ASSERT_EQ(serialOutput, expectedOutput);
     }
 }
