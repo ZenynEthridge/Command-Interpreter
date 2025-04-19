@@ -27,11 +27,10 @@ void printToSerial(std::string message, int serial) {
 
 #else
 
-#include <wiringPi.h>
 #include <wiringSerial.h>
 
 bool WiringControl::initializeGPIO() {
-    if (wiringPiSetupGpio() < 0 || ((serial = serialOpen("/dev/ttyACM0", 115200)) < 0)) {
+    if ((serial = serialOpen("/dev/serial/by-id/usb-MicroPython_Board_in_FS_mode_e6614864d3798738-if00", 115200)) < 0) {
         return false;
     }
     return true;
