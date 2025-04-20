@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 project(Propulsion_2024)
 
 set(CMAKE_CXX_STANDARD 14)
-add_compile_options("-DMOCK_RPI")
+add_compile_options("-g")
 
 include_directories(
         ../lib
