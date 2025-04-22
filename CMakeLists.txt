@@ -47,4 +47,6 @@ else()
 endif()
 
 include(GoogleTest)
+
 gtest_discover_tests(propulsion_test)
+
