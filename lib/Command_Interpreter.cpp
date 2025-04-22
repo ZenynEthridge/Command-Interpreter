@@ -143,7 +143,8 @@ std::vector<Pin*> Command_Interpreter_RPi5::allPins() {
 void Command_Interpreter_RPi5::initializePins() {
     if (!wiringControl.initializeGPIO()) {
         std::cerr << "Failure to configure GPIO pins!" << std::endl;
-        exit(42);
+        std::cerr << "Executive Main Loop shutting down" << std::endl;
+       // exit(42);
     }
     for (Pin* pin : allPins()) {
         pin->initialize(wiringControl);
