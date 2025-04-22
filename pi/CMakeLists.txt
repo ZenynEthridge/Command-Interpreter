@@ -40,7 +40,12 @@ add_library(PropulsionFunctions
         ../lib/Command_Interpreter.h
         ../lib/Wiring.cpp
         ../lib/Wiring.h
-)       
+)    
+target_sources(some_target_sources PRIVATE ../lib/Command.h
+        ../lib/Command_Interpreter.cpp
+        ../lib/Command_Interpreter.h
+        ../lib/Wiring.cpp
+        ../lib/Wiring.h)   
 include(GoogleTest)
 gtest_discover_tests(propulsion_test)
 #Gtest end
