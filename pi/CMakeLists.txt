@@ -22,7 +22,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(
-        run_tests
+        propulsion_test
         ../testing/Command_Interpreter_Testing.cpp
         ../lib/Command.h
         ../lib/Command_Interpreter.cpp
@@ -30,7 +30,7 @@ add_executable(
         ../lib/Wiring.cpp
         ../lib/Wiring.h)
 target_link_libraries(
-        run_tests
+        propulsion_test
         GTest::gtest_main
         wiringPi
 )
@@ -42,5 +42,5 @@ add_library(PropulsionFunctions
         ../lib/Wiring.h
 )       
 include(GoogleTest)
-gtest_discover_tests(run_tests)
+gtest_discover_tests(propulsion_test)
 #Gtest end
