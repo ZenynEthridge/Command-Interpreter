@@ -185,9 +185,10 @@ void Command_Interpreter_RPi5::blind_execute(const CommandComponent& commandComp
     auto endTime = std::chrono::system_clock::now() + commandComponent.duration;
     auto currentTime = std::chrono::system_clock::now();
     execute(commandComponent.thruster_pwms, logfile);
-    while (currentTime < endTime) {
+    while (currentTime < endTime && !isInterruptBlind_Execute) {
         currentTime = std::chrono::system_clock::now();
     }
+    isInterruptBlind_Execute = false;
 }
 
 //void Command_Interpreter_RPi5::corrective_execute(command_component command, std::ofstream logfile) {

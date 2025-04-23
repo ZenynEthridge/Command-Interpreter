@@ -108,6 +108,7 @@ private:
     std::vector<PwmPin*> thrusterPins;
     std::vector<DigitalPin*> digitalPins;
     WiringControl wiringControl;
+    bool isInterruptBlind_Execute;
 
 public:
     explicit Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins);
@@ -131,6 +132,9 @@ public:
     /// @return A vector containing the current value of all pins. PWM pins will return a value in their range, which
     /// varies depending on the type.
     std::vector<int> readPins();
+
+    /// @brief Set an interrupt for the blind_execute function while running. Calling this function sets the interrupt to occur.
+    void interruptBlind_Execute() {isInterruptBlind_Execute = true;}
 
     ~Command_Interpreter_RPi5(); //TODO this also deletes all its pins. Not sure if this is desirable or not?
 };
