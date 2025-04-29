@@ -143,8 +143,8 @@ std::vector<Pin *> Command_Interpreter_RPi5::allPins() {
 }
 
 void Command_Interpreter_RPi5::initializePins() {
-    if (!wiringControl.initializeGPIO()) {
-        errorLog << "Failure to configure GPIO pins!" << std::endl;
+    if (!wiringControl.initializeSerial()) {
+        errorLog << "Failure to configure serial!" << std::endl;
         exit(42);
     }
     for (Pin *pin: allPins()) {

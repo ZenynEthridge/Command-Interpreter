@@ -9,6 +9,7 @@ void echoOn(int serial) {
     serialPuts(serial, "echo on\n");
 }
 
+
 bool initializeSerial(int *serial) {
     if ((*serial = serialOpen("/dev/serial/by-id/usb-MicroPython_Board_in_FS_mode_e6614864d3798738-if00", 115200)) <
         0) {

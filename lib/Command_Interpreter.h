@@ -14,10 +14,10 @@ enum EnableType {
 /*
  * NOTE: We may not need DigitalPin, in which case both DigitalPin and abstract Pin classes are not useful, and can
  * be replaced with just the HardwarePwmPin class (probably renamed to Pin). This would also necessitate the removal of allPins
- * and digitalPins data members from Command_Interpreter_RPi5
+ * and digitalPins data members from Command_Interpreter_RPi5. Additionally, we probably won't use SoftwarePWM.
  */
 
-/// @brief A Raspberry Pi 5 GPIO pin, as specified by its GPIO pin number (see https://pinout.xyz)
+/// @brief A Raspberry Pi Pico GPIO pin, as specified by its GPIO pin number (see https://pico.pinout.xyz/)
 class Pin {
 protected:
     int gpioNumber{};
@@ -42,6 +42,10 @@ public:
     /// @return The current pin status
     virtual int read(WiringControl &wiringControl) = 0;
 
+    /// @param gpioNumber the Pico GPIO number for the pin (see https://pico.pinout.xyz/ and look for GPX labels in green)
+    /// @param output where you want output (not logging) messages to be sent (probably std::cout)
+    /// @param outLog where you want logging (not error) messages to be logged
+    /// @param errorLog where you want error messages to be logged
     explicit Pin(int gpioNumber, std::ostream &output, std::ostream &outLog, std::ostream &errorLog) : gpioNumber(
             gpioNumber),
                                                                                                           output(output),
@@ -52,7 +56,7 @@ public:
     virtual ~Pin() = default;
 };
 
-/// @brief A digital (two-state) Raspberry Pi 5 GPIO pin
+/// @brief A digital (two-state) Raspberry Pi Pico GPIO pin
 class DigitalPin : public Pin {
 private:
     EnableType enableType;
@@ -67,6 +71,11 @@ public:
 
     int read(WiringControl &wiringControl) override;
 
+    /// @param gpioNumber the Pico GPIO number for the pin (see https://pico.pinout.xyz/ and look for GPX labels in green)
+    /// @param enableType whether the pin is active high or active low
+    /// @param output where you want output (not logging) messages to be sent (probably std::cout)
+    /// @param outLog where you want logging (not error) messages to be logged
+    /// @param errorLog where you want error messages to be logged
     DigitalPin(int gpioNumber, EnableType enableType, std::ostream &output, std::ostream &outLog,
                std::ostream &errorLog) : Pin(gpioNumber, output, outLog, errorLog), enableType(enableType) {};
 };
@@ -83,13 +92,17 @@ public:
     /// @param frequency the desired frequency, between 1100 and 1900
     virtual void setPwm(int frequency, WiringControl &wiringControl);
 
+    /// @param gpioNumber the Pico GPIO number for the pin (see https://pico.pinout.xyz/ and look for GPX labels in green)
+    /// @param output where you want output (not logging) messages to be sent (probably std::cout)
+    /// @param outLog where you want logging (not error) messages to be logged
+    /// @param errorLog where you want error messages to be logged
     explicit PwmPin(int gpioNumber, std::ostream &output, std::ostream &outLog, std::ostream &errorLog) : Pin(
             gpioNumber, output, outLog, errorLog) {}
 
     virtual ~PwmPin() = default;
 };
 
-/// @brief a pwm-capable Raspberry Pi 5 GPIO pin (supports analogue output)
+/// @brief a pwm-capable Raspberry Pi Pico GPIO pin (supports analogue output)
 class HardwarePwmPin : public PwmPin {
 protected:
     /// @brief Sets pin to the specified pwm value and direction
@@ -107,11 +120,15 @@ public:
 
     int read(WiringControl &wiringControl) override;
 
+    /// @param gpioNumber the Pico GPIO number for the pin (see https://pico.pinout.xyz/ and look for GPX labels in green)
+    /// @param output where you want output (not logging) messages to be sent (probably std::cout)
+    /// @param outLog where you want logging (not error) messages to be logged
+    /// @param errorLog where you want error messages to be logged
     explicit HardwarePwmPin(int gpioNumber, std::ostream &output, std::ostream &outLog, std::ostream &errorLog)
             : PwmPin(gpioNumber, output, outLog, errorLog) {};
 };
 
-/// @brief a Raspberry Pi 5 GPIO pin that doesn't natively support PWM, but that will simulate analogue output
+/// @brief a Raspberry Pi Pico GPIO pin that doesn't natively support PWM, but that will simulate analogue output
 /// through software pwm control.
 class SoftwarePwmPin : public PwmPin {
 public:
@@ -129,6 +146,10 @@ public:
 
     int read(WiringControl &wiringControl) override;
 
+    /// @param gpioNumber the Pico GPIO number for the pin (see https://pico.pinout.xyz/ and look for GPX labels in green)
+    /// @param output where you want output (not logging) messages to be sent (probably std::cout)
+    /// @param outLog where you want logging (not error) messages to be logged
+    /// @param errorLog where you want error messages to be logged
     explicit SoftwarePwmPin(int gpioNumber, std::ostream &output, std::ostream &outLog, std::ostream &errorLog)
             : PwmPin(gpioNumber, output, outLog, errorLog) {};
 };
@@ -147,16 +168,20 @@ private:
     std::ostream &errorLog;
 
 public:
+    /// @param thrusterPins the PWM pins that will drive robot thrusters
+    /// @param digitalPins non-PWM pins to be used for digital (2-state) output
+    /// @param output where you want output (not logging) messages to be sent (probably std::cout)
+    /// @param outLog where you want logging (not error) messages to be logged
+    /// @param errorLog where you want error messages to be logged
     explicit Command_Interpreter_RPi5(std::vector<PwmPin *> thrusterPins,
                                       std::vector<DigitalPin *> digitalPins,
                                       const WiringControl &wiringControl, std::ostream &output,
                                       std::ostream &outLog, std::ostream &errorLog);
 
-    /// @brief Initializes the pins in allPins through the WiringPi library to be either PWM or digital pins
-    /// depending on their types
+    /// @brief Sends the initialize commands to the Pico
     void initializePins();
 
-    /// @brief Executes a command by sending the specified pwm values to the Pi's GPIO for the specified duration
+    /// @brief Executes a command by sending the specified pwm values to the Pico for the specified duration
     /// @param command a command struct with a C-style array of pwm frequency integers and a duration float
     void execute(pwm_array thrusterPwms);
 
@@ -166,8 +191,7 @@ public:
     void blind_execute(const CommandComponent &command);
 
     /// @brief Get the current pwm values of all the pins.
-    /// @return A vector containing the current value of all pins. PWM pins will return a value in their range, which
-    /// varies depending on the type.
+    /// @return A vector containing the current value of all pins. PWM pins will return a value in the range [1100, 1900]
     std::vector<int> readPins();
 
     ~Command_Interpreter_RPi5(); //TODO this also deletes all its pins. Not sure if this is desirable or not?

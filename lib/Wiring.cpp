@@ -22,7 +22,7 @@ void WiringControl::printToSerial(const std::string& message) {
 
 #include <wiringSerial.h>
 
-bool WiringControl::initializeGPIO() {
+bool WiringControl::initializeSerial() {
     if ((serial = serialOpen("/dev/serial/by-id/usb-MicroPython_Board_in_FS_mode_e6614864d3798738-if00", 115200)) < 0) {
         return false;
     }

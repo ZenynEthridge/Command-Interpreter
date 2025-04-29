@@ -32,8 +32,8 @@ private:
     std::ostream &outLog;
     std::ostream &errorLog;
 public:
-    /// @brief Perform necessary steps to initialize the GPIO of the Pi. Includes configuring serial connection to Pico.
-    bool initializeGPIO();
+    /// @brief Perform necessary steps to configure the serial connection from the Pi 5 to the Pico.
+    bool initializeSerial();
 
     /// @brief Sets the pin with the given pin number to the purpose specified: either digital or pwm
     /// @param pinNumber the GPIO number of the pin. See https://pinout.xyz/ or https://pico.pinout.xyz/
@@ -70,10 +70,13 @@ public:
     /// @param pinNumber the GPIO number of the pin. See https://pinout.xyz/ or https://pico.pinout.xyz/
     void pwmWriteOff(int pinNumber);
 
-    /// @brief Print message to serial specified by file descriptor
+    /// @brief Print message to serial specified by file descriptor (which is initialized by initializeSerial())
     /// @param message a C++ string containing the message to be sent
     void printToSerial(const std::string &message);
 
+    /// @param output where you want output (not logging) messages to be sent (probably std::cout)
+    /// @param outLog where you want logging (not error) messages to be logged
+    /// @param errorLog where you want error messages to be logged
     WiringControl(std::ostream &output, std::ostream &outLog, std::ostream &errorLog);
 
     ~WiringControl();
