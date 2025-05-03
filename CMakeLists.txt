@@ -45,7 +45,13 @@ else()
     message(STATUS "Building with MOCK_RPI=OFF: Linking to real WiringPi.")
     target_link_libraries(propulsion_test wiringPi)
 endif()
-
+add_library(PropulsionFunctions
+        lib/Command.h
+        lib/Command_Interpreter.cpp
+        lib/Command_Interpreter.h
+        lib/Wiring.cpp
+        lib/Wiring.h
+)
 include(GoogleTest)
 
 gtest_discover_tests(propulsion_test)
