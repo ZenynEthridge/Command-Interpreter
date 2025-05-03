@@ -42,14 +42,6 @@ add_executable(propulsion_test
 # Always link GTest
 target_link_libraries(propulsion_test GTest::gtest_main)
 
-# Define mock or real behavior
-if(MOCK_RPI)
-    message(STATUS "Building with MOCK_RPI=ON: Using mock WiringPi (no external linkage).")
-    target_compile_definitions(propulsion_test PRIVATE MOCK_RPI)
-else()
-    message(STATUS "Building with MOCK_RPI=OFF: Linking to real WiringPi.")
-    target_link_libraries(propulsion_test wiringPi)
-endif()
 add_library(PropulsionFunctions
         lib/Command.h
         lib/Command_Interpreter.cpp
