@@ -182,8 +182,8 @@ public:
     void initializePins();
 
     /// @brief Executes a command by sending the specified pwm values to the Pico for the specified duration
-    /// @param command a command struct with a C-style array of pwm frequency integers and a duration float
-    void execute(pwm_array thrusterPwms);
+    /// @param thrusterPwms a C-style array of pwm frequency integers
+    void untimed_execute(pwm_array thrusterPwms);
 
     /// @brief Executes a command without self-correction. Sets pwm values for the duration specified. Does not stop
     /// thrusters after execution.

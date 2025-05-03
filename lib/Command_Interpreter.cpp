@@ -152,14 +152,6 @@ void Command_Interpreter_RPi5::initializePins() {
     }
 }
 
-void Command_Interpreter_RPi5::execute(pwm_array thrusterPwms) {
-    int i = 0;
-    for (int pulseWidth: thrusterPwms.pwm_signals) {
-        thrusterPins.at(i)->setPwm(pulseWidth, wiringControl);
-        i++;
-    }
-}
-
 std::vector<int> Command_Interpreter_RPi5::readPins() {
     std::vector<int> pinValues;
     for (auto pin: allPins()) {
@@ -174,27 +166,19 @@ Command_Interpreter_RPi5::~Command_Interpreter_RPi5() {
     }
 }
 
-//move_forwards(float distance, std::ostream logfile) {
-//    command = calculate_stuff(distance, current_robot_data);
-//    blind_execute(command.accel_command, logfile); //accel
-//    blind_execute(command.ss_command, logfile); //stead-state
-//    blind_execute(command.dec_command, logfile); //decel
-//    // At this point, a new thread/command sends new commands. This can be stop, or it can be a new direction, etc.
-//}
-
 void Command_Interpreter_RPi5::blind_execute(const CommandComponent &commandComponent) {
     auto endTime = std::chrono::system_clock::now() + commandComponent.duration;
     auto currentTime = std::chrono::system_clock::now();
-    execute(commandComponent.thruster_pwms);
+    untimed_execute(commandComponent.thruster_pwms);
     while (currentTime < endTime) {
         currentTime = std::chrono::system_clock::now();
     }
 }
 
-//void Command_Interpreter_RPi5::corrective_execute(command_component command, std::ostream logfile) {
-//    adjusted_command = copy(command)
-//    while (!time_is_up()) {
-//        adjusted_command = correct_command();
-//        execute(command);
-//    }
-//}
+void Command_Interpreter_RPi5::untimed_execute(pwm_array thrusterPwms) {
+    int i = 0;
+    for (int pulseWidth: thrusterPwms.pwm_signals) {
+        thrusterPins.at(i)->setPwm(pulseWidth, wiringControl);
+        i++;
+    }
+}

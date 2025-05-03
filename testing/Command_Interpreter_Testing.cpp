@@ -145,6 +145,64 @@ TEST(CommandInterpreterTest, CreateCommandInterpreterWithDigitalPins) {
     }
 }
 
+TEST(CommandInterpreterTest, UntimedExecute) {
+    testing::internal::CaptureStdout();
+    std::ofstream outLog("/dev/null");
+    int serial = -1;
+    initializeSerial(&serial);
+
+    const pwm_array pwms = {1900, 1900, 1100, 1250, 1300, 1464, 1535, 1536};
+
+    auto pinNumbers = std::vector<int>{4, 5, 2, 3, 9, 7, 8, 6};
+
+    auto pins = std::vector<PwmPin *>{};
+
+    for (int pinNumber: pinNumbers) {
+        pins.push_back(new HardwarePwmPin(pinNumber, std::cout, outLog, std::cerr));
+    }
+
+    WiringControl wiringControl = WiringControl(std::cout, outLog, std::cerr);
+
+    auto interpreter = new Command_Interpreter_RPi5(pins, std::vector<DigitalPin *>{}, wiringControl, std::cout, outLog,
+                                                    std::cerr);
+    interpreter->initializePins();
+    interpreter->untimed_execute(pwms);
+    std::string output = testing::internal::GetCapturedStdout();
+    auto pinStatus = interpreter->readPins();
+
+    delete interpreter;
+
+    std::string expectedOutput;
+    for (int pinNumber: pinNumbers) {
+        expectedOutput.append("Configure ");
+        expectedOutput.append(std::to_string(pinNumber));
+        expectedOutput.append(" HardPwm\nSet ");
+        expectedOutput.append(std::to_string(pinNumber));
+        expectedOutput.append(" PWM 1500\n");
+    }
+    expectedOutput.append("Set 4 PWM 1900\n");
+    expectedOutput.append("Set 5 PWM 1900\n");
+    expectedOutput.append("Set 2 PWM 1100\n");
+    expectedOutput.append("Set 3 PWM 1250\n");
+    expectedOutput.append("Set 9 PWM 1300\n");
+    expectedOutput.append("Set 7 PWM 1464\n");
+    expectedOutput.append("Set 8 PWM 1535\n");
+    expectedOutput.append("Set 6 PWM 1536\n");
+
+    int charRead = EOF;
+    std::string serialOutput;
+    while ((charRead = getSerialChar(&serial)) != EOF) {
+        serialOutput.push_back((char) charRead);
+    }
+    ASSERT_EQ(pinStatus, (std::vector<int>{1900, 1900, 1100, 1250, 1300, 1464, 1535, 1536}));
+    if (serialOutput.empty()) {
+        ASSERT_EQ(output, expectedOutput);
+    } else {
+        expectedOutput.insert(0, "echo on\n");
+        ASSERT_EQ(serialOutput, expectedOutput);
+    }
+}
+
 TEST(CommandInterpreterTest, BlindExecuteHardwarePwm) {
     testing::internal::CaptureStdout();
     std::ofstream outLog("/dev/null");

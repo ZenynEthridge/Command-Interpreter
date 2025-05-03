@@ -9,7 +9,7 @@
 // use -MOCK_RPI flag to enable mock functions
 #ifdef MOCK_RPI
 
-bool WiringControl::initializeGPIO() {
+bool WiringControl::initializeSerial() {
     return true;
 }
 
