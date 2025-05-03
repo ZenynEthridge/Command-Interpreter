@@ -6,9 +6,7 @@
 #include <ctime>
 #include <utility>
 
-DigitalPin::DigitalPin(int gpioNumber, EnableType enableType): Pin(gpioNumber), enableType(enableType) {}
-
-void DigitalPin::initialize(WiringControl& wiringControl) {
+void DigitalPin::initialize(WiringControl &wiringControl) {
     switch (enableType) {
         case ActiveLow:
             wiringControl.setPinType(gpioNumber, DigitalActiveLow);
@@ -17,12 +15,12 @@ void DigitalPin::initialize(WiringControl& wiringControl) {
             wiringControl.setPinType(gpioNumber, DigitalActiveHigh);
             break;
         default:
-            std::cerr << "Impossible digital pin type " << enableType << "! Exiting." << std::endl;
+            errorLog << "Impossible digital pin type " << enableType << "! Exiting." << std::endl;
             exit(42);
     }
 }
 
-void DigitalPin::enable(WiringControl& wiringControl) {
+void DigitalPin::enable(WiringControl &wiringControl) {
     switch (enableType) {
         case ActiveHigh:
             wiringControl.digitalWrite(gpioNumber, High);
@@ -31,12 +29,12 @@ void DigitalPin::enable(WiringControl& wiringControl) {
             wiringControl.digitalWrite(gpioNumber, Low);
             break;
         default:
-            std::cerr << "Impossible pin mode!" << std::endl;
+            errorLog << "Impossible pin mode!" << std::endl;
             exit(42);
     }
 }
 
-void DigitalPin::disable(WiringControl& wiringControl) {
+void DigitalPin::disable(WiringControl &wiringControl) {
     switch (enableType) {
         case ActiveHigh:
             wiringControl.digitalWrite(gpioNumber, Low);
@@ -45,123 +43,118 @@ void DigitalPin::disable(WiringControl& wiringControl) {
             wiringControl.digitalWrite(gpioNumber, High);
             break;
         default:
-            std::cerr << "Impossible pin mode!" << std::endl;
+            errorLog << "Impossible pin mode!" << std::endl;
             exit(42);
     }
 }
 
-bool DigitalPin::enabled(WiringControl& wiringControl) {
+bool DigitalPin::enabled(WiringControl &wiringControl) {
     switch (enableType) {
         case ActiveHigh:
             return wiringControl.digitalRead(gpioNumber) == High;
         case ActiveLow:
             return wiringControl.digitalRead(gpioNumber) == Low;
         default:
-            std::cerr << "Impossible pin enable type! Exiting." << std::endl;
+            errorLog << "Impossible pin enable type! Exiting." << std::endl;
             exit(42);
     }
 }
 
-int DigitalPin::read(WiringControl& wiringControl) {
+int DigitalPin::read(WiringControl &wiringControl) {
     return wiringControl.digitalRead(gpioNumber);
 }
 
-void PwmPin::setPwm(int pulseWidth, WiringControl& wiringControl, std::ofstream &logFile) {
+void PwmPin::setPwm(int pulseWidth, WiringControl &wiringControl) {
     setPowerAndDirection(pulseWidth, wiringControl);
     std::time_t currentTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    logFile << "Current time: " << std::ctime(&currentTime) << std::endl;
-    logFile << "Thruster at pin " << gpioNumber << ": " << pulseWidth << std::endl;
+    outLog << "Current time: " << std::ctime(&currentTime) << std::endl;
+    outLog << "Thruster at pin " << gpioNumber << ": " << pulseWidth << std::endl;
 }
 
-HardwarePwmPin::HardwarePwmPin(int gpioNumber): PwmPin(gpioNumber) {}
 
-void HardwarePwmPin::initialize(WiringControl& wiringControl) {
+void HardwarePwmPin::initialize(WiringControl &wiringControl) {
     wiringControl.setPinType(gpioNumber, HardwarePWM);
 }
 
-void HardwarePwmPin::enable(WiringControl& wiringControl) {
+void HardwarePwmPin::enable(WiringControl &wiringControl) {
     wiringControl.pwmWriteMaximum(gpioNumber);
 }
 
-void HardwarePwmPin::disable(WiringControl& wiringControl) {
+void HardwarePwmPin::disable(WiringControl &wiringControl) {
     wiringControl.pwmWriteOff(gpioNumber);
 }
 
-bool HardwarePwmPin::enabled(WiringControl& wiringControl) {
+bool HardwarePwmPin::enabled(WiringControl &wiringControl) {
     return wiringControl.pwmRead(gpioNumber).pulseWidth != 1500;
 }
 
-void HardwarePwmPin::setPowerAndDirection(int pwmValue, WiringControl& wiringControl) {
+void HardwarePwmPin::setPowerAndDirection(int pwmValue, WiringControl &wiringControl) {
     wiringControl.pwmWrite(gpioNumber, pwmValue);
 }
 
-int HardwarePwmPin::read(WiringControl& wiringControl) {
+int HardwarePwmPin::read(WiringControl &wiringControl) {
     return wiringControl.pwmRead(gpioNumber).pulseWidth;
 }
 
-SoftwarePwmPin::SoftwarePwmPin(int gpioNumber): PwmPin(gpioNumber) {}
 
-void SoftwarePwmPin::initialize(WiringControl& wiringControl) {
+void SoftwarePwmPin::initialize(WiringControl &wiringControl) {
     wiringControl.setPinType(gpioNumber, SoftwarePWM);
 }
 
-void SoftwarePwmPin::enable(WiringControl& wiringControl) {
+void SoftwarePwmPin::enable(WiringControl &wiringControl) {
     wiringControl.pwmWriteMaximum(gpioNumber);
 }
 
-void SoftwarePwmPin::disable(WiringControl& wiringControl) {
+void SoftwarePwmPin::disable(WiringControl &wiringControl) {
     wiringControl.pwmWriteOff(gpioNumber);
 }
 
-bool SoftwarePwmPin::enabled(WiringControl& wiringControl) {
+bool SoftwarePwmPin::enabled(WiringControl &wiringControl) {
     return wiringControl.pwmRead(gpioNumber).pulseWidth != 1500;
 }
 
-void SoftwarePwmPin::setPowerAndDirection(int pwmValue, WiringControl& wiringControl) {
+void SoftwarePwmPin::setPowerAndDirection(int pwmValue, WiringControl &wiringControl) {
     wiringControl.pwmWrite(gpioNumber, pwmValue);
 }
 
-int SoftwarePwmPin::read(WiringControl& wiringControl) {
+int SoftwarePwmPin::read(WiringControl &wiringControl) {
     return wiringControl.pwmRead(gpioNumber).pulseWidth;
 }
 
-Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<PwmPin*> thrusterPins, std::vector<DigitalPin*> digitalPins):
-                                                thrusterPins(std::move(thrusterPins)), digitalPins(std::move(digitalPins)) {
+Command_Interpreter_RPi5::Command_Interpreter_RPi5(std::vector<PwmPin *> thrusterPins,
+                                                   std::vector<DigitalPin *> digitalPins,
+                                                   const WiringControl &wiringControl, std::ostream &output,
+                                                   std::ostream &outLog, std::ostream &errorLog) :
+        thrusterPins(std::move(thrusterPins)), digitalPins(std::move(digitalPins)), wiringControl(wiringControl),
+        errorLog(errorLog),
+        outLog(outLog), output(output) {
     if (this->thrusterPins.size() != 8) {
-        std::cerr << "Incorrect number of thruster pwm pins given! Need 8, given " << this->thrusterPins.size() << std::endl;
+        errorLog << "Incorrect number of thruster pwm pins given! Need 8, given " << this->thrusterPins.size()
+                 << std::endl;
         exit(42);
     }
 }
 
-std::vector<Pin*> Command_Interpreter_RPi5::allPins() {
-    auto allPins = std::vector<Pin*>{};
+std::vector<Pin *> Command_Interpreter_RPi5::allPins() {
+    auto allPins = std::vector<Pin *>{};
     allPins.insert(allPins.end(), this->thrusterPins.begin(), this->thrusterPins.end());
     allPins.insert(allPins.end(), this->digitalPins.begin(), this->digitalPins.end());
     return allPins;
 }
 
 void Command_Interpreter_RPi5::initializePins() {
-    if (!wiringControl.initializeGPIO()) {
-        std::cerr << "Failure to configure GPIO pins!" << std::endl;
-        std::cerr << "Executive Main Loop shutting down" << std::endl;
+    if (!wiringControl.initializeSerial()) {
+        errorLog << "Failure to configure serial!" << std::endl;
         exit(42);
     }
-    for (Pin* pin : allPins()) {
+    for (Pin *pin: allPins()) {
         pin->initialize(wiringControl);
-    }
-}
-
-void Command_Interpreter_RPi5::execute(pwm_array thrusterPwms, std::ofstream& logFile) {
-    int i = 0;
-    for (int pulseWidth : thrusterPwms.pwm_signals) {
-        thrusterPins.at(i)->setPwm(pulseWidth, wiringControl, logFile);
-        i++;
     }
 }
 
 std::vector<int> Command_Interpreter_RPi5::readPins() {
     std::vector<int> pinValues;
-    for (auto pin : allPins()) {
+    for (auto pin: allPins()) {
         pinValues.push_back(pin->read(wiringControl));
     }
     return pinValues;
@@ -173,28 +166,21 @@ Command_Interpreter_RPi5::~Command_Interpreter_RPi5() {
     }
 }
 
-//move_forwards(float distance, std::ofstream logfile) {
-//    command = calculate_stuff(distance, current_robot_data);
-//    blind_execute(command.accel_command, logfile); //accel
-//    blind_execute(command.ss_command, logfile); //stead-state
-//    blind_execute(command.dec_command, logfile); //decel
-//    // At this point, a new thread/command sends new commands. This can be stop, or it can be a new direction, etc.
-//}
-
-void Command_Interpreter_RPi5::blind_execute(const CommandComponent& commandComponent, std::ofstream& logfile) {
+void Command_Interpreter_RPi5::blind_execute(const CommandComponent &commandComponent) {
     auto endTime = std::chrono::system_clock::now() + commandComponent.duration;
     auto currentTime = std::chrono::system_clock::now();
-    execute(commandComponent.thruster_pwms, logfile);
-    while (currentTime < endTime && !isInterruptBlind_Execute) {
+    untimed_execute(commandComponent.thruster_pwms);
+    while (currentTime < endTime) {
+
         currentTime = std::chrono::system_clock::now();
     }
     isInterruptBlind_Execute = false;
 }
 
-//void Command_Interpreter_RPi5::corrective_execute(command_component command, std::ofstream logfile) {
-//    adjusted_command = copy(command)
-//    while (!time_is_up()) {
-//        adjusted_command = correct_command();
-//        execute(command);
-//    }
-//}
+void Command_Interpreter_RPi5::untimed_execute(pwm_array thrusterPwms) {
+    int i = 0;
+    for (int pulseWidth: thrusterPwms.pwm_signals) {
+        thrusterPins.at(i)->setPwm(pulseWidth, wiringControl);
+        i++;
+    }
+}
