@@ -1,10 +1,11 @@
 // William Barber
-#include "Command_Interpreter.h"
-#include "Wiring.h"
 #include <iostream>
 #include <fstream>
 #include <ctime>
 #include <utility>
+#include "Serial.h"
+#include "Command_Interpreter.h"
+#include "Wiring.h"
 
 void DigitalPin::initialize(WiringControl &wiringControl) {
     switch (enableType) {
