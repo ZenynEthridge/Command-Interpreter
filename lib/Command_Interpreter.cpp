@@ -172,8 +172,10 @@ void Command_Interpreter_RPi5::blind_execute(const CommandComponent &commandComp
     auto currentTime = std::chrono::system_clock::now();
     untimed_execute(commandComponent.thruster_pwms);
     while (currentTime < endTime) {
+
         currentTime = std::chrono::system_clock::now();
     }
+    isInterruptBlind_Execute = false;
 }
 
 void Command_Interpreter_RPi5::untimed_execute(pwm_array thrusterPwms) {
