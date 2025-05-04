@@ -1,10 +1,11 @@
 // William Barber
-#include "Command_Interpreter.h"
-#include "Wiring.h"
 #include <iostream>
 #include <fstream>
 #include <ctime>
 #include <utility>
+#include "Serial.h"
+#include "Command_Interpreter.h"
+#include "Wiring.h"
 
 void DigitalPin::initialize(WiringControl &wiringControl) {
     switch (enableType) {
@@ -174,7 +175,6 @@ void Command_Interpreter_RPi5::blind_execute(const CommandComponent &commandComp
 
         currentTime = std::chrono::system_clock::now();
     }
-    isInterruptBlind_Execute = false;
 }
 
 void Command_Interpreter_RPi5::untimed_execute(pwm_array thrusterPwms) {

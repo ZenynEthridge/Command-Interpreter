@@ -3,32 +3,7 @@
 
 #ifndef MOCK_RPI
 
-#include <wiringSerial.h>
-
-void echoOn(int serial) {
-    serialPuts(serial, "echo on\n");
-}
-
-
-bool initializeSerial(int *serial) {
-    if ((*serial = serialOpen("/dev/serial/by-id/usb-MicroPython_Board_in_FS_mode_e6614864d3798738-if00", 115200)) <
-        0) {
-        return false;
-    }
-    echoOn(*serial);
-    return true;
-}
-
-int getSerialChar(int *serial) {
-    if (*serial == -1) {
-        if (!initializeSerial
-                (serial)) {
-            std::cerr << "Unable to open serial port! Exiting." << std::endl;
-            exit(42);
-        }
-    }
-    return serialGetchar(*serial); // from wiringSerial
-}
+#include "Serial.h"
 
 #else
 
