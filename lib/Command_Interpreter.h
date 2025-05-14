@@ -5,6 +5,8 @@
 #include "Wiring.h"
 #include <vector>
 #include <fstream>
+#include <array>
+#include <algorithm>
 
 ///@brief Whether a digital pin is active high or active low
 enum EnableType {
@@ -186,7 +188,7 @@ public:
     /// @brief Executes a command by sending the specified pwm values to the Pico for the specified duration
     /// @param thrusterPwms a C-style array of pwm frequency integers
     void untimed_execute(pwm_array thrusterPwms);
-
+    void untimed_execute(const std::array<int, 8>& pwms);
     /// @brief Executes a command without self-correction. Sets pwm values for the duration specified. Does not stop
     /// thrusters after execution.
     /// @param command a command struct with three sub-components: the acceleration, steady-state, and deceleration.

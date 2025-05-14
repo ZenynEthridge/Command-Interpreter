@@ -171,7 +171,7 @@ void Command_Interpreter_RPi5::blind_execute(const CommandComponent &commandComp
     auto endTime = std::chrono::system_clock::now() + commandComponent.duration;
     auto currentTime = std::chrono::system_clock::now();
     untimed_execute(commandComponent.thruster_pwms);
-    while (currentTime < endTime && !interruptBlind_Execute) {
+    while (currentTime < endTime && !isInterruptBlind_Execute) {
         currentTime = std::chrono::system_clock::now();
     }
     isInterruptBlind_Execute = false;
@@ -183,4 +183,11 @@ void Command_Interpreter_RPi5::untimed_execute(pwm_array thrusterPwms) {
         thrusterPins.at(i)->setPwm(pulseWidth, wiringControl);
         i++;
     }
+}
+
+void Command_Interpreter_RPi5::untimed_execute(const std::array<int, 8>& pwms){
+    pwm_array a;
+    std::copy(pwms.begin(), pwms.end(), a.pwm_signals);
+    untimed_execute(a);
+
 }
